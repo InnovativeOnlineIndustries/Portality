@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -19,8 +18,8 @@ public class BlockTile<T extends TileEntity> extends BlockBasic {
 
     private final Class<T> tileClass;
 
-    public BlockTile(ResourceLocation resourceLocation, Class<T> tileClass, Material materialIn) {
-        super(resourceLocation, materialIn);
+    public BlockTile(String name, Class<T> tileClass, Material materialIn) {
+        super(name, materialIn);
         this.tileClass = tileClass;
     }
 

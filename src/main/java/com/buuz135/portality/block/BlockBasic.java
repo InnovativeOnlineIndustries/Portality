@@ -1,6 +1,6 @@
 package com.buuz135.portality.block;
 
-import com.buuz135.litterboxlib.api.IRegisterable;
+import com.buuz135.portality.Portality;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -9,20 +9,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class BlockBasic extends Block implements IRegisterable<Block> {
+import java.util.ArrayList;
+import java.util.List;
 
-    public BlockBasic(ResourceLocation resourceLocation, Material materialIn) {
+public class BlockBasic extends Block {
+
+    public static final List<BlockBasic> BLOCKS = new ArrayList<>();
+
+    public BlockBasic(String name, Material materialIn) {
         super(materialIn);
-        this.setRegistryName(resourceLocation);
-        this.setUnlocalizedName(resourceLocation.toString());
+        this.setRegistryName(new ResourceLocation(Portality.MOD_ID, name));
+        this.setUnlocalizedName(getRegistryName().toString());
+        this.setCreativeTab(Portality.TAB);
+        BLOCKS.add(this);
     }
 
-    @Override
     public void registerObject(IForgeRegistry<Block> registry) {
         registry.register(this);
     }
 
-    @Override
     public void registerRender() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(this.getRegistryName(), "inventory"));
     }

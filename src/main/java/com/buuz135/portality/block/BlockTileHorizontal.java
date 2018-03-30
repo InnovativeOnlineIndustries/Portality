@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -16,8 +15,8 @@ public class BlockTileHorizontal<T extends TileEntity> extends BlockTile<T> {
 
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
 
-    public BlockTileHorizontal(ResourceLocation resourceLocation, Class<T> tileClass, Material materialIn) {
-        super(resourceLocation, tileClass, materialIn);
+    public BlockTileHorizontal(String name, Class<T> tileClass, Material materialIn) {
+        super(name, tileClass, materialIn);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
     }
 
