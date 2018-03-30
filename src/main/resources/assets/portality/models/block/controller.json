@@ -1,0 +1,12 @@
+{
+  "parent": "portality:block/util_cube_glow_2_sided",
+  "textures": {
+    "all": "portality:blocks/base/base_all",
+    "glow_down": "portality:blocks/frame/frame",
+    "glow_up": "portality:blocks/controller/controller_top",
+    "glow_north": "portality:blocks/controller/controller_front",
+    "glow_east": "portality:blocks/frame/frame",
+    "glow_south": "portality:blocks/frame/frame",
+    "glow_west": "portality:blocks/frame/frame"
+  }
+}
