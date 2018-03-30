@@ -1,7 +1,6 @@
 package com.buuz135.portality;
 
 import com.buuz135.portality.block.BlockBasic;
-import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -32,11 +31,10 @@ public class Portality {
     @Mod.Instance(MOD_ID)
     public static Portality INSTANCE;
 
-    public static final BlockController BLOCK_CONTROLLER = new BlockController();
     public static final CreativeTabs TAB = new CreativeTabs(MOD_ID) {
         @Override
         public ItemStack getTabIconItem() {
-            return new ItemStack(BLOCK_CONTROLLER);
+            return new ItemStack(CommonProxy.BLOCK_CONTROLLER);
         }
     };
     @SidedProxy(clientSide = "com.buuz135.portality.proxy.client.ClientProxy", serverSide = "com.buuz135.portality.proxy.CommonProxy")
