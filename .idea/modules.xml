@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Portality.iml" filepath="$PROJECT_DIR$/Portality.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Portality_api.iml" filepath="$PROJECT_DIR$/.idea/modules/Portality_api.iml" group="Portality" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Portality_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Portality_main.iml" group="Portality" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Portality_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Portality_test.iml" group="Portality" />
+    </modules>
+  </component>
+</project>

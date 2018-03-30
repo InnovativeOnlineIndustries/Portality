@@ -1,0 +1,19 @@
+[
+  {
+    "modid": "portality",
+    "name": "Portality",
+    "description": "Thinking through portals",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Buuz135"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+    ]
+  }
+]
