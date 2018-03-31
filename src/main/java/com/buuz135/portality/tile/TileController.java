@@ -26,15 +26,11 @@ public class TileController extends TileBase implements ITickable {
     private int length = 0;
     private PortalInformation information;
 
-    public TileController() {
-        getPortalInfo();
-    }
 
     @Override
     public void update() {
         if (world.isRemote) return;
         ++tick;
-
         if (tick >= 10) {
             tick = 0;
             length = checkArea();
@@ -49,7 +45,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setBoolean(NBT_FORMED, isFormed);
         compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
-        compound.setTag(NBT_PORTAL, information.writetoNBT());
+        if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
         return compound;
     }
 
@@ -58,7 +54,8 @@ public class TileController extends TileBase implements ITickable {
         isFormed = compound.getBoolean(NBT_FORMED);
         tick = compound.getInteger(NBT_TICK);
         length = compound.getInteger(NBT_LENGTH);
-        information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
+        if (compound.hasKey(NBT_PORTAL))
+            information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
         super.readFromNBT(compound);
     }
 

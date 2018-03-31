@@ -36,11 +36,17 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         GlStateManager.translate(x, y, z);
         //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
         EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockController.FACING);
-        boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
-        if (!isSouthNorth) {
-            GlStateManager.translate(-2, 0, 1);
+        if (facing == EnumFacing.SOUTH) {
+            GlStateManager.translate(1, 0, 1);
+            GlStateManager.rotate(-180, 0, 1, 0);
+        }
+        if (facing == EnumFacing.EAST) {
+            GlStateManager.translate(1, 0, 0);
+            GlStateManager.rotate(-90, 0, 1, 0);
+        }
+        if (facing == EnumFacing.WEST) {
+            GlStateManager.translate(0, 0, 1);
             GlStateManager.rotate(90, 0, 1, 0);
-
         }
         double frame = ClientProxy.TICK / 80D;
         //TOP

@@ -47,6 +47,6 @@ public class GuiController extends GuiContainer {
         fontRenderer.drawString("Private: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
         fontRenderer.drawString("Max Distance: " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
         fontRenderer.drawString("Interdimensional: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
-        fontRenderer.drawString("Power: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
+        fontRenderer.drawString("Power: " + 0, 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
     }
 }
