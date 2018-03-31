@@ -6,8 +6,14 @@ import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class GuiController extends GuiContainer {
 
@@ -15,7 +21,6 @@ public class GuiController extends GuiContainer {
 
     public GuiController(ContainerController inventorySlotsIn) {
         super(inventorySlotsIn);
-        this.addButton(new GuiButton(0, this.guiLeft, this.guiTop, "Call Portal"));
     }
 
     @Override
@@ -24,6 +29,19 @@ public class GuiController extends GuiContainer {
         this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, "Call Portal"));
         this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22, 166, 20, "Single Portal Call"));
         this.addButton(new GuiButton(2, this.guiLeft + 5, this.guiTop + 96 + 22 * 2, 166, 20, "Force Portal Call"));
+        this.addButton(new TooltipGuiButton(3, this.guiLeft - 21, this.guiTop + 17, 20, 20, "") {
+            @Override
+            public List<String> getTooltip() {
+                return Arrays.asList("Change name");
+            }
+        });
+        this.addButton(new TooltipGuiButton(4, this.guiLeft - 21, this.guiTop + 17 + 21, 20, 20, "") {
+            @Override
+            public List<String> getTooltip() {
+                ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
+                return containerController.getController().isPrivate() ? Arrays.asList("Make portal public") : Arrays.asList("Make portal private");
+            }
+        });
     }
 
     @Override
@@ -34,6 +52,7 @@ public class GuiController extends GuiContainer {
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
         drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+
     }
 
     @Override
@@ -48,5 +67,14 @@ public class GuiController extends GuiContainer {
         fontRenderer.drawString("Max Distance: " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
         fontRenderer.drawString("Interdimensional: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
         fontRenderer.drawString("Power: " + 0, 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
+
+        this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.SIGN), -19, 19);
+        this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Blocks.TRIPWIRE_HOOK), -19, 19 + 20);
+
+        for (GuiButton button : this.buttonList) {
+            if (button instanceof TooltipGuiButton && button.isMouseOver()) {
+                this.drawHoveringText(((TooltipGuiButton) button).getTooltip(), mouseX - this.guiLeft, mouseY - this.guiTop);
+            }
+        }
     }
 }
