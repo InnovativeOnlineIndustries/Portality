@@ -27,7 +27,6 @@ public class TileController extends TileBase implements ITickable {
         ++tick;
         if (tick >= 10) {
             tick = 0;
-
             length = checkArea();
             markForUpdate();
         }
