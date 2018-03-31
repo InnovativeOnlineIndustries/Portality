@@ -55,6 +55,16 @@ public class PortalDataManager extends WorldSavedData {
         return null;
     }
 
+    public static void setPortalPrivacy(World world, BlockPos pos, boolean privacy) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) {
+                information.setPrivate(privacy);
+                dataManager.markDirty();
+            }
+        }
+    }
+
     @Nonnull
     public static PortalDataManager getData(World world) {
         PortalDataManager data = (PortalDataManager) world.getMapStorage().getOrLoadData(PortalDataManager.class, NAME);

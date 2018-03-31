@@ -97,6 +97,12 @@ public class TileController extends TileBase implements ITickable {
         information = PortalDataManager.getInfoFromPos(this.world, this.pos);
     }
 
+    public void togglePrivacy() {
+        PortalDataManager.setPortalPrivacy(this.world, this.pos, !information.isPrivate());
+        getPortalInfo();
+        markForUpdate();
+    }
+
     public boolean isFormed() {
         return length >= 3;
     }

@@ -8,8 +8,14 @@ import com.buuz135.portality.tile.TileController;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
@@ -38,5 +44,24 @@ public class BlockController extends BlockTileHorizontal<TileController> {
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
         super.onBlockDestroyedByPlayer(worldIn, pos, state);
         PortalDataManager.removeInformation(worldIn, pos);
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if (tile != null && tile instanceof TileController) {
+            TileController controller = (TileController) tile;
+            if (!controller.isFormed()) {
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: Portal needs to be 3 blocks deep!"), true);
+                return true;
+            }
+            System.out.println(controller.getOwner());
+            System.out.println(playerIn.getUniqueID());
+            if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: This portal is private!"), true);
+                return true;
+            }
+        }
+        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 }

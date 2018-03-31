@@ -1,8 +1,10 @@
 package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
+import com.buuz135.portality.network.PortalPrivacyToggleMessage;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.util.BlockPosUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -36,6 +38,14 @@ public class GuiController extends GuiContainer {
             }
         });
         this.addButton(new TooltipGuiButton(4, this.guiLeft - 21, this.guiTop + 17 + 21, 20, 20, "") {
+
+            @Override
+            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
+                Portality.NETWORK.sendToServer(new PortalPrivacyToggleMessage(containerController.getController().getPos().toLong()));
+                return super.mousePressed(mc, mouseX, mouseY);
+            }
+
             @Override
             public List<String> getTooltip() {
                 ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
