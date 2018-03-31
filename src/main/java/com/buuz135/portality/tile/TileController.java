@@ -26,10 +26,15 @@ public class TileController extends TileBase implements ITickable {
     private int length = 0;
     private PortalInformation information;
 
+    public TileController() {
+        getPortalInfo();
+    }
+
     @Override
     public void update() {
         if (world.isRemote) return;
         ++tick;
+
         if (tick >= 10) {
             tick = 0;
             length = checkArea();
@@ -96,7 +101,7 @@ public class TileController extends TileBase implements ITickable {
     }
 
     public boolean isFormed() {
-        return isFormed;
+        return length >= 3;
     }
 
     public int getTick() {

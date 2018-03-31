@@ -1,6 +1,7 @@
 package com.buuz135.portality.proxy.client.render;
 
 import com.buuz135.portality.Portality;
+import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.proxy.client.ClientProxy;
 import com.buuz135.portality.tile.TileController;
 import net.minecraft.client.Minecraft;
@@ -10,6 +11,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -18,7 +20,7 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
     @Override
     public void render(TileController te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         super.render(te, x, y, z, partialTicks, destroyStage, alpha);
-        if (te.getLength() == 0) return;
+        if (!te.isFormed()) return;
         GlStateManager.pushMatrix();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -33,7 +35,13 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/blocks/frame/frame.png"));
         GlStateManager.translate(x, y, z);
         //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
+        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockController.FACING);
+        boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
+        if (!isSouthNorth) {
+            GlStateManager.translate(-2, 0, 1);
+            GlStateManager.rotate(90, 0, 1, 0);
 
+        }
         double frame = ClientProxy.TICK / 80D;
         //TOP
         renderTop(tessellator, buffer, te, x, y, z, frame, j, k);

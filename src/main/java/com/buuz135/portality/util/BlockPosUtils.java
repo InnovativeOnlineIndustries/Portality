@@ -19,4 +19,8 @@ public class BlockPosUtils {
         }
         return blocks;
     }
+
+    public static int getMaxDistance(int length) {
+        return length * 200;
+    }
 }
