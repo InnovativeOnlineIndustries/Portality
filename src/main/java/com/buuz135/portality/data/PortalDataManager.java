@@ -33,7 +33,7 @@ public class PortalDataManager extends WorldSavedData {
 
     public static void removeInformation(World world, BlockPos blockPos) {
         PortalDataManager dataManager = getData(world);
-        dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos) || information1.getLocation().equals(BlockPos.ORIGIN));
+        dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos));
         dataManager.markDirty();
     }
 
@@ -42,6 +42,15 @@ public class PortalDataManager extends WorldSavedData {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getId().equals(uuid)) return information;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static PortalInformation getInfoFromPos(World world, BlockPos pos) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) return information;
         }
         return null;
     }
@@ -62,8 +71,7 @@ public class PortalDataManager extends WorldSavedData {
         NBTTagCompound root = nbt.getCompoundTag(NAME);
         for (String key : root.getKeySet()) {
             NBTTagCompound info = root.getCompoundTag(key);
-            informationList.add(new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                    info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position"))));
+            informationList.add(PortalInformation.readFromNBT(info));
         }
     }
 
@@ -71,14 +79,7 @@ public class PortalDataManager extends WorldSavedData {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         NBTTagCompound tag = new NBTTagCompound();
         for (PortalInformation information : informationList) {
-            NBTTagCompound infoTag = new NBTTagCompound();
-            infoTag.setUniqueId("ID", information.getId());
-            infoTag.setUniqueId("Owner", information.getOwner());
-            infoTag.setBoolean("Active", information.isActive());
-            infoTag.setBoolean("Private", information.isPrivate());
-            infoTag.setInteger("Dimension", information.getDimension());
-            infoTag.setLong("Position", information.getLocation().toLong());
-            tag.setTag(information.getId().toString(), infoTag);
+            tag.setTag(information.getId().toString(), information.writetoNBT());
         }
         compound.setTag(NAME, tag);
         return compound;

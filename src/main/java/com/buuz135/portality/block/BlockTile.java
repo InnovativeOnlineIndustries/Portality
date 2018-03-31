@@ -1,5 +1,6 @@
 package com.buuz135.portality.block;
 
+import com.buuz135.portality.Portality;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -17,10 +18,12 @@ import javax.annotation.Nullable;
 public class BlockTile<T extends TileEntity> extends BlockBasic {
 
     private final Class<T> tileClass;
+    private final int guiID;
 
-    public BlockTile(String name, Class<T> tileClass, Material materialIn) {
+    public BlockTile(String name, Class<T> tileClass, Material materialIn, int guiID) {
         super(name, materialIn);
         this.tileClass = tileClass;
+        this.guiID = guiID;
     }
 
     @Override
@@ -47,6 +50,10 @@ public class BlockTile<T extends TileEntity> extends BlockBasic {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (!worldIn.isRemote) {
+            playerIn.openGui(Portality.INSTANCE, guiID, worldIn, pos.getX(), pos.getY(), pos.getZ());
+
+        }
         return true;
     }
 }

@@ -2,6 +2,8 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
+import com.buuz135.portality.data.PortalDataManager;
+import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -10,16 +12,19 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TileController extends TileBase implements ITickable {
 
     private static String NBT_FORMED = "Formed";
     private static String NBT_TICK = "Tick";
     private static String NBT_LENGTH = "Length";
+    private static String NBT_PORTAL = "Portal";
 
     private boolean isFormed = false;
     private int tick = 0;
     private int length = 0;
+    private PortalInformation information;
 
     @Override
     public void update() {
@@ -28,6 +33,7 @@ public class TileController extends TileBase implements ITickable {
         if (tick >= 10) {
             tick = 0;
             length = checkArea();
+            getPortalInfo();
             markForUpdate();
         }
     }
@@ -38,6 +44,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setBoolean(NBT_FORMED, isFormed);
         compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
+        compound.setTag(NBT_PORTAL, information.writetoNBT());
         return compound;
     }
 
@@ -46,6 +53,7 @@ public class TileController extends TileBase implements ITickable {
         isFormed = compound.getBoolean(NBT_FORMED);
         tick = compound.getInteger(NBT_TICK);
         length = compound.getInteger(NBT_LENGTH);
+        information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
         super.readFromNBT(compound);
     }
 
@@ -83,6 +91,10 @@ public class TileController extends TileBase implements ITickable {
         return new AxisAlignedBB(corner1, corner2);
     }
 
+    private void getPortalInfo() {
+        information = PortalDataManager.getInfoFromPos(this.world, this.pos);
+    }
+
     public boolean isFormed() {
         return isFormed;
     }
@@ -93,5 +105,19 @@ public class TileController extends TileBase implements ITickable {
 
     public int getLength() {
         return length;
+    }
+
+    public boolean isPrivate() {
+        return information != null && information.isPrivate();
+    }
+
+    public UUID getOwner() {
+        if (information != null) return information.getOwner();
+        return null;
+    }
+
+    public String getName() {
+        if (information != null) return information.getName();
+        return "";
     }
 }

@@ -15,8 +15,8 @@ public class BlockTileHorizontal<T extends TileEntity> extends BlockTile<T> {
 
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
 
-    public BlockTileHorizontal(String name, Class<T> tileClass, Material materialIn) {
-        super(name, tileClass, materialIn);
+    public BlockTileHorizontal(String name, Class<T> tileClass, Material materialIn, int guiID) {
+        super(name, tileClass, materialIn, guiID);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
     }
 
