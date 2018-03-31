@@ -5,6 +5,7 @@ import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.network.PortalPrivacyToggleMessage;
+import com.buuz135.portality.network.PortalRenameMessage;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -20,6 +21,7 @@ public class CommonProxy {
         NetworkRegistry.INSTANCE.registerGuiHandler(Portality.INSTANCE, new GuiHandler());
         int id = 0;
         Portality.NETWORK.registerMessage(PortalPrivacyToggleMessage.PortalPrivacyToggleHandler.class, PortalPrivacyToggleMessage.class, id++, Side.SERVER);
+        Portality.NETWORK.registerMessage(PortalRenameMessage.PortalRenameHandler.class, PortalRenameMessage.class, id++, Side.SERVER);
     }
 
     public void onInit(FMLInitializationEvent event) {

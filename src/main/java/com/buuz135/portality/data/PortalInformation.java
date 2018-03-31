@@ -25,6 +25,11 @@ public class PortalInformation {
         this.name = name;
     }
 
+    public static PortalInformation readFromNBT(NBTTagCompound info) {
+        return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
+                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"));
+    }
+
     public UUID getId() {
         return id;
     }
@@ -55,11 +60,6 @@ public class PortalInformation {
 
     public BlockPos getLocation() {
         return location;
-    }
-
-    public static PortalInformation readFromNBT(NBTTagCompound info) {
-        return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"));
     }
 
     public String getName() {

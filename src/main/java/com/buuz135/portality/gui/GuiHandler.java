@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 public class GuiHandler implements IGuiHandler {
 
     public static final int CONTROLLER = 0;
+    public static final int CONTROLLER_RENAME = 1;
 
     @Nullable
     @Override
@@ -29,6 +30,8 @@ public class GuiHandler implements IGuiHandler {
         switch (ID) {
             case CONTROLLER:
                 return new GuiController((ContainerController) getServerGuiElement(ID, player, world, x, y, z));
+            case CONTROLLER_RENAME:
+                return new GuiControllerRename((ContainerController) getServerGuiElement(CONTROLLER, player, world, x, y, z));
             default:
                 return null;
         }

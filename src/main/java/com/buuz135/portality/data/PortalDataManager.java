@@ -65,6 +65,16 @@ public class PortalDataManager extends WorldSavedData {
         }
     }
 
+    public static void setPortalName(World world, BlockPos pos, String name) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) {
+                information.setName(name);
+                dataManager.markDirty();
+            }
+        }
+    }
+
     @Nonnull
     public static PortalDataManager getData(World world) {
         PortalDataManager data = (PortalDataManager) world.getMapStorage().getOrLoadData(PortalDataManager.class, NAME);

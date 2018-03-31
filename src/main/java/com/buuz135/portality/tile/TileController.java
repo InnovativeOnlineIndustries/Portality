@@ -128,4 +128,10 @@ public class TileController extends TileBase implements ITickable {
         if (information != null) return information.getName();
         return "";
     }
+
+    public void setName(String name) {
+        PortalDataManager.setPortalName(this.world, this.getPos(), name);
+        getPortalInfo();
+        markForUpdate();
+    }
 }

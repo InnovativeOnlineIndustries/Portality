@@ -29,18 +29,15 @@ public class Portality {
     public static final String MOD_ID = "portality";
     public static final String MOD_NAME = "Portality";
     public static final String VERSION = "1.0-SNAPSHOT";
-
-    @Mod.Instance(MOD_ID)
-    public static Portality INSTANCE;
-
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
-
     public static final CreativeTabs TAB = new CreativeTabs(MOD_ID) {
         @Override
         public ItemStack getTabIconItem() {
             return new ItemStack(CommonProxy.BLOCK_CONTROLLER);
         }
     };
+    @Mod.Instance(MOD_ID)
+    public static Portality INSTANCE;
     @SidedProxy(clientSide = "com.buuz135.portality.proxy.client.ClientProxy", serverSide = "com.buuz135.portality.proxy.CommonProxy")
     public static CommonProxy proxy;
 

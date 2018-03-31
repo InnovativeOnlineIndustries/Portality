@@ -55,8 +55,6 @@ public class BlockController extends BlockTileHorizontal<TileController> {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: Portal needs to be 3 blocks deep!"), true);
                 return true;
             }
-            System.out.println(controller.getOwner());
-            System.out.println(playerIn.getUniqueID());
             if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: This portal is private!"), true);
                 return true;
