@@ -5,6 +5,7 @@ import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.util.BlockPosUtils;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -131,6 +132,17 @@ public class TileController extends TileBase implements ITickable {
 
     public void setName(String name) {
         PortalDataManager.setPortalName(this.world, this.getPos(), name);
+        getPortalInfo();
+        markForUpdate();
+    }
+
+    public ItemStack getDisplay() {
+        if (information != null) return information.getDisplay();
+        return ItemStack.EMPTY;
+    }
+
+    public void setDisplay(ItemStack display) {
+        PortalDataManager.setPortalDisplay(this.world, this.pos, display);
         getPortalInfo();
         markForUpdate();
     }

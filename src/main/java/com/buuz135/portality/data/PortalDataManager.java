@@ -1,5 +1,6 @@
 package com.buuz135.portality.data;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -70,6 +71,16 @@ public class PortalDataManager extends WorldSavedData {
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setName(name);
+                dataManager.markDirty();
+            }
+        }
+    }
+
+    public static void setPortalDisplay(World world, BlockPos pos, ItemStack stack) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) {
+                information.setDisplay(stack);
                 dataManager.markDirty();
             }
         }

@@ -3,6 +3,7 @@ package com.buuz135.portality.block;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiHandler;
+import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
 import net.minecraft.block.material.Material;
@@ -35,7 +36,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.provider.getDimension(), pos, "Dim: " + worldIn.provider.getDimension() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ());
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.provider.getDimension(), pos, "Dim: " + worldIn.provider.getDimension() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME));
         PortalDataManager.addInformation(worldIn, information);
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
@@ -57,6 +58,11 @@ public class BlockController extends BlockTileHorizontal<TileController> {
             }
             if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: This portal is private!"), true);
+                return true;
+            }
+            if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + "Portal icon changed!"), true);
+                controller.setDisplay(playerIn.getHeldItem(hand));
                 return true;
             }
         }

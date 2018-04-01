@@ -1,5 +1,6 @@
 package com.buuz135.portality.data;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
@@ -14,8 +15,9 @@ public class PortalInformation {
     private boolean isPrivate;
     private int dimension;
     private BlockPos location;
+    private ItemStack display;
 
-    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name) {
+    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name, ItemStack display) {
         this.id = id;
         this.owner = owner;
         this.isActive = isActive;
@@ -23,11 +25,12 @@ public class PortalInformation {
         this.dimension = dimension;
         this.location = location;
         this.name = name;
+        this.display = display;
     }
 
     public static PortalInformation readFromNBT(NBTTagCompound info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"));
+                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), new ItemStack(info.getCompoundTag("Display")));
     }
 
     public UUID getId() {
@@ -70,6 +73,14 @@ public class PortalInformation {
         this.name = name;
     }
 
+    public ItemStack getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(ItemStack display) {
+        this.display = display;
+    }
+
     public NBTTagCompound writetoNBT() {
         NBTTagCompound infoTag = new NBTTagCompound();
         infoTag.setUniqueId("ID", getId());
@@ -79,6 +90,7 @@ public class PortalInformation {
         infoTag.setInteger("Dimension", getDimension());
         infoTag.setLong("Position", getLocation().toLong());
         infoTag.setString("Name", getName());
+        infoTag.setTag("Display", display.serializeNBT());
         return infoTag;
     }
 

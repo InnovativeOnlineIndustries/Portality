@@ -7,9 +7,13 @@ import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.network.PortalNetworkMessage;
 import com.buuz135.portality.network.PortalPrivacyToggleMessage;
 import com.buuz135.portality.network.PortalRenameMessage;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -25,6 +29,8 @@ public class CommonProxy {
         Portality.NETWORK.registerMessage(PortalRenameMessage.PortalRenameHandler.class, PortalRenameMessage.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalNetworkMessage.HandleRequest.class, PortalNetworkMessage.Request.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalNetworkMessage.HandleResponse.class, PortalNetworkMessage.Response.class, id++, Side.CLIENT);
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public void onInit(FMLInitializationEvent event) {
@@ -33,5 +39,12 @@ public class CommonProxy {
 
     public void onPostInit(FMLPostInitializationEvent event) {
 
+    }
+
+    @SubscribeEvent
+    public void onInteract(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getEntityPlayer().isSneaking() && event.getEntityPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
+            event.setUseBlock(Event.Result.ALLOW);
+        }
     }
 }
