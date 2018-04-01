@@ -3,9 +3,11 @@ package com.buuz135.portality.network;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiPortals;
+import com.buuz135.portality.tile.TileController;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -78,7 +80,12 @@ public class PortalNetworkMessage {
 
         @Override
         public Response onMessage(Request message, MessageContext ctx) {
-            return new Response(PortalDataManager.getData(ctx.getServerHandler().player.world).getInformationList());
+            List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(ctx.getServerHandler().player.world).getInformationList());
+            infos.removeIf(information -> {
+                World world = ctx.getServerHandler().player.getServer().getWorld(information.getDimension());
+                return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
+            });
+            return new Response(infos);
         }
 
     }
