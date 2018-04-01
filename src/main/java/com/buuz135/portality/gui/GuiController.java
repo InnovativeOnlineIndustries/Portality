@@ -107,8 +107,8 @@ public class GuiController extends GuiContainer {
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Blocks.TRIPWIRE_HOOK), -19, 19 + 20);
 
         for (GuiButton button : this.buttonList) {
-            if (button instanceof TooltipGuiButton && button.isMouseOver()) {
-                this.drawHoveringText(((TooltipGuiButton) button).getTooltip(), mouseX - this.guiLeft, mouseY - this.guiTop);
+            if (button instanceof IHasTooltip && button.isMouseOver()) {
+                this.drawHoveringText(((IHasTooltip) button).getTooltip(), mouseX - this.guiLeft, mouseY - this.guiTop);
             }
         }
     }
