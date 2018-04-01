@@ -12,6 +12,7 @@ public class GuiHandler implements IGuiHandler {
 
     public static final int CONTROLLER = 0;
     public static final int CONTROLLER_RENAME = 1;
+    public static final int PORTALS = 2;
 
     @Nullable
     @Override
@@ -33,7 +34,7 @@ public class GuiHandler implements IGuiHandler {
             case CONTROLLER_RENAME:
                 return new GuiControllerRename((ContainerController) getServerGuiElement(CONTROLLER, player, world, x, y, z));
             default:
-                return null;
+                return new GuiPortals((ContainerController) getServerGuiElement(CONTROLLER, player, world, x, y, z));
         }
     }
 }

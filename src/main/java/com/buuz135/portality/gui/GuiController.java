@@ -1,6 +1,7 @@
 package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
+import com.buuz135.portality.network.PortalNetworkMessage;
 import com.buuz135.portality.network.PortalPrivacyToggleMessage;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.util.BlockPosUtils;
@@ -29,7 +30,18 @@ public class GuiController extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, "Call Portal"));
+        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, "Call Portal") {
+            @Override
+            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                if (isMouseOver()) {
+                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(false));
+                    ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
+                    BlockPos pos = containerController.getController().getPos();
+                    mc.player.openGui(Portality.INSTANCE, 2, containerController.getController().getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                }
+                return super.mousePressed(mc, mouseX, mouseY);
+            }
+        });
         this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22, 166, 20, "Single Portal Call"));
         this.addButton(new GuiButton(2, this.guiLeft + 5, this.guiTop + 96 + 22 * 2, 166, 20, "Force Portal Call"));
         this.addButton(new TooltipGuiButton(3, this.guiLeft - 21, this.guiTop + 17, 20, 20, "") {
