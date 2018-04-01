@@ -5,7 +5,9 @@ import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.util.BlockPosUtils;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -32,8 +34,19 @@ public class TileController extends TileBase implements ITickable {
     private PortalInformation information;
     private PortalLinkData linkData;
 
+    private TeleportHandler teleportHandler;
+
     @Override
     public void update() {
+        if (teleportHandler == null) teleportHandler = new TeleportHandler(this);
+        if (isActive()) {
+            teleportHandler.tick();
+            if (linkData != null && linkData.isCaller()) {
+                for (Entity entity : this.world.getEntitiesWithinAABB(Entity.class, getPortalArea())) {
+                    teleportHandler.addEntityToTeleport(entity, linkData);
+                }
+            }
+        }
         if (world.isRemote) return;
         ++tick;
         if (tick >= 10) {
@@ -92,14 +105,18 @@ public class TileController extends TileBase implements ITickable {
         }
     }
 
-    @Override
-    public AxisAlignedBB getRenderBoundingBox() {
+    public AxisAlignedBB getPortalArea() {
         BlockPos center = this.pos.offset(EnumFacing.UP, 2);
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
         boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
         BlockPos corner1 = new BlockPos(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0)).offset(facing.getOpposite(), length);
         BlockPos corner2 = new BlockPos(center.getX() + (isSouthNorth ? -2 : 0), center.getY() - 2, center.getZ() + (!isSouthNorth ? -2 : 0));
         return new AxisAlignedBB(corner1, corner2);
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return getPortalArea();
     }
 
     private void getPortalInfo() {

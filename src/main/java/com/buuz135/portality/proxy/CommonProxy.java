@@ -47,4 +47,5 @@ public class CommonProxy {
             event.setUseBlock(Event.Result.ALLOW);
         }
     }
+
 }
