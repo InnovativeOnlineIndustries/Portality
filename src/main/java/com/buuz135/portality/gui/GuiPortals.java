@@ -2,11 +2,13 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class GuiPortals extends GuiContainer {
@@ -40,11 +42,41 @@ public class GuiPortals extends GuiContainer {
     private void addPortalButtons() {
         buttonList.clear();
         for (int i = 0; i < 4; i++) {
-            GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(pointer + i), i + 3, this.guiLeft + 5, this.guiTop + 6 + 39 * i, 166, 36, 0, 166, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-            this.addButton(buttonImage);
+            if (informationList.size() > pointer + i) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(pointer + i), i + 3, this.guiLeft + 5, this.guiTop + 6 + 39 * i, 166, 36, 0, 166, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+                this.addButton(buttonImage);
+            }
         }
-        this.addButton(new GuiButton(0, this.guiLeft, this.guiTop - 20, 20, 20, "<"));
-        this.addButton(new GuiButton(1, this.guiLeft + this.xSize - 20, this.guiTop - 20, 20, 20, ">"));
+        this.addButton(new TooltipGuiButton(0, this.guiLeft, this.guiTop + ySize, 20, 20, "<") {
+            @Override
+            public List<String> getTooltip() {
+                return Arrays.asList("Previous page");
+            }
+
+            @Override
+            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                if (isMouseOver()) {
+                    pointer = Math.max(0, pointer - 4);
+                    addPortalButtons();
+                }
+                return super.mousePressed(mc, mouseX, mouseY);
+            }
+        });
+        this.addButton(new TooltipGuiButton(1, this.guiLeft + this.xSize - 20, this.guiTop + ySize, 20, 20, ">") {
+            @Override
+            public List<String> getTooltip() {
+                return Arrays.asList("Next page");
+            }
+
+            @Override
+            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                if (isMouseOver() && pointer + 4 < informationList.size()) {
+                    pointer += 4;
+                    addPortalButtons();
+                }
+                return super.mousePressed(mc, mouseX, mouseY);
+            }
+        });
     }
 
     @Override
@@ -61,8 +93,8 @@ public class GuiPortals extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        String name = "PAGE: " + (pointer + 1) + "/" + ((int) Math.ceil(informationList.size() / 4D));
-        fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, -14, 0xFFFFFF);
+        String name = "PAGE: " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
+        fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, this.ySize + 7, 0xFFFFFF);
 
 
         for (GuiButton button : this.buttonList) {
