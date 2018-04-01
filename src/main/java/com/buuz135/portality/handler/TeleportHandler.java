@@ -6,18 +6,12 @@ import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TeleportHandler {
 
@@ -36,6 +30,11 @@ public class TeleportHandler {
     }
 
     public void tick() {
+        EnumFacing facing = controller.getWorld().getBlockState(controller.getPos()).getValue(BlockController.FACING).getOpposite();
+        Random random = controller.getWorld().rand;
+        BlockPos offset = controller.getPos().offset(facing);
+        double mult = controller.getLength() / 20D;
+        controller.getWorld().spawnParticle(EnumParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * 2 - 1, offset.getY() + 2.5 + random.nextDouble() * 2 - 1, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult);
         List<Entity> entityRemove = new ArrayList<>();
         for (Map.Entry<Entity, TeleportData> entry : entityTimeToTeleport.entrySet()) {
             if (entry.getKey().isDead || !controller.getPortalArea().contains(new Vec3d(entry.getKey().getPosition()))) {
@@ -46,7 +45,6 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            EnumFacing facing = entry.getKey().getEntityWorld().getBlockState(controller.getPos()).getValue(BlockController.FACING).getOpposite();
             BlockPos destinationPos = controller.getPos().offset(facing, controller.getLength() - 1);
             Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 1.5, 0.5);
             double distance = destinationPos.add(0.5, 1.5, 0.5).getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
