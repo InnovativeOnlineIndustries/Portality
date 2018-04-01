@@ -54,7 +54,12 @@ public class TileController extends TileBase implements ITickable {
             length = checkArea();
             getPortalInfo();
             markForUpdate();
-            //CHECK IF THE LINK IS BROKEN
+            if (linkData != null) {
+                TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
+                if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    this.closeLink();
+                }
+            }
         }
     }
 
