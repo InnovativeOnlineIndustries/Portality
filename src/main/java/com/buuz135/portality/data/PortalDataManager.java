@@ -56,6 +56,16 @@ public class PortalDataManager extends WorldSavedData {
         return null;
     }
 
+    @Nullable
+    public static PortalInformation getInfoFromLink(World world, PortalLinkData data) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getDimension() == data.getDimension() && information.getLocation().equals(data.getPos()))
+                return information;
+        }
+        return null;
+    }
+
     public static void setPortalPrivacy(World world, BlockPos pos, boolean privacy) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
@@ -96,6 +106,16 @@ public class PortalDataManager extends WorldSavedData {
         return data;
     }
 
+    public static void setActiveStatus(World world, BlockPos pos, boolean active) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) {
+                information.setActive(active);
+                dataManager.markDirty();
+            }
+        }
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         informationList.clear();
@@ -119,4 +139,5 @@ public class PortalDataManager extends WorldSavedData {
     public List<PortalInformation> getInformationList() {
         return informationList;
     }
+
 }

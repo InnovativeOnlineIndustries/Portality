@@ -4,9 +4,7 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.gui.GuiHandler;
-import com.buuz135.portality.network.PortalNetworkMessage;
-import com.buuz135.portality.network.PortalPrivacyToggleMessage;
-import com.buuz135.portality.network.PortalRenameMessage;
+import com.buuz135.portality.network.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -29,6 +27,8 @@ public class CommonProxy {
         Portality.NETWORK.registerMessage(PortalRenameMessage.PortalRenameHandler.class, PortalRenameMessage.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalNetworkMessage.HandleRequest.class, PortalNetworkMessage.Request.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalNetworkMessage.HandleResponse.class, PortalNetworkMessage.Response.class, id++, Side.CLIENT);
+        Portality.NETWORK.registerMessage(PortalLinkMessage.Handler.class, PortalLinkMessage.class, id++, Side.SERVER);
+        Portality.NETWORK.registerMessage(PortalCloseMessage.Handler.class, PortalCloseMessage.class, id++, Side.SERVER);
 
         MinecraftForge.EVENT_BUS.register(this);
     }

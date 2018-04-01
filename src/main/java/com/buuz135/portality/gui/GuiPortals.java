@@ -17,7 +17,6 @@ public class GuiPortals extends GuiContainer {
     private int pointer;
     private List<PortalInformation> informationList;
 
-
     public GuiPortals(ContainerController controller) {
         super(controller);
         this.controller = controller;
@@ -35,6 +34,7 @@ public class GuiPortals extends GuiContainer {
         pointer = 0;
         informationList.removeIf(information -> information.isPrivate() && !information.getOwner().equals(mc.player.getUniqueID()));
         informationList.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
+        informationList.removeIf(information -> information.getDimension() == controller.getController().getWorld().provider.getDimension() && information.getLocation().equals(controller.getController().getPos()));
         this.buttonList.clear();
         addPortalButtons();
     }
@@ -43,7 +43,7 @@ public class GuiPortals extends GuiContainer {
         buttonList.clear();
         for (int i = 0; i < 4; i++) {
             if (informationList.size() > pointer + i) {
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(pointer + i), i + 3, this.guiLeft + 5, this.guiTop + 6 + 39 * i, 166, 36, 0, 166, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(pointer + i), i + 3, this.guiLeft + 5, this.guiTop + 6 + 39 * i, 166, 36, 0, 166, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"), controller.getController());
                 this.addButton(buttonImage);
             }
         }

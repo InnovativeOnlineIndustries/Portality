@@ -1,6 +1,10 @@
 package com.buuz135.portality.gui;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.network.PortalLinkMessage;
+import com.buuz135.portality.tile.TileController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButtonImage;
@@ -16,10 +20,12 @@ import java.util.List;
 public class GuiButtonImagePortal extends GuiButtonImage implements IHasTooltip {
 
     private PortalInformation information;
+    private TileController controller;
 
-    public GuiButtonImagePortal(PortalInformation information, int id, int x, int y, int xSize, int ySize, int textureX, int textureY, int offset, ResourceLocation location) {
+    public GuiButtonImagePortal(PortalInformation information, int id, int x, int y, int xSize, int ySize, int textureX, int textureY, int offset, ResourceLocation location, TileController tile) {
         super(id, x, y, xSize, ySize, textureX, textureY, offset, location);
         this.information = information;
+        this.controller = tile;
     }
 
     @Override
@@ -30,12 +36,20 @@ public class GuiButtonImagePortal extends GuiButtonImage implements IHasTooltip 
 
     @Override
     public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-        if (GuiScreen.isShiftKeyDown() && GuiScreen.isCtrlKeyDown()) {// Force call
-
-        } else if (GuiScreen.isShiftKeyDown()) { // One Call
-
-        } else {
-
+        if (isMouseOver()) {
+            if (information.getDimension() == controller.getWorld().provider.getDimension() && information.getLocation().equals(controller.getPos()))
+                return super.mousePressed(mc, mouseX, mouseY);
+            int type = 0;
+            if (GuiScreen.isShiftKeyDown()) {// One Call
+                type = 1;
+            }
+            if (GuiScreen.isShiftKeyDown() && GuiScreen.isCtrlKeyDown()) {// Force call
+                type = 2;
+            }
+            if (!information.isActive() || type == 2) {
+                Portality.NETWORK.sendToServer(new PortalLinkMessage(type, new PortalLinkData(controller.getWorld().provider.getDimension(), controller.getPos(), true), new PortalLinkData(information.getDimension(), information.getLocation(), false)));
+                mc.player.closeScreen();
+            }
         }
         return super.mousePressed(mc, mouseX, mouseY);
     }

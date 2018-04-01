@@ -4,13 +4,16 @@ import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,12 +24,13 @@ public class TileController extends TileBase implements ITickable {
     private static String NBT_TICK = "Tick";
     private static String NBT_LENGTH = "Length";
     private static String NBT_PORTAL = "Portal";
+    private static String NBT_LINK = "Link";
 
     private boolean isFormed = false;
     private int tick = 0;
     private int length = 0;
     private PortalInformation information;
-
+    private PortalLinkData linkData;
 
     @Override
     public void update() {
@@ -37,6 +41,7 @@ public class TileController extends TileBase implements ITickable {
             length = checkArea();
             getPortalInfo();
             markForUpdate();
+            //CHECK IF THE LINK IS BROKEN
         }
     }
 
@@ -47,6 +52,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
+        if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
         return compound;
     }
 
@@ -57,6 +63,8 @@ public class TileController extends TileBase implements ITickable {
         length = compound.getInteger(NBT_LENGTH);
         if (compound.hasKey(NBT_PORTAL))
             information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
+        if (compound.hasKey(NBT_LINK))
+            linkData = PortalLinkData.readFromNBT(compound.getCompoundTag(NBT_LINK));
         super.readFromNBT(compound);
     }
 
@@ -145,5 +153,42 @@ public class TileController extends TileBase implements ITickable {
         PortalDataManager.setPortalDisplay(this.world, this.pos, display);
         getPortalInfo();
         markForUpdate();
+    }
+
+    public void linkTo(PortalLinkData data, PortalLinkData.PortalCallType type) {
+        if (type == PortalLinkData.PortalCallType.FORCE) {
+            closeLink();
+        }
+        if (linkData != null) return;
+        if (data.isCaller()) {
+            World world = this.world.getMinecraftServer().getWorld(data.getDimension());
+            TileEntity entity = world.getTileEntity(data.getPos());
+            if (entity instanceof TileController) {
+                ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false), type);
+            }
+        }
+        PortalDataManager.setActiveStatus(this.world, this.pos, true);
+        this.linkData = data;
+    }
+
+    public void closeLink() {
+        if (linkData != null) {
+            PortalDataManager.setActiveStatus(this.world, this.pos, false);
+            World world = this.world.getMinecraftServer().getWorld(linkData.getDimension());
+            TileEntity entity = world.getTileEntity(linkData.getPos());
+            linkData = null;
+            if (entity instanceof TileController) {
+                ((TileController) entity).closeLink();
+            }
+        }
+    }
+
+    public boolean isActive() {
+        if (information != null) return information.isActive();
+        return false;
+    }
+
+    public PortalLinkData getLinkData() {
+        return linkData;
     }
 }
