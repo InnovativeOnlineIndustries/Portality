@@ -51,9 +51,9 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            BlockPos destinationPos = controller.getPos().offset(facing, controller.getLength() - 1);
-            Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 1.5, 0.5);
-            double distance = destinationPos.add(0.5, 1.5, 0.5).getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
+            BlockPos destinationPos = controller.getPos().add(0, 2, 0).offset(facing, controller.getLength() - 1);
+            Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 0, 0.5);
+            double distance = destinationPos.getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 1) {
                 if (!entry.getKey().world.isRemote) {
@@ -94,9 +94,10 @@ public class TeleportHandler {
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
-                entry.getKey().motionX = tpFacing.getDirectionVec().getX();
-                entry.getKey().motionY = tpFacing.getDirectionVec().getY();
-                entry.getKey().motionZ = tpFacing.getDirectionVec().getZ();
+                Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) TileController.MAX_LENGTH);
+                entry.getKey().motionX = vec3d.x;
+                entry.getKey().motionY = vec3d.y;
+                entry.getKey().motionZ = vec3d.z;
                 entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
             }
             if (entry.getValue().ticks > 40) {
