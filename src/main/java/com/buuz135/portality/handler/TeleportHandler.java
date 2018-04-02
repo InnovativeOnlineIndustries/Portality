@@ -5,7 +5,10 @@ import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -62,7 +65,9 @@ public class TeleportHandler {
                             return;
                         }
                     } else {
-                        //TODO Something bad
+                        if (entry.getKey() instanceof EntityLivingBase) {
+                            ((EntityLivingBase) entry.getKey()).addPotionEffect(new PotionEffect(MobEffects.WITHER, 5 * 20, 1));
+                        }
                     }
                 }
                 entityRemove.add(entry.getKey());
