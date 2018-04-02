@@ -37,7 +37,7 @@ public class TeleportHandler {
         controller.getWorld().spawnParticle(EnumParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * 2 - 1, offset.getY() + 2.5 + random.nextDouble() * 2 - 1, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult);
         List<Entity> entityRemove = new ArrayList<>();
         for (Map.Entry<Entity, TeleportData> entry : entityTimeToTeleport.entrySet()) {
-            if (entry.getKey().isDead || !controller.getPortalArea().contains(new Vec3d(entry.getKey().getPosition()))) {
+            if (entry.getKey().isDead || !controller.getWorld().getEntitiesWithinAABB(Entity.class, controller.getPortalArea()).contains(entry.getKey())) {
                 entityRemove.add(entry.getKey());
                 continue;
             }
@@ -49,7 +49,7 @@ public class TeleportHandler {
             Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 1.5, 0.5);
             double distance = destinationPos.add(0.5, 1.5, 0.5).getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
-            if (distance <= 0.1) {
+            if (distance <= 1) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergy().extractEnergyInternal(5000, true) == 5000) {
                         World tpWorld = entry.getKey().world;
