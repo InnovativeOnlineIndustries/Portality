@@ -26,6 +26,8 @@ import java.util.UUID;
 
 public class TileController extends TileBase implements ITickable {
 
+    public static final int MAX_LENGTH = 16;
+
     private static String NBT_FORMED = "Formed";
     private static String NBT_TICK = "Tick";
     private static String NBT_LENGTH = "Length";
@@ -131,7 +133,7 @@ public class TileController extends TileBase implements ITickable {
                 return length;
             }
             ++length;
-            if (length > 16) return length;
+            if (length > MAX_LENGTH) return length;
             center = center.offset(facing.getOpposite());
         }
     }

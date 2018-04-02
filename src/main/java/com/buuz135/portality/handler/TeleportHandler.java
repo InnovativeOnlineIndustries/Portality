@@ -1,12 +1,15 @@
 package com.buuz135.portality.handler;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.network.PortalTeleportMessage;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
@@ -61,6 +64,8 @@ public class TeleportHandler {
                         Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergy().extractEnergyInternal(5000, false);
+                        if (entry.getKey() instanceof EntityPlayerMP)
+                            Portality.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), (EntityPlayerMP) entry.getKey());
                         if (controller.teleportedEntity()) {
                             return;
                         }
