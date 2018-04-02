@@ -40,7 +40,7 @@ public class GuiController extends GuiContainer {
                     ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
                     BlockPos pos = containerController.getController().getPos();
                     mc.player.openGui(Portality.INSTANCE, 2, containerController.getController().getWorld(), pos.getX(), pos.getY(), pos.getZ());
-                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(containerController.getController().isInterdimensional()));
+                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(containerController.getController().isInterdimensional(), containerController.getController().getPos(), BlockPosUtils.getMaxDistance(containerController.getController().getLength())));
 
                 }
                 return super.mousePressed(mc, mouseX, mouseY);

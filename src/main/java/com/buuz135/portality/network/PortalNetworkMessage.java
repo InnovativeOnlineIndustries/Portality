@@ -4,9 +4,12 @@ import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiPortals;
 import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.util.BlockPosUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -21,22 +24,30 @@ public class PortalNetworkMessage {
     public static class Request implements IMessage {
 
         private boolean interdimensional;
+        private BlockPos pos;
+        private int distance;
 
         public Request() {
         }
 
-        public Request(boolean interdimensional) {
+        public Request(boolean interdimensional, BlockPos pos, int distance) {
             this.interdimensional = interdimensional;
+            this.pos = pos;
+            this.distance = distance;
         }
 
         @Override
         public void fromBytes(ByteBuf buf) {
             interdimensional = buf.readBoolean();
+            pos = BlockPos.fromLong(buf.readLong());
+            distance = buf.readInt();
         }
 
         @Override
         public void toBytes(ByteBuf buf) {
             buf.writeBoolean(interdimensional);
+            buf.writeLong(pos.toLong());
+            buf.writeInt(distance);
         }
     }
 
@@ -87,6 +98,11 @@ public class PortalNetworkMessage {
             });
             infos.removeIf(information -> !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension());
             infos.removeIf(information -> message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension() && !information.isInterdimensional());
+            infos.removeIf(information -> {
+                World world = ctx.getServerHandler().player.world.getMinecraftServer().getWorld(information.getDimension());
+                TileEntity entity = world.getTileEntity(information.getLocation());
+                return entity instanceof TileController && !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() == information.getDimension() && (information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= message.distance || information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
+            });
             return new Response(infos);
         }
 
