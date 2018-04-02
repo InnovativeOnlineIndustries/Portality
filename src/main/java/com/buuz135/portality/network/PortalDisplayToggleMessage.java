@@ -39,7 +39,7 @@ public class PortalDisplayToggleMessage implements IMessage {
             serverPlayer.getServerWorld().addScheduledTask(() -> {
                 World world = serverPlayer.world;
                 BlockPos pos = BlockPos.fromLong(message.tileLocation);
-                if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof TileController) {
+                if (world.getTileEntity(pos) instanceof TileController) {
                     TileController controller = (TileController) world.getTileEntity(pos);
                     if (controller.getOwner().equals(serverPlayer.getUniqueID()))
                         controller.setDisplayNameEnabled(!controller.isDisplayNameEnabled());

@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
@@ -65,7 +66,7 @@ public class GuiButtonImagePortal extends GuiButtonImage implements IHasTooltip 
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
         fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 28)), x + 40, 10 + y, 0xFFFFFF);
-        fontRenderer.drawString(color + (information.isPrivate() ? "Private" : "Public"), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
+        fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.popMatrix();
     }
@@ -73,6 +74,6 @@ public class GuiButtonImagePortal extends GuiButtonImage implements IHasTooltip 
 
     @Override
     public List<String> getTooltip() {
-        return Arrays.asList("Click to dial the portal", "Shift+Click to dial once", "Ctrl+Shift to force a dial");
+        return Arrays.asList(I18n.format("portality.display.dial"), I18n.format("portality.display.dial_once"), I18n.format("portality.display.force"));
     }
 }

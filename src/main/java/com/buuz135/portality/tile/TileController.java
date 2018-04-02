@@ -8,6 +8,7 @@ import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.TeleportHandler;
+import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -29,7 +30,6 @@ import java.util.UUID;
 
 public class TileController extends TileBase implements ITickable {
 
-    public static final int MAX_LENGTH = 16;
 
     private static String NBT_FORMED = "Formed";
     private static String NBT_TICK = "Tick";
@@ -59,7 +59,7 @@ public class TileController extends TileBase implements ITickable {
         this.display = true;
         this.teleportHandler = new TeleportHandler(this);
         this.modules = new ArrayList<>();
-        this.energy = new CustomEnergyStorageHandler(100000, 2000, 0, 0);
+        this.energy = new CustomEnergyStorageHandler(PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0, 0);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class TileController extends TileBase implements ITickable {
         }
         if (world.isRemote) return;
         if (isActive() && linkData != null) {
-            energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length, false);
+            energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length * PortalityConfig.POWER_PORTAL_TICK, false);
             if (energy.getEnergyStored() == 0) {
                 closeLink();
             }
@@ -148,7 +148,7 @@ public class TileController extends TileBase implements ITickable {
                 return length;
             }
             ++length;
-            if (length > MAX_LENGTH) return length;
+            if (length > PortalityConfig.MAX_PORTAL_LENGTH) return length;
             center = center.offset(facing.getOpposite());
         }
     }
@@ -247,7 +247,7 @@ public class TileController extends TileBase implements ITickable {
             if (entity instanceof TileController) {
                 data.setName(((TileController) entity).getName());
                 ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false, this.getName()), type);
-                int power = 50000;
+                int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.getDistance(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY()) * length;
                 }

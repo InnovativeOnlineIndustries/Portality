@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -34,7 +35,7 @@ public class GuiController extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, "Call Portal") {
+        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, I18n.format("portality.display.call_portal")) {
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
                 if (isMouseOver()) {
@@ -47,7 +48,7 @@ public class GuiController extends GuiContainer {
                 return super.mousePressed(mc, mouseX, mouseY);
             }
         });
-        this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22, 166, 20, "Close Portal") {
+        this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22, 166, 20, I18n.format("portality.display.close_portal")) {
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
                 if (isMouseOver()) {
@@ -58,11 +59,11 @@ public class GuiController extends GuiContainer {
                 return super.mousePressed(mc, mouseX, mouseY);
             }
         });
-        this.addButton(new GuiButton(2, this.guiLeft + 5, this.guiTop + 96 + 22 * 2, 166, 20, "Force Portal Call"));
+        //this.addButton(new GuiButton(2, this.guiLeft + 5, this.guiTop + 96 + 22 * 2, 166, 20, "Force Portal Call"));
         this.addButton(new TooltipGuiButton(3, this.guiLeft - 21, this.guiTop + 17, 20, 20, "") {
             @Override
             public List<String> getTooltip() {
-                return Arrays.asList("Change name");
+                return Arrays.asList(I18n.format("portality.display.change_name"));
             }
 
             @Override
@@ -89,7 +90,7 @@ public class GuiController extends GuiContainer {
             @Override
             public List<String> getTooltip() {
                 ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
-                return containerController.getController().isPrivate() ? Arrays.asList("Make portal public") : Arrays.asList("Make portal private");
+                return containerController.getController().isPrivate() ? Arrays.asList(I18n.format("portality.display.make_public")) : Arrays.asList(I18n.format("portality.display.make_private"));
             }
         });
         this.addButton(new TooltipGuiButton(5, this.guiLeft - 21, this.guiTop + 17 + 21 * 2, 20, 20, "") {
@@ -106,7 +107,7 @@ public class GuiController extends GuiContainer {
             @Override
             public List<String> getTooltip() {
                 ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
-                return containerController.getController().isDisplayNameEnabled() ? Arrays.asList("Hide name display") : Arrays.asList("Show name display");
+                return containerController.getController().isDisplayNameEnabled() ? Arrays.asList(I18n.format("portality.display.hide_name")) : Arrays.asList(I18n.format("portality.display.show_name"));
             }
         });
     }
@@ -129,12 +130,12 @@ public class GuiController extends GuiContainer {
         fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, 6, 0x404040);
 
         ContainerController containerController = (ContainerController) this.inventorySlots;
-        fontRenderer.drawString("Name: " + containerController.getController().getName().substring(0, Math.min(containerController.getController().getName().length(), 28)), 10, 21, 0xFFFFFF);
-        fontRenderer.drawString("Private: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
-        fontRenderer.drawString("Max Distance: " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
-        fontRenderer.drawString("Interdimensional: " + containerController.getController().isInterdimensional(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
-        fontRenderer.drawString("Power: " + new DecimalFormat().format(containerController.getController().getEnergy().getEnergyStored()) + " FE", 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
-        fontRenderer.drawString("Link: " + (containerController.getController().isActive() ? "Active" : "Missing"), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.name") + " " + containerController.getController().getName().substring(0, Math.min(containerController.getController().getName().length(), 28)), 10, 21, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.private") + " " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.interdimensional") + " " + containerController.getController().isInterdimensional(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.power") + " " + new DecimalFormat().format(containerController.getController().getEnergy().getEnergyStored()) + " FE", 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller.link") + " " + (containerController.getController().isActive() ? I18n.format("portality.gui.controller.link_active") : I18n.format("portality.gui.controller.link_missing")), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
 
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.SIGN), -19, 19);
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Blocks.TRIPWIRE_HOOK), -19, 19 + 20);

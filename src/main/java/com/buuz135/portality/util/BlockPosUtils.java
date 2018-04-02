@@ -1,5 +1,6 @@
 package com.buuz135.portality.util;
 
+import com.buuz135.portality.proxy.PortalityConfig;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -21,6 +22,6 @@ public class BlockPosUtils {
     }
 
     public static int getMaxDistance(int length) {
-        return length * 200;
+        return length * PortalityConfig.DISTANCE_MULTIPLIER;
     }
 }

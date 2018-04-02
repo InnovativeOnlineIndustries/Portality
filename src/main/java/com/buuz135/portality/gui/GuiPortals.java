@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public class GuiPortals extends GuiContainer {
         this.addButton(new TooltipGuiButton(0, this.guiLeft, this.guiTop + ySize, 20, 20, "<") {
             @Override
             public List<String> getTooltip() {
-                return Arrays.asList("Previous page");
+                return Arrays.asList(I18n.format("portality.gui.portals.previous_page"));
             }
 
             @Override
@@ -65,7 +66,7 @@ public class GuiPortals extends GuiContainer {
         this.addButton(new TooltipGuiButton(1, this.guiLeft + this.xSize - 20, this.guiTop + ySize, 20, 20, ">") {
             @Override
             public List<String> getTooltip() {
-                return Arrays.asList("Next page");
+                return Arrays.asList(I18n.format("portality.gui.portals.next_page"));
             }
 
             @Override
@@ -94,7 +95,7 @@ public class GuiPortals extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         if (informationList != null) {
-            String name = "PAGE: " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
+            String name = I18n.format("portality.gui.portals.page") + " " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
             fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, this.ySize + 7, 0xFFFFFF);
         }
 

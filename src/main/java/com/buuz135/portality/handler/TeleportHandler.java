@@ -4,6 +4,7 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.network.PortalTeleportMessage;
+import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import net.minecraft.entity.Entity;
@@ -57,20 +58,20 @@ public class TeleportHandler {
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 1) {
                 if (!entry.getKey().world.isRemote) {
-                    if (controller.getEnergy().extractEnergyInternal(5000, true) == 5000) {
+                    if (controller.getEnergy().extractEnergyInternal(PortalityConfig.TELEPORT_ENERGY_AMOUNT, true) == PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getMinecraftServer().getWorld(entry.getValue().data.getDimension());
                         EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
-                        controller.getEnergy().extractEnergyInternal(5000, false);
+                        controller.getEnergy().extractEnergyInternal(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
                         if (entry.getKey() instanceof EntityPlayerMP)
                             Portality.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), (EntityPlayerMP) entry.getKey());
                         if (controller.teleportedEntity()) {
                             return;
                         }
                     } else {
-                        if (entry.getKey() instanceof EntityLivingBase) {
+                        if (entry.getKey() instanceof EntityLivingBase && PortalityConfig.HURT_PLAYERS) {
                             ((EntityLivingBase) entry.getKey()).addPotionEffect(new PotionEffect(MobEffects.WITHER, 5 * 20, 1));
                         }
                     }
@@ -94,7 +95,7 @@ public class TeleportHandler {
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
-                Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) TileController.MAX_LENGTH);
+                Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                 entry.getKey().motionX = vec3d.x;
                 entry.getKey().motionY = vec3d.y;
                 entry.getKey().motionZ = vec3d.z;

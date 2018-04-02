@@ -8,6 +8,7 @@ import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -56,15 +57,15 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         if (tile != null && tile instanceof TileController) {
             TileController controller = (TileController) tile;
             if (!controller.isFormed()) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: Portal needs to be 3 blocks deep!"), true);
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
                 return true;
             }
             if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + "ERROR: This portal is private!"), true);
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
                 return true;
             }
             if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + "Portal icon changed!"), true);
+                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
                 controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                 return true;
             }

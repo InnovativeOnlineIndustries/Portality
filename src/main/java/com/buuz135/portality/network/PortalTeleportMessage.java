@@ -1,6 +1,6 @@
 package com.buuz135.portality.network;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.proxy.PortalityConfig;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -43,12 +43,14 @@ public class PortalTeleportMessage implements IMessage {
         public IMessage onMessage(PortalTeleportMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
-                EnumFacing facing = EnumFacing.values()[message.facing];
-                Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * message.length / (double) TileController.MAX_LENGTH);
-                EntityPlayerSP player = Minecraft.getMinecraft().player;
-                player.motionX = vector.x;
-                player.motionY = vector.y;
-                player.motionZ = vector.z;
+                if (PortalityConfig.LAUNCH_PLAYERS) {
+                    EnumFacing facing = EnumFacing.values()[message.facing];
+                    Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * message.length / (double) PortalityConfig.MAX_PORTAL_LENGTH);
+                    EntityPlayerSP player = Minecraft.getMinecraft().player;
+                    player.motionX = vector.x;
+                    player.motionY = vector.y;
+                    player.motionZ = vector.z;
+                }
             });
             return null;
         }

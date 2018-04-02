@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiControllerRename extends GuiContainer {
@@ -24,7 +25,8 @@ public class GuiControllerRename extends GuiContainer {
         field.setFocused(true);
         field.setMaxStringLength(28);
         field.setText(containerController.getController().getName());
-        this.addButton(new GuiButton(2, this.guiLeft, this.guiTop + 25, this.xSize, 20, "Rename") {
+        field.setSelectionPos(0);
+        this.addButton(new GuiButton(2, this.guiLeft, this.guiTop + 25, this.xSize, 20, I18n.format("portality.gui.controller.rename")) {
 
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
