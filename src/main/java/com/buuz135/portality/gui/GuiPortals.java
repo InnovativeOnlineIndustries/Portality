@@ -93,9 +93,10 @@ public class GuiPortals extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        String name = "PAGE: " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
-        fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, this.ySize + 7, 0xFFFFFF);
-
+        if (informationList != null) {
+            String name = "PAGE: " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
+            fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, this.ySize + 7, 0xFFFFFF);
+        }
 
         for (GuiButton button : this.buttonList) {
             if (button instanceof IHasTooltip && button.isMouseOver()) {

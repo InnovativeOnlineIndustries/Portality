@@ -51,11 +51,16 @@ public class TeleportHandler {
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 0.1) {
                 if (!entry.getKey().world.isRemote) {
-                    World tpWorld = entry.getKey().world;
-                    EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
-                    BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
-                    Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
-                    entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
+                    if (controller.getEnergy().extractEnergyInternal(5000, true) == 5000) {
+                        World tpWorld = entry.getKey().world;
+                        EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
+                        BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
+                        Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
+                        entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
+                        controller.getEnergy().extractEnergyInternal(5000, false);
+                    } else {
+                        //TODO Something bad
+                    }
                 }
                 entityRemove.add(entry.getKey());
                 continue;

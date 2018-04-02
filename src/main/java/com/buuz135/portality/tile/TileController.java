@@ -61,6 +61,12 @@ public class TileController extends TileBase implements ITickable {
             }
         }
         if (world.isRemote) return;
+        if (isActive()) {
+            energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length, false);
+            if (energy.getEnergyStored() == 0) {
+                closeLink();
+            }
+        }
         ++tick;
         if (tick >= 10) {
             tick = 0;
@@ -203,6 +209,11 @@ public class TileController extends TileBase implements ITickable {
             if (entity instanceof TileController) {
                 data.setName(((TileController) entity).getName());
                 ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false, this.getName()), type);
+                int power = 50000;
+                if (entity.getWorld().equals(this.world)) {
+                    power = (int) this.pos.getDistance(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY()) * length;
+                }
+                energy.extractEnergyInternal(power, false);
             }
         }
         PortalDataManager.setActiveStatus(this.world, this.pos, true);

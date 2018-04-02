@@ -37,10 +37,11 @@ public class GuiController extends GuiContainer {
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
                 if (isMouseOver()) {
-                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(false));
                     ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
                     BlockPos pos = containerController.getController().getPos();
                     mc.player.openGui(Portality.INSTANCE, 2, containerController.getController().getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(false));
+
                 }
                 return super.mousePressed(mc, mouseX, mouseY);
             }
