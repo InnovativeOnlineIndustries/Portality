@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class GuiController extends GuiContainer {
         fontRenderer.drawString("Private: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
         fontRenderer.drawString("Max Distance: " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
         fontRenderer.drawString("Interdimensional: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
-        fontRenderer.drawString("Power: " + 0, 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
+        fontRenderer.drawString("Power: " + new DecimalFormat().format(containerController.getController().getEnergy().getEnergyStored()) + " FE", 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
         fontRenderer.drawString("Link: " + (containerController.getController().isActive() ? "Active" : "Missing"), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
 
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.SIGN), -19, 19);

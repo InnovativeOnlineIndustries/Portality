@@ -5,6 +5,7 @@ import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.entity.Entity;
@@ -16,7 +17,10 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,18 +31,27 @@ public class TileController extends TileBase implements ITickable {
     private static String NBT_LENGTH = "Length";
     private static String NBT_PORTAL = "Portal";
     private static String NBT_LINK = "Link";
+    private static String NBT_ENERGY = "Energy";
 
-    private boolean isFormed = false;
-    private int tick = 0;
-    private int length = 0;
+    private boolean isFormed;
+    private int tick;
+    private int length;
     private PortalInformation information;
     private PortalLinkData linkData;
+    private CustomEnergyStorageHandler energy;
 
     private TeleportHandler teleportHandler;
 
+    public TileController() {
+        this.length = 0;
+        this.tick = 0;
+        this.isFormed = false;
+        this.teleportHandler = new TeleportHandler(this);
+        this.energy = new CustomEnergyStorageHandler(100000, 2000, 0, 0);
+    }
+
     @Override
     public void update() {
-        if (teleportHandler == null) teleportHandler = new TeleportHandler(this);
         if (isActive()) {
             teleportHandler.tick();
             if (linkData != null && linkData.isCaller()) {
@@ -69,6 +82,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setBoolean(NBT_FORMED, isFormed);
         compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
+        energy.writeToNBT(compound);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
         return compound;
@@ -83,6 +97,7 @@ public class TileController extends TileBase implements ITickable {
             information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
         if (compound.hasKey(NBT_LINK))
             linkData = PortalLinkData.readFromNBT(compound.getCompoundTag(NBT_LINK));
+        energy.readFromNBT(compound);
         super.readFromNBT(compound);
     }
 
@@ -213,5 +228,21 @@ public class TileController extends TileBase implements ITickable {
 
     public PortalLinkData getLinkData() {
         return linkData;
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+    }
+
+    public CustomEnergyStorageHandler getEnergy() {
+        return energy;
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) return (T) energy;
+        return super.getCapability(capability, facing);
     }
 }
