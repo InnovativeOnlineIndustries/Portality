@@ -5,7 +5,9 @@ import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.block.BlockInterdimensionalModule;
 import com.buuz135.portality.gui.GuiHandler;
+import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.network.*;
+import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -38,7 +40,7 @@ public class CommonProxy {
     }
 
     public void onInit(FMLInitializationEvent event) {
-
+        ForgeChunkManager.setForcedChunkLoadingCallback(Portality.INSTANCE, new ChunkLoaderHandler());
     }
 
     public void onPostInit(FMLPostInitializationEvent event) {

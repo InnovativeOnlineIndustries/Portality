@@ -6,6 +6,7 @@ import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.proxy.PortalityConfig;
@@ -87,6 +88,7 @@ public class TileController extends TileBase implements ITickable {
             getPortalInfo();
             markForUpdate();
             if (linkData != null) {
+                ChunkLoaderHandler.addPortalAsChunkloader(this);
                 TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
                 if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
                     this.closeLink();
@@ -268,6 +270,7 @@ public class TileController extends TileBase implements ITickable {
                 ((TileController) entity).closeLink();
             }
         }
+        ChunkLoaderHandler.removePortalAsChunkloader(this);
     }
 
     public boolean isActive() {
