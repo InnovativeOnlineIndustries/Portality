@@ -1,5 +1,6 @@
 package com.buuz135.portality.network;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiPortals;
@@ -91,19 +92,22 @@ public class PortalNetworkMessage {
 
         @Override
         public Response onMessage(Request message, MessageContext ctx) {
-            List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(ctx.getServerHandler().player.world).getInformationList());
-            infos.removeIf(information -> {
-                World world = ctx.getServerHandler().player.getServer().getWorld(information.getDimension());
-                return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
+            ctx.getServerHandler().player.getServer().addScheduledTask(() -> {
+                List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(ctx.getServerHandler().player.world).getInformationList());
+                infos.removeIf(information -> {
+                    World world = ctx.getServerHandler().player.getServer().getWorld(information.getDimension());
+                    return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
+                });
+                infos.removeIf(information -> !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension());
+                infos.removeIf(information -> message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension() && !information.isInterdimensional());
+                infos.removeIf(information -> {
+                    World world = ctx.getServerHandler().player.world.getMinecraftServer().getWorld(information.getDimension());
+                    TileEntity entity = world.getTileEntity(information.getLocation());
+                    return entity instanceof TileController && !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() == information.getDimension() && (information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= message.distance || information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
+                });
+                Portality.NETWORK.sendTo(new Response(infos), ctx.getServerHandler().player);
             });
-            infos.removeIf(information -> !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension());
-            infos.removeIf(information -> message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension() && !information.isInterdimensional());
-            infos.removeIf(information -> {
-                World world = ctx.getServerHandler().player.world.getMinecraftServer().getWorld(information.getDimension());
-                TileEntity entity = world.getTileEntity(information.getLocation());
-                return entity instanceof TileController && !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() == information.getDimension() && (information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= message.distance || information.getLocation().getDistance(message.pos.getX(), message.pos.getY(), message.pos.getZ()) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
-            });
-            return new Response(infos);
+            return null;
         }
 
     }

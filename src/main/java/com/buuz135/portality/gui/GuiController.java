@@ -3,6 +3,7 @@ package com.buuz135.portality.gui;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.network.PortalCloseMessage;
+import com.buuz135.portality.network.PortalDisplayToggleMessage;
 import com.buuz135.portality.network.PortalNetworkMessage;
 import com.buuz135.portality.network.PortalPrivacyToggleMessage;
 import com.buuz135.portality.proxy.CommonProxy;
@@ -91,6 +92,23 @@ public class GuiController extends GuiContainer {
                 return containerController.getController().isPrivate() ? Arrays.asList("Make portal public") : Arrays.asList("Make portal private");
             }
         });
+        this.addButton(new TooltipGuiButton(5, this.guiLeft - 21, this.guiTop + 17 + 21 * 2, 20, 20, "") {
+
+            @Override
+            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                if (isMouseOver()) {
+                    ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
+                    Portality.NETWORK.sendToServer(new PortalDisplayToggleMessage(containerController.getController().getPos().toLong()));
+                }
+                return super.mousePressed(mc, mouseX, mouseY);
+            }
+
+            @Override
+            public List<String> getTooltip() {
+                ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
+                return containerController.getController().isDisplayNameEnabled() ? Arrays.asList("Hide name display") : Arrays.asList("Show name display");
+            }
+        });
     }
 
     @Override
@@ -120,6 +138,7 @@ public class GuiController extends GuiContainer {
 
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.SIGN), -19, 19);
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Blocks.TRIPWIRE_HOOK), -19, 19 + 20);
+        this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.PAINTING), -19, 19 + 20 * 2 + 1);
 
         for (GuiButton button : this.buttonList) {
             if (button instanceof IHasTooltip && button.isMouseOver()) {

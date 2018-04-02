@@ -32,6 +32,7 @@ public class CommonProxy {
         Portality.NETWORK.registerMessage(PortalLinkMessage.Handler.class, PortalLinkMessage.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalCloseMessage.Handler.class, PortalCloseMessage.class, id++, Side.SERVER);
         Portality.NETWORK.registerMessage(PortalTeleportMessage.Handler.class, PortalTeleportMessage.class, id++, Side.CLIENT);
+        Portality.NETWORK.registerMessage(PortalDisplayToggleMessage.Handler.class, PortalDisplayToggleMessage.class, id++, Side.SERVER);
 
         MinecraftForge.EVENT_BUS.register(this);
     }

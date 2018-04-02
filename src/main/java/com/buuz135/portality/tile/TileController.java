@@ -36,13 +36,14 @@ public class TileController extends TileBase implements ITickable {
     private static String NBT_LENGTH = "Length";
     private static String NBT_PORTAL = "Portal";
     private static String NBT_LINK = "Link";
-    private static String NBT_ENERGY = "Energy";
+    private static String NBT_DISPLAY = "Display";
     private static String NBT_ONCE = "Once";
 
     private boolean isFormed;
     private int tick;
     private int length;
     private boolean onceCall;
+    private boolean display;
     private PortalInformation information;
     private PortalLinkData linkData;
     private CustomEnergyStorageHandler energy;
@@ -55,6 +56,7 @@ public class TileController extends TileBase implements ITickable {
         this.tick = 0;
         this.isFormed = false;
         this.onceCall = false;
+        this.display = true;
         this.teleportHandler = new TeleportHandler(this);
         this.modules = new ArrayList<>();
         this.energy = new CustomEnergyStorageHandler(100000, 2000, 0, 0);
@@ -101,6 +103,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setInteger(NBT_LENGTH, length);
         energy.writeToNBT(compound);
         compound.setBoolean(NBT_ONCE, onceCall);
+        compound.setBoolean(NBT_DISPLAY, display);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
         return compound;
@@ -117,6 +120,7 @@ public class TileController extends TileBase implements ITickable {
             linkData = PortalLinkData.readFromNBT(compound.getCompoundTag(NBT_LINK));
         energy.readFromNBT(compound);
         onceCall = compound.getBoolean(NBT_ONCE);
+        display = compound.getBoolean(NBT_DISPLAY);
         super.readFromNBT(compound);
     }
 
@@ -225,7 +229,7 @@ public class TileController extends TileBase implements ITickable {
         return ItemStack.EMPTY;
     }
 
-    public void setDisplay(ItemStack display) {
+    public void setDisplayNameEnabled(ItemStack display) {
         PortalDataManager.setPortalDisplay(this.world, this.pos, display);
         getPortalInfo();
         markForUpdate();
@@ -281,6 +285,14 @@ public class TileController extends TileBase implements ITickable {
 
     public CustomEnergyStorageHandler getEnergy() {
         return energy;
+    }
+
+    public boolean isDisplayNameEnabled() {
+        return display;
+    }
+
+    public void setDisplayNameEnabled(boolean display) {
+        this.display = display;
     }
 
     @Nullable

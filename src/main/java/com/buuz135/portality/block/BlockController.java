@@ -65,7 +65,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
             }
             if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + "Portal icon changed!"), true);
-                controller.setDisplay(playerIn.getHeldItem(hand));
+                controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                 return true;
             }
         }

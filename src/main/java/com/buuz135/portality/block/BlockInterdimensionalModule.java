@@ -2,7 +2,6 @@ package com.buuz135.portality.block;
 
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileInterdimensional;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,10 +12,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockInterdimensionalModule extends BlockTile implements IPortalModule {
+public class BlockInterdimensionalModule extends BlockBasic implements IPortalModule {
 
     public BlockInterdimensionalModule() {
-        super("module_interdimensional", TileInterdimensional.class, Material.ROCK, 0);
+        super("module_interdimensional", Material.ROCK);
     }
 
     @Override
