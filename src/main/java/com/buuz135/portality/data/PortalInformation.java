@@ -16,8 +16,9 @@ public class PortalInformation {
     private int dimension;
     private BlockPos location;
     private ItemStack display;
+    private boolean interdimensional;
 
-    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name, ItemStack display) {
+    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
         this.id = id;
         this.owner = owner;
         this.isActive = isActive;
@@ -26,11 +27,12 @@ public class PortalInformation {
         this.location = location;
         this.name = name;
         this.display = display;
+        this.interdimensional = interdimensional;
     }
 
     public static PortalInformation readFromNBT(NBTTagCompound info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), new ItemStack(info.getCompoundTag("Display")));
+                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), new ItemStack(info.getCompoundTag("Display")), info.getBoolean("Interdimensional"));
     }
 
     public UUID getId() {
@@ -81,6 +83,14 @@ public class PortalInformation {
         this.display = display;
     }
 
+    public boolean isInterdimensional() {
+        return interdimensional;
+    }
+
+    public void setInterdimensional(boolean interdimensional) {
+        this.interdimensional = interdimensional;
+    }
+
     public NBTTagCompound writetoNBT() {
         NBTTagCompound infoTag = new NBTTagCompound();
         infoTag.setUniqueId("ID", getId());
@@ -91,6 +101,7 @@ public class PortalInformation {
         infoTag.setLong("Position", getLocation().toLong());
         infoTag.setString("Name", getName());
         infoTag.setTag("Display", display.serializeNBT());
+        infoTag.setBoolean("Interdimensional", interdimensional);
         return infoTag;
     }
 

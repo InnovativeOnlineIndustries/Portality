@@ -73,7 +73,7 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         buffer.setTranslation(0, 0, 0);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
-        if (te.isActive()) {
+        if (te.isActive() && te.getLinkData() != null) {
             this.setLightmapDisabled(true);
             drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
         }

@@ -58,7 +58,7 @@ public class TeleportHandler {
             if (distance <= 1) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergy().extractEnergyInternal(5000, true) == 5000) {
-                        World tpWorld = entry.getKey().world;
+                        World tpWorld = entry.getKey().world.getMinecraftServer().getWorld(entry.getValue().data.getDimension());
                         EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);

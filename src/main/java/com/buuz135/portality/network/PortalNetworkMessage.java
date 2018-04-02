@@ -85,6 +85,8 @@ public class PortalNetworkMessage {
                 World world = ctx.getServerHandler().player.getServer().getWorld(information.getDimension());
                 return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
             });
+            infos.removeIf(information -> !message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension());
+            infos.removeIf(information -> message.interdimensional && ctx.getServerHandler().player.getServerWorld().provider.getDimension() != information.getDimension() && !information.isInterdimensional());
             return new Response(infos);
         }
 

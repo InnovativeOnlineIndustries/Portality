@@ -40,7 +40,7 @@ public class GuiController extends GuiContainer {
                     ContainerController containerController = (ContainerController) GuiController.this.inventorySlots;
                     BlockPos pos = containerController.getController().getPos();
                     mc.player.openGui(Portality.INSTANCE, 2, containerController.getController().getWorld(), pos.getX(), pos.getY(), pos.getZ());
-                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(false));
+                    Portality.NETWORK.sendToServer(new PortalNetworkMessage.Request(containerController.getController().isInterdimensional()));
 
                 }
                 return super.mousePressed(mc, mouseX, mouseY);
@@ -114,7 +114,7 @@ public class GuiController extends GuiContainer {
         fontRenderer.drawString("Name: " + containerController.getController().getName().substring(0, Math.min(containerController.getController().getName().length(), 28)), 10, 21, 0xFFFFFF);
         fontRenderer.drawString("Private: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
         fontRenderer.drawString("Max Distance: " + BlockPosUtils.getMaxDistance(containerController.getController().getLength()), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
-        fontRenderer.drawString("Interdimensional: " + containerController.getController().isPrivate(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
+        fontRenderer.drawString("Interdimensional: " + containerController.getController().isInterdimensional(), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
         fontRenderer.drawString("Power: " + new DecimalFormat().format(containerController.getController().getEnergy().getEnergyStored()) + " FE", 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
         fontRenderer.drawString("Link: " + (containerController.getController().isActive() ? "Active" : "Missing"), 10, 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
 

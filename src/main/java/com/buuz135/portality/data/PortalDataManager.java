@@ -86,6 +86,16 @@ public class PortalDataManager extends WorldSavedData {
         }
     }
 
+    public static void setPortalInterdimensional(World world, BlockPos pos, boolean interdimensional) {
+        PortalDataManager dataManager = getData(world);
+        for (PortalInformation information : dataManager.getInformationList()) {
+            if (information.getLocation().equals(pos)) {
+                information.setInterdimensional(interdimensional);
+                dataManager.markDirty();
+            }
+        }
+    }
+
     public static void setPortalDisplay(World world, BlockPos pos, ItemStack stack) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {

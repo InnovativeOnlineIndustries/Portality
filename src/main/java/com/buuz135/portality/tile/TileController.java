@@ -2,12 +2,14 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
+import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.util.BlockPosUtils;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,6 +23,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +48,7 @@ public class TileController extends TileBase implements ITickable {
     private CustomEnergyStorageHandler energy;
 
     private TeleportHandler teleportHandler;
+    private List<BlockPos> modules;
 
     public TileController() {
         this.length = 0;
@@ -52,6 +56,7 @@ public class TileController extends TileBase implements ITickable {
         this.isFormed = false;
         this.onceCall = false;
         this.teleportHandler = new TeleportHandler(this);
+        this.modules = new ArrayList<>();
         this.energy = new CustomEnergyStorageHandler(100000, 2000, 0, 0);
     }
 
@@ -66,7 +71,7 @@ public class TileController extends TileBase implements ITickable {
             }
         }
         if (world.isRemote) return;
-        if (isActive()) {
+        if (isActive() && linkData != null) {
             energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length, false);
             if (energy.getEnergyStored() == 0) {
                 closeLink();
@@ -76,6 +81,7 @@ public class TileController extends TileBase implements ITickable {
         if (tick >= 10) {
             tick = 0;
             length = checkArea();
+            workModules();
             getPortalInfo();
             markForUpdate();
             if (linkData != null) {
@@ -119,6 +125,7 @@ public class TileController extends TileBase implements ITickable {
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
         boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
         int length = 0;
+        modules.clear();
         while (true) {
             AxisAlignedBB box = new AxisAlignedBB(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0),
                     center.getX() + (isSouthNorth ? -2 : 0), center.getY() - 2, center.getZ() + (!isSouthNorth ? -2 : 0));
@@ -127,6 +134,10 @@ public class TileController extends TileBase implements ITickable {
             blocks.removeIf(pos1 -> BlockPosUtils.getBlockPosInAABB(new AxisAlignedBB(finalCenter.getX() + (isSouthNorth ? 1 : 0), finalCenter.getY() + 1, finalCenter.getZ() + (!isSouthNorth ? 1 : 0),
                     finalCenter.getX() + (isSouthNorth ? -1 : 0), finalCenter.getY() - 1, finalCenter.getZ() + (!isSouthNorth ? -1 : 0))).contains(pos1));
             for (BlockPos pos : blocks) {
+                if (world.getBlockState(pos).getBlock() instanceof IPortalModule) {
+                    modules.add(pos);
+                    continue;
+                }
                 if (length == 0 && (pos.getX() == center.getX() && pos.getY() == center.getY() - 2 && pos.getZ() == center.getZ()) && this.world.getBlockState(pos).getBlock() instanceof BlockController)
                     continue;
                 if (this.world.getBlockState(pos).getBlock() instanceof BlockFrame) continue;
@@ -136,6 +147,17 @@ public class TileController extends TileBase implements ITickable {
             if (length > MAX_LENGTH) return length;
             center = center.offset(facing.getOpposite());
         }
+    }
+
+    private void workModules() {
+        boolean interdimensional = false;
+        for (BlockPos pos : modules) {
+            Block block = this.world.getBlockState(pos).getBlock();
+            if (block instanceof IPortalModule) {
+                if (((IPortalModule) block).allowsInterdimensionalTravel()) interdimensional = true;
+            }
+        }
+        PortalDataManager.setPortalInterdimensional(this.world, this.pos, interdimensional);
     }
 
     public AxisAlignedBB getPortalArea() {
@@ -186,6 +208,10 @@ public class TileController extends TileBase implements ITickable {
     public String getName() {
         if (information != null) return information.getName();
         return "";
+    }
+
+    public boolean isInterdimensional() {
+        return information != null && information.isInterdimensional();
     }
 
     public void setName(String name) {
