@@ -186,7 +186,8 @@ public class TileController extends TileBase implements ITickable {
             World world = this.world.getMinecraftServer().getWorld(data.getDimension());
             TileEntity entity = world.getTileEntity(data.getPos());
             if (entity instanceof TileController) {
-                ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false), type);
+                data.setName(((TileController) entity).getName());
+                ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false, this.getName()), type);
             }
         }
         PortalDataManager.setActiveStatus(this.world, this.pos, true);

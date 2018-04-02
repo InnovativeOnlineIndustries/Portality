@@ -73,6 +73,10 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         buffer.setTranslation(0, 0, 0);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
+        if (te.isActive()) {
+            this.setLightmapDisabled(true);
+            drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
+        }
     }
 
     public void renderTop(Tessellator tessellator, BufferBuilder buffer, TileController te, double x, double y, double z, double frame, int j, int k) {
