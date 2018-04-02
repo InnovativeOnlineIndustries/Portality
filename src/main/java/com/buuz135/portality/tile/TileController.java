@@ -32,10 +32,12 @@ public class TileController extends TileBase implements ITickable {
     private static String NBT_PORTAL = "Portal";
     private static String NBT_LINK = "Link";
     private static String NBT_ENERGY = "Energy";
+    private static String NBT_ONCE = "Once";
 
     private boolean isFormed;
     private int tick;
     private int length;
+    private boolean onceCall;
     private PortalInformation information;
     private PortalLinkData linkData;
     private CustomEnergyStorageHandler energy;
@@ -46,6 +48,7 @@ public class TileController extends TileBase implements ITickable {
         this.length = 0;
         this.tick = 0;
         this.isFormed = false;
+        this.onceCall = false;
         this.teleportHandler = new TeleportHandler(this);
         this.energy = new CustomEnergyStorageHandler(100000, 2000, 0, 0);
     }
@@ -89,6 +92,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
         energy.writeToNBT(compound);
+        compound.setBoolean(NBT_ONCE, onceCall);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
         return compound;
@@ -104,6 +108,7 @@ public class TileController extends TileBase implements ITickable {
         if (compound.hasKey(NBT_LINK))
             linkData = PortalLinkData.readFromNBT(compound.getCompoundTag(NBT_LINK));
         energy.readFromNBT(compound);
+        onceCall = compound.getBoolean(NBT_ONCE);
         super.readFromNBT(compound);
     }
 
@@ -203,6 +208,7 @@ public class TileController extends TileBase implements ITickable {
             closeLink();
         }
         if (linkData != null) return;
+        if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
             World world = this.world.getMinecraftServer().getWorld(data.getDimension());
             TileEntity entity = world.getTileEntity(data.getPos());
@@ -233,8 +239,7 @@ public class TileController extends TileBase implements ITickable {
     }
 
     public boolean isActive() {
-        if (information != null) return information.isActive();
-        return false;
+        return information != null && information.isActive();
     }
 
     public PortalLinkData getLinkData() {
@@ -255,5 +260,14 @@ public class TileController extends TileBase implements ITickable {
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
         if (capability == CapabilityEnergy.ENERGY) return (T) energy;
         return super.getCapability(capability, facing);
+    }
+
+    public boolean teleportedEntity() {
+        if (onceCall) {
+            onceCall = false;
+            closeLink();
+            return true;
+        }
+        return false;
     }
 }

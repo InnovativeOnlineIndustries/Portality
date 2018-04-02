@@ -58,6 +58,9 @@ public class TeleportHandler {
                         Entity entity = TeleportUtil.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergy().extractEnergyInternal(5000, false);
+                        if (controller.teleportedEntity()) {
+                            return;
+                        }
                     } else {
                         //TODO Something bad
                     }
