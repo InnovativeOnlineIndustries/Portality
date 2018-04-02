@@ -35,7 +35,7 @@ public class GuiController extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96, 166, 20, I18n.format("portality.display.call_portal")) {
+        this.addButton(new GuiButton(0, this.guiLeft + 5, this.guiTop + 96 + 10, 166, 20, I18n.format("portality.display.call_portal")) {
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
                 if (isMouseOver()) {
@@ -48,7 +48,7 @@ public class GuiController extends GuiContainer {
                 return super.mousePressed(mc, mouseX, mouseY);
             }
         });
-        this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22, 166, 20, I18n.format("portality.display.close_portal")) {
+        this.addButton(new GuiButton(1, this.guiLeft + 5, this.guiTop + 96 + 22 + 15, 166, 20, I18n.format("portality.display.close_portal")) {
             @Override
             public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
                 if (isMouseOver()) {
@@ -126,7 +126,7 @@ public class GuiController extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        String name = new TextComponentTranslation(CommonProxy.BLOCK_CONTROLLER.getUnlocalizedName()).getFormattedText();
+        String name = new TextComponentTranslation(CommonProxy.BLOCK_CONTROLLER.getUnlocalizedName() + ".name").getFormattedText();
         fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, 6, 0x404040);
 
         ContainerController containerController = (ContainerController) this.inventorySlots;
