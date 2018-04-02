@@ -140,7 +140,7 @@ public class TileController extends TileBase implements ITickable {
         BlockPos center = this.pos.offset(EnumFacing.UP, 2);
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
         boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
-        BlockPos corner1 = new BlockPos(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0)).offset(facing.getOpposite(), length);
+        BlockPos corner1 = new BlockPos(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0)).offset(facing.getOpposite(), length - 1);
         BlockPos corner2 = new BlockPos(center.getX() + (isSouthNorth ? -2 : 0), center.getY() - 2, center.getZ() + (!isSouthNorth ? -2 : 0));
         return new AxisAlignedBB(corner1, corner2);
     }

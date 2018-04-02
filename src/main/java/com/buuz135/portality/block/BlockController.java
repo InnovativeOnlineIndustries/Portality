@@ -19,6 +19,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 
@@ -28,6 +30,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         super("controller", TileController.class, Material.ROCK, GuiHandler.CONTROLLER);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void registerRender() {
         super.registerRender();
