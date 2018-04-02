@@ -54,7 +54,7 @@ public class TileController extends TileBase implements ITickable {
     public void update() {
         if (isActive()) {
             teleportHandler.tick();
-            if (linkData != null && linkData.isCaller()) {
+            if (linkData != null) {
                 for (Entity entity : this.world.getEntitiesWithinAABB(Entity.class, getPortalArea())) {
                     teleportHandler.addEntityToTeleport(entity, linkData);
                 }
