@@ -1,0 +1,20 @@
+{
+  "result": {
+    "item": "portality:frame"
+  },
+  "pattern": [
+    "fdf",
+    "d d",
+    "fdf"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "f": {
+      "item": "minecraft:stone",
+      "data": 0
+    },
+    "d": {
+      "item": "minecraft:quartz"
+    }
+  }
+}

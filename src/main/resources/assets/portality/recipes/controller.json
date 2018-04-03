@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "portality:controller"
+  },
+  "pattern": [
+    "fdf",
+    "dqd",
+    "fdf"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "f": {
+      "item": "portality:frame"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    },
+    "q": {
+      "item": "minecraft:quartz_block",
+      "data": 0
+    }
+  }
+}
