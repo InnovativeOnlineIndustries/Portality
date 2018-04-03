@@ -25,7 +25,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = Portality.MOD_ID,
         name = Portality.MOD_NAME,
         version = Portality.VERSION,
-        dependencies = "required-after:ctm"
+        dependencies = "required-client:ctm"
 )
 public class Portality {
 
