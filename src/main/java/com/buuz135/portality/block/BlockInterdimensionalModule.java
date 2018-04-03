@@ -19,7 +19,7 @@ public class BlockInterdimensionalModule extends BlockBasic implements IPortalMo
     }
 
     @Override
-    public void work(TileController controller) {
+    public void work(TileController controller, BlockPos pos) {
 
     }
 

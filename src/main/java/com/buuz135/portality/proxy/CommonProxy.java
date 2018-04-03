@@ -4,6 +4,9 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.block.BlockInterdimensionalModule;
+import com.buuz135.portality.block.module.BlockCapabilityEnergyModule;
+import com.buuz135.portality.block.module.BlockCapabilityFluidModule;
+import com.buuz135.portality.block.module.BlockCapabilityItemModule;
 import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.network.*;
@@ -22,7 +25,11 @@ public class CommonProxy {
 
     public static final BlockController BLOCK_CONTROLLER = new BlockController();
     public static final BlockFrame BLOCK_FRAME = new BlockFrame();
+
     public static final BlockInterdimensionalModule BLOCK_INTERDIMENSIONAL_MODULE = new BlockInterdimensionalModule();
+    public static final BlockCapabilityItemModule BLOCK_CAPABILITY_ITEM_MODULE_INPUT = new BlockCapabilityItemModule();
+    public static final BlockCapabilityFluidModule BLOCK_CAPABILITY_FLUID_MODULE = new BlockCapabilityFluidModule();
+    public static final BlockCapabilityEnergyModule BLOCK_CAPABILITY_ENERGY_MODULE = new BlockCapabilityEnergyModule();
 
     public void onPreInit(FMLPreInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(Portality.INSTANCE, new GuiHandler());

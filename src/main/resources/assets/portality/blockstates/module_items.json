@@ -1,0 +1,22 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "portality:module_items_input"
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ],
+    "input": {
+      "true": {
+        "model": "portality:module_items_input"
+      },
+      "false": {
+        "model": "portality:module_items_output"
+      }
+    }
+  }
+}

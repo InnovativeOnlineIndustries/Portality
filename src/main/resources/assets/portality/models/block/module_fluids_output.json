@@ -1,0 +1,7 @@
+{
+  "parent": "portality:block/util_cube_glow_2_all",
+  "textures": {
+    "all": "portality:blocks/base/base_all",
+    "glow": "portality:blocks/modules/fluids_output"
+  }
+}

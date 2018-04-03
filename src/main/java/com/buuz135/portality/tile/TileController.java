@@ -161,6 +161,7 @@ public class TileController extends TileBase implements ITickable {
             Block block = this.world.getBlockState(pos).getBlock();
             if (block instanceof IPortalModule) {
                 if (((IPortalModule) block).allowsInterdimensionalTravel()) interdimensional = true;
+                ((IPortalModule) block).work(this, pos);
             }
         }
         PortalDataManager.setPortalInterdimensional(this.world, this.pos, interdimensional);
@@ -216,14 +217,14 @@ public class TileController extends TileBase implements ITickable {
         return "";
     }
 
-    public boolean isInterdimensional() {
-        return information != null && information.isInterdimensional();
-    }
-
     public void setName(String name) {
         PortalDataManager.setPortalName(this.world, this.getPos(), name);
         getPortalInfo();
         markForUpdate();
+    }
+
+    public boolean isInterdimensional() {
+        return information != null && information.isInterdimensional();
     }
 
     public ItemStack getDisplay() {
@@ -296,6 +297,10 @@ public class TileController extends TileBase implements ITickable {
 
     public void setDisplayNameEnabled(boolean display) {
         this.display = display;
+    }
+
+    public List<BlockPos> getModules() {
+        return modules;
     }
 
     @Nullable

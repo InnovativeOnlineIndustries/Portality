@@ -1,6 +1,11 @@
+itemGroup.portality=Portality
+
 tile.portality:controller.name=Portal Controller
 tile.portality:frame.name=Portal Frame
 tile.portality:module_interdimensional.name=Interdimensional Module
+tile.portality:module_items.name=Item Module
+tile.portality:module_fluids.name=Fluid Module
+tile.portality:module_energy.name=Energy Module
 
 portality.controller.error.size=ERROR: Portal needs to be 3 blocks deep!
 portality.controller.error.privacy=ERROR: This portal is private!
@@ -30,3 +35,5 @@ portality.gui.controller.rename=Rename
 portality.gui.portals.previous_page=Previous Page
 portality.gui.portals.next_page=Next Page
 portality.gui.portals.page=PAGE:
+module.type.output=Type: Output
+module.type.input=Type: Input
