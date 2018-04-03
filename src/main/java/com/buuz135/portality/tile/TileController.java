@@ -168,7 +168,7 @@ public class TileController extends TileBase implements ITickable {
     }
 
     public AxisAlignedBB getPortalArea() {
-        if ((world.getBlockState(this.pos).getBlock() instanceof BlockController))
+        if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
         BlockPos center = this.pos.offset(EnumFacing.UP, 2);
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
