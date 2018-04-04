@@ -6,7 +6,7 @@ To start with Portality you will need to to craft a couple of Portal Controllers
 
 ![](https://i.imgur.com/qllUZMm.png)
 
-A 5x5 hollow of frames and the controller will sit in the bottom row center of it. Then you will need to make it 2 blocks deep. (You will only need to add a controller in the first row)
+A 5x5 hollow of frames and the controller will sit in the bottom row center of it. Then you will need to make it 2 blocks deep. (You will only need to add a controller in the first row). The controller will need power to operate!
 
 ![](https://i.imgur.com/W3NiCFd.png)
 
