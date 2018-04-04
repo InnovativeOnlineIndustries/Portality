@@ -76,6 +76,7 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         if (te.isActive() && te.getLinkData() != null && te.isDisplayNameEnabled()) {
             this.setLightmapDisabled(true);
             drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
+            this.setLightmapDisabled(false);
         }
     }
 
