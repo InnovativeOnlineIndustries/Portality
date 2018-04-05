@@ -90,8 +90,9 @@ public abstract class BlockCapabilityModule<T, S extends TileEntity> extends Blo
     @SideOnly(Side.CLIENT)
     @Override
     public void registerRender() {
-        super.registerRender();
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 1, new ModelResourceLocation(this.getRegistryName(), "inventory"));
+        //super.registerRender();
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(this.getRegistryName(), "input=true"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 1, new ModelResourceLocation(this.getRegistryName(), "input=false"));
     }
 
     @SideOnly(Side.CLIENT)
