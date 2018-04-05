@@ -13,6 +13,17 @@ buildscript {
 
 apply plugin: "net.minecraftforge.gradle.forge"
 
+String b = ""
+if (project.hasProperty("teamcity")) {
+    b = System.getenv("BUILD_NUMBER")
+}
+
+if (b == null || b == "") {
+    version = "${project.minecraftVersion}-${modVersion}"
+} else {
+    version = "${project.minecraftVersion}-${modVersion}-" + b
+}
+
 version = modVersion
 group = modGroup
 archivesBaseName = modBaseName

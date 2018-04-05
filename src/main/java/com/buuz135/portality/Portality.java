@@ -4,6 +4,7 @@ import com.buuz135.portality.block.BlockBasic;
 import com.buuz135.portality.block.module.BlockCapabilityModule;
 import com.buuz135.portality.proxy.CommonProxy;
 import net.minecraft.block.Block;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -73,6 +74,11 @@ public class Portality {
                                 items.add(new ItemStack(this, 1, 0));
                                 items.add(new ItemStack(this, 1, 1));
                             }
+                        }
+
+                        @Override
+                        public String getItemStackDisplayName(ItemStack stack) {
+                            return super.getItemStackDisplayName(stack) + " (" + (stack.getMetadata() == 0 ? I18n.format("module.type.input") : I18n.format("module.type.output")) + ")";
                         }
 
                         @Override
