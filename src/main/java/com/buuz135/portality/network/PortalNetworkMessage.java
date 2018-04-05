@@ -116,9 +116,11 @@ public class PortalNetworkMessage {
 
         @Override
         public IMessage onMessage(Response message, MessageContext ctx) {
-            if (Minecraft.getMinecraft().currentScreen instanceof GuiPortals) {
-                ((GuiPortals) Minecraft.getMinecraft().currentScreen).refresh(message.information);
-            }
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                if (Minecraft.getMinecraft().currentScreen instanceof GuiPortals) {
+                    ((GuiPortals) Minecraft.getMinecraft().currentScreen).refresh(message.information);
+                }
+            });
             return null;
         }
     }
