@@ -18,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.Capability;
@@ -74,7 +75,7 @@ public abstract class BlockCapabilityModule<T, S extends TileEntity> extends Blo
     }
 
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(INPUT) ? 1 : 0;
+        return state.getValue(INPUT) ? 0 : 1;
     }
 
     @Override
@@ -90,7 +91,6 @@ public abstract class BlockCapabilityModule<T, S extends TileEntity> extends Blo
     @SideOnly(Side.CLIENT)
     @Override
     public void registerRender() {
-        //super.registerRender();
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(this.getRegistryName(), "input=true"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 1, new ModelResourceLocation(this.getRegistryName(), "input=false"));
     }
@@ -100,5 +100,10 @@ public abstract class BlockCapabilityModule<T, S extends TileEntity> extends Blo
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
         tooltip.add(stack.getMetadata() == 0 ? I18n.format("module.type.input") : I18n.format("module.type.output"));
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        return new ItemStack(this, 1, this.getMetaFromState(state));
     }
 }
