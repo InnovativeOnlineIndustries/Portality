@@ -1,5 +1,6 @@
 # 1.0.3
 + Fixed a server side crash
++ You are now able to shift+right click blocks against the controller
 
 # 1.0.2
 + Module Items now have proper inventory items

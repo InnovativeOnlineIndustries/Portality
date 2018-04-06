@@ -10,6 +10,7 @@ import com.buuz135.portality.block.module.BlockCapabilityItemModule;
 import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.network.*;
+import com.buuz135.portality.tile.TileController;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -57,7 +58,10 @@ public class CommonProxy {
     @SubscribeEvent
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
         if (event.getEntityPlayer().isSneaking() && event.getEntityPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
-            event.setUseBlock(Event.Result.ALLOW);
+            TileController controller = (TileController) event.getWorld().getTileEntity(event.getPos());
+            if (!controller.getDisplay().isItemEqual(event.getItemStack())) {
+                event.setUseBlock(Event.Result.ALLOW);
+            }
         }
     }
 
