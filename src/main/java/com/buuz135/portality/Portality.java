@@ -4,12 +4,12 @@ import com.buuz135.portality.block.BlockBasic;
 import com.buuz135.portality.block.module.BlockCapabilityModule;
 import com.buuz135.portality.proxy.CommonProxy;
 import net.minecraft.block.Block;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -78,7 +78,7 @@ public class Portality {
 
                         @Override
                         public String getItemStackDisplayName(ItemStack stack) {
-                            return super.getItemStackDisplayName(stack) + " (" + (stack.getMetadata() == 0 ? I18n.format("module.type.input") : I18n.format("module.type.output")) + ")";
+                            return super.getItemStackDisplayName(stack) + " (" + (stack.getMetadata() == 0 ? new TextComponentTranslation("module.type.input").getFormattedText() : new TextComponentTranslation("module.type.output").getFormattedText()) + ")";
                         }
 
                         @Override
