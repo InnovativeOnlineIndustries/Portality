@@ -17,6 +17,6 @@ You can change the icon of a portal of how by Shift+Right Clicking with a block 
 
 ## Functional Modules
 
-There are different types of modules that can transfer items/fluids/energy between connected portals. Just make sure the they have the correct type for input and output! When the modules are present the will transfer stuff from the input type to the output type
+There are different types of modules that can transfer items/fluids/energy between connected portals. Just make sure the they have the correct type for input and output! When the modules are present they will transfer stuff from the input type to the output type, you can connect any pipe to them but they won't pull or push anthing. They dont have a GUI but they have a small buffer.
 
 ![](https://i.imgur.com/wz1s5Zc.png)
