@@ -1,5 +1,6 @@
 # 1.0.4
 + Energy module output now pushes energy out
++ Block have the right tools to break
 
 # 1.0.3
 + Fixed a server side crash
