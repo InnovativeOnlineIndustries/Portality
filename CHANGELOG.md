@@ -1,3 +1,6 @@
+# 1.0.4
++ Energy module output now pushes energy out
+
 # 1.0.3
 + Fixed a server side crash
 + You are now able to shift+right click blocks against the controller
