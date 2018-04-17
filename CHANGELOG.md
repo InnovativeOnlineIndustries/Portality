@@ -1,3 +1,6 @@
+# 1.0.5
++ Fixed Blocks not having the correct BlockRenderLayer
+
 # 1.0.4
 + Energy module output now pushes energy out
 + Block have the right tools to break
