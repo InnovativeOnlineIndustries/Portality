@@ -1,0 +1,10 @@
+{
+  "portal": {
+    "category": "block",
+    "sounds": [
+      "portality:portal"
+    ],
+    "subtitle": "portality.subtitle.portal",
+    "stream": true
+  }
+}

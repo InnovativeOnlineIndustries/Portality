@@ -10,6 +10,8 @@ import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.proxy.PortalityConfig;
+import com.buuz135.portality.proxy.PortalitySoundHandler;
+import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -23,6 +25,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -49,6 +54,9 @@ public class TileController extends TileBase implements ITickable {
     private PortalLinkData linkData;
     private CustomEnergyStorageHandler energy;
 
+    @SideOnly(Side.CLIENT)
+    private TickeableSound sound;
+
     private TeleportHandler teleportHandler;
     private List<BlockPos> modules;
 
@@ -73,7 +81,10 @@ public class TileController extends TileBase implements ITickable {
                 }
             }
         }
-        if (world.isRemote) return;
+        if (world.isRemote) {
+            tickSound();
+            return;
+        }
         if (isActive() && linkData != null) {
             energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length * PortalityConfig.POWER_PORTAL_TICK, false);
             if (energy.getEnergyStored() == 0) {
@@ -93,6 +104,24 @@ public class TileController extends TileBase implements ITickable {
                 if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
                     this.closeLink();
                 }
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void tickSound() {
+        if (isActive()) {
+            if (sound == null) {
+                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.pos, PortalitySoundHandler.portal));
+            } else {
+                sound.increase();
+            }
+        } else if (sound != null) {
+            if (sound.getPitch() > 0) {
+                sound.decrease();
+            } else {
+                sound.setDone();
+                sound = null;
             }
         }
     }

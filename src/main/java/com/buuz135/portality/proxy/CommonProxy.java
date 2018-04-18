@@ -45,6 +45,7 @@ public class CommonProxy {
         Portality.NETWORK.registerMessage(PortalDisplayToggleMessage.Handler.class, PortalDisplayToggleMessage.class, id++, Side.SERVER);
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new PortalitySoundHandler());
     }
 
     public void onInit(FMLInitializationEvent event) {

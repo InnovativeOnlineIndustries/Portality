@@ -1,5 +1,7 @@
 # 1.0.5
 + Fixed Blocks not having the correct BlockRenderLayer
++ Fixed manifest exporting incorrectly
++ Added portal sounds
 
 # 1.0.4
 + Energy module output now pushes energy out
