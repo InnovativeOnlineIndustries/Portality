@@ -50,25 +50,27 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         }
         double frame = ClientProxy.TICK / 80D;
         //TOP
+        GlStateManager.translate(0.2, 0, 0);
         renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
+        GlStateManager.translate(-0.2, 0, 0);
         //RIGHT
-        GlStateManager.translate(3, 2, 0);
+        GlStateManager.translate(3, 2.2, 0);
         GlStateManager.rotate(90, 0, 0, 1);
         renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
         GlStateManager.rotate(-90, 0, 0, 1);
-        GlStateManager.translate(-3, -2, 0);
+        GlStateManager.translate(-3, -2.2, 0);
         //LEFT
-        GlStateManager.translate(-2, 3, 0);
+        GlStateManager.translate(-2, 2.8, 0);
         GlStateManager.rotate(-90, 0, 0, 1);
         renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
         GlStateManager.rotate(90, 0, 0, 1);
-        GlStateManager.translate(2, -3, 0);
+        GlStateManager.translate(2, -2.8, 0);
         //BOTTOM
-        GlStateManager.translate(1, 5, 0);
+        GlStateManager.translate(0.8, 5, 0);
         GlStateManager.rotate(-180, 0, 0, 1);
         renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
         GlStateManager.rotate(190, 0, 0, 1);
-        GlStateManager.translate(-1, -5, 0);
+        GlStateManager.translate(-0.8, -5, 0);
 
         buffer.setTranslation(0, 0, 0);
         RenderHelper.enableStandardItemLighting();
@@ -89,13 +91,17 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
                 double u = 1;
                 double pX2 = 0;
                 double u2 = 0;
-                if (posX == 3) {
-                    pX1 = 1 - frame - 0.2;
-                    u = 1 - 1 * frame - 0.2;
-                }
                 if (posX == 0) {
-                    pX2 = 1 - frame + 0.2;
-                    u2 = 1 - frame + 0.2;
+                    pX2 = 1 - frame;
+                    u2 = 1 - frame;
+                }
+                if (posX == 3) {
+                    pX1 = Math.max(1 - frame - 0.4, 0);
+                    u = 1 - 1 * frame - 0.4;
+                }
+                if (posX == 2 && posX + frame > 2.60) {
+                    pX1 = 1 - frame + 0.6;
+                    u = 1 - 1 * frame + 0.6;
                 }
                 buffer.pos(pX2, 3.8, 0).tex(u2, 0).lightmap(j, k).color(255, 255, 255, 255).endVertex();
                 buffer.pos(pX1, 3.8, 0).tex(u, 0).lightmap(j, k).color(255, 255, 255, 255).endVertex();
