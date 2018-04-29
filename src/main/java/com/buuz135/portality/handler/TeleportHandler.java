@@ -5,6 +5,7 @@ import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.network.PortalTeleportMessage;
 import com.buuz135.portality.proxy.PortalityConfig;
+import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import net.minecraft.entity.Entity;
@@ -12,8 +13,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
+import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -90,8 +95,7 @@ public class TeleportHandler {
         for (Map.Entry<Entity, TeleportedEntityData> entry : entitesTeleported.entrySet()) {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
-                if (entry.getKey() instanceof EntityPlayer)
-                    entry.getKey().world.playSound((EntityPlayer) entry.getKey(), entry.getKey().getPosition(), new SoundEvent(new ResourceLocation("block.portal.travel")), SoundCategory.AMBIENT, 1, 1);
+                entry.getKey().world.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPacketCustomSound(PortalitySoundHandler.PORTAL_TP.getSoundName().toString(), SoundCategory.BLOCKS, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, 1f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);

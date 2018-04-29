@@ -20,7 +20,7 @@ public class TickeableSound extends PositionedSound implements ITickableSound {
         this.zPosF = pos.getZ();
         this.repeat = true;
         this.done = false;
-        this.volume = 0.5f;
+        this.volume = 0.35f;
         this.pitch = 0f;
     }
 

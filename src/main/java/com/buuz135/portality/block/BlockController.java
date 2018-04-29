@@ -54,7 +54,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile != null && tile instanceof TileController) {
+        if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
             if (!controller.isFormed()) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);

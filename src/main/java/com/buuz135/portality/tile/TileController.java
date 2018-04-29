@@ -112,7 +112,7 @@ public class TileController extends TileBase implements ITickable {
     private void tickSound() {
         if (isActive()) {
             if (sound == null) {
-                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.pos, PortalitySoundHandler.portal));
+                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.pos, PortalitySoundHandler.PORTAL));
             } else {
                 sound.increase();
             }

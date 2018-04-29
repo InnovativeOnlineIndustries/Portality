@@ -1,12 +1,11 @@
 package com.buuz135.portality.network;
 
 import com.buuz135.portality.proxy.PortalityConfig;
+import com.buuz135.portality.proxy.PortalitySoundHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -42,7 +41,8 @@ public class PortalTeleportMessage implements IMessage {
         @Override
         public IMessage onMessage(PortalTeleportMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
-                Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
+                //Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
+                Minecraft.getMinecraft().player.playSound(PortalitySoundHandler.PORTAL_TP, 1, 1f);
                 if (PortalityConfig.LAUNCH_PLAYERS) {
                     EnumFacing facing = EnumFacing.values()[message.facing];
                     Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * message.length / (double) PortalityConfig.MAX_PORTAL_LENGTH);
