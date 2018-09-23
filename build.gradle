@@ -82,7 +82,7 @@ jar{
 }
 
 changelog {
-    title = "Worldgen Indicators"
+    title = "Portality"
     fileName = "CHANGELOG.md"
     outputDirectory = file("$projectDir")
     since = '1.0.5'
