@@ -42,6 +42,10 @@ public class TeleportHandler {
     }
 
     public void tick() {
+        if (!(controller.getWorld().getBlockState(controller.getPos()).getBlock() instanceof BlockController)) {
+            controller.closeLink();
+            return;
+        }
         EnumFacing facing = controller.getWorld().getBlockState(controller.getPos()).getValue(BlockController.FACING).getOpposite();
         Random random = controller.getWorld().rand;
         BlockPos offset = controller.getPos().offset(facing);
