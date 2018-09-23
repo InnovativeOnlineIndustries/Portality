@@ -60,13 +60,13 @@ public class GuiButtonImagePortal extends GuiButtonImage implements IHasTooltip 
         super.drawButtonForegroundLayer(mouseX, mouseY);
         GlStateManager.pushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
-        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(information.getDisplay(), x + 13, 10 + y);
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(information.getDisplay(), x + 5, y + 3);
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
         TextFormatting color = TextFormatting.WHITE;
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 28)), x + 40, 10 + y, 0xFFFFFF);
-        fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
+        fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 28)), x + 28, 7 + y, 0xFFFFFF);
+        //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.popMatrix();
     }

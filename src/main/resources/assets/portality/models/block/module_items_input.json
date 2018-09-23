@@ -1,7 +1,6 @@
 {
-  "parent": "portality:block/util_cube_glow_2_all",
+  "parent": "portality:block/module",
   "textures": {
-    "all": "portality:blocks/base/base_all",
     "glow": "portality:blocks/modules/items_input"
   }
 }

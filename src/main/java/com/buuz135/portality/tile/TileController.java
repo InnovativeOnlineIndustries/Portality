@@ -101,7 +101,7 @@ public class TileController extends TileBase implements ITickable {
             if (linkData != null) {
                 ChunkLoaderHandler.addPortalAsChunkloader(this);
                 TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
                     this.closeLink();
                 }
             }
@@ -240,6 +240,11 @@ public class TileController extends TileBase implements ITickable {
 
     public UUID getOwner() {
         if (information != null) return information.getOwner();
+        return null;
+    }
+
+    public UUID getID() {
+        if (information != null) return information.getId();
         return null;
     }
 

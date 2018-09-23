@@ -2,7 +2,6 @@ package com.buuz135.portality.proxy.client.render;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
-import com.buuz135.portality.proxy.client.ClientProxy;
 import com.buuz135.portality.tile.TileController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -15,6 +14,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+
 public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
 
     @Override
@@ -22,6 +23,7 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         super.render(te, x, y, z, partialTicks, destroyStage, alpha);
         if (!te.isFormed()) return;
         GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         int j = 240;
@@ -32,7 +34,8 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         } else {
             GlStateManager.shadeModel(GL11.GL_FLAT);
         }
-        bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/blocks/frame/frame.png"));
+        bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"));
+        //GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         GlStateManager.translate(x, y, z);
         //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
         EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockController.FACING);
@@ -48,32 +51,34 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
             GlStateManager.translate(0, 0, 1);
             GlStateManager.rotate(90, 0, 1, 0);
         }
-        double frame = ClientProxy.TICK / 80D;
+        double frame = (te.getWorld().getTotalWorldTime() % 60) / 60D;
+        //frame = 0.4;
         //TOP
-        GlStateManager.translate(0.2, 0, 0);
-        renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
-        GlStateManager.translate(-0.2, 0, 0);
+        GlStateManager.translate(0.1, 0, 0);
+        renderTop(tessellator, buffer, te, frame, j, k, 0.4);
+        GlStateManager.translate(-0.1, 0, 0);
         //RIGHT
-        GlStateManager.translate(3, 2.2, 0);
+        GlStateManager.translate(3, 2.1, 0);
         GlStateManager.rotate(90, 0, 0, 1);
-        renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
+        renderTop(tessellator, buffer, te, frame, j, k, 0.2);
         GlStateManager.rotate(-90, 0, 0, 1);
-        GlStateManager.translate(-3, -2.2, 0);
+        GlStateManager.translate(-3, -2.1, 0);
         //LEFT
-        GlStateManager.translate(-2, 2.8, 0);
+        GlStateManager.translate(-2, 2.9, 0);
         GlStateManager.rotate(-90, 0, 0, 1);
-        renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
+        renderTop(tessellator, buffer, te, frame, j, k, 0);
         GlStateManager.rotate(90, 0, 0, 1);
-        GlStateManager.translate(2, -2.8, 0);
+        GlStateManager.translate(2, -2.9, 0);
         //BOTTOM
-        GlStateManager.translate(0.8, 5, 0);
+        GlStateManager.translate(0.9, 5, 0);
         GlStateManager.rotate(-180, 0, 0, 1);
-        renderTop(tessellator, buffer, te, x, y, z, frame, j, k);
+        renderTop(tessellator, buffer, te, frame, j, k, 0.6);
         GlStateManager.rotate(190, 0, 0, 1);
-        GlStateManager.translate(-0.8, -5, 0);
+        GlStateManager.translate(-0.9, -5, 0);
 
         buffer.setTranslation(0, 0, 0);
         RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
         if (te.isActive() && te.getLinkData() != null && te.isDisplayNameEnabled()) {
             this.setLightmapDisabled(true);
@@ -82,10 +87,14 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         }
     }
 
-    public void renderTop(Tessellator tessellator, BufferBuilder buffer, TileController te, double x, double y, double z, double frame, int j, int k) {
-        for (int posX = 0; posX < 4; ++posX) {
+    public void renderTop(Tessellator tessellator, BufferBuilder buffer, TileController te, double frame, int j, int k, double offset) {
+        double scale = 0.9335;
+        double off = 0.0278;
+        GlStateManager.scale(scale, 1, 1);
+        GlStateManager.enableAlpha();
+        for (double posX = 0; posX < 4; ++posX) {
             for (int posZ = 0; posZ < te.getLength(); ++posZ) {
-                GlStateManager.translate(posX - 2 + frame, 0, posZ);
+                GlStateManager.translate(posX - 2.1 + frame + off, 0, posZ);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
                 double pX1 = 1;
                 double u = 1;
@@ -95,21 +104,29 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
                     pX2 = 1 - frame;
                     u2 = 1 - frame;
                 }
+                if (posX == 1 && frame < 0) {
+                    pX2 = -frame;
+                    u2 = -frame;
+                }
                 if (posX == 3) {
-                    pX1 = Math.max(1 - frame - 0.4, 0);
-                    u = 1 - 1 * frame - 0.4;
+                    pX1 = Math.max(1 - frame, 0);
+                    u = 1 - 1 * frame;
                 }
-                if (posX == 2 && posX + frame > 2.60) {
-                    pX1 = 1 - frame + 0.6;
-                    u = 1 - 1 * frame + 0.6;
+                if (posX == 2 && posX + frame > 3) {
+                    pX1 = 1 - frame + 1;
+                    u = 1 - 1 * frame + 1;
                 }
-                buffer.pos(pX2, 3.8, 0).tex(u2, 0).lightmap(j, k).color(255, 255, 255, 255).endVertex();
-                buffer.pos(pX1, 3.8, 0).tex(u, 0).lightmap(j, k).color(255, 255, 255, 255).endVertex();
-                buffer.pos(pX1, 3.8, 1).tex(u, 1).lightmap(j, k).color(255, 255, 255, 255).endVertex();
-                buffer.pos(pX2, 3.8, 1).tex(u2, 1).lightmap(j, k).color(255, 255, 255, 255).endVertex();
+                int alpha = 100;
+                buffer.pos(pX2, 3.9, 0).tex(u2, 0).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
+                buffer.pos(pX1, 3.9, 0).tex(u, 0).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
+                buffer.pos(pX1, 3.9, 1).tex(u, 1).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
+                buffer.pos(pX2, 3.9, 1).tex(u2, 1).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
                 tessellator.draw();
-                GlStateManager.translate(-(posX - 2 + frame), 0, -posZ);
+
+                GlStateManager.translate(-(posX - 2.1 + frame + off), 0, -posZ);
+
             }
         }
+        GlStateManager.scale(1 / scale, 1, 1);
     }
 }

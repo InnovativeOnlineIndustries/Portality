@@ -42,7 +42,7 @@ public class PortalTeleportMessage implements IMessage {
         public IMessage onMessage(PortalTeleportMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 //Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
-                Minecraft.getMinecraft().player.playSound(PortalitySoundHandler.PORTAL_TP, 1, 1f);
+                Minecraft.getMinecraft().player.playSound(PortalitySoundHandler.PORTAL_TP, 0.1f, 1f);
                 if (PortalityConfig.LAUNCH_PLAYERS) {
                     EnumFacing facing = EnumFacing.values()[message.facing];
                     Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * message.length / (double) PortalityConfig.MAX_PORTAL_LENGTH);

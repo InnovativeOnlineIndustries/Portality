@@ -4,101 +4,90 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import org.lwjgl.input.Mouse;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GuiPortals extends GuiContainer {
 
     private ContainerController controller;
-    private int pointer;
     private List<PortalInformation> informationList;
+    private GuiTextField textField;
+    private double scrolling;
+    private double lastScrolling;
+    private boolean isDragging;
+    private int visiblePortalInformations;
 
     public GuiPortals(ContainerController controller) {
         super(controller);
+        this.xSize = 200;
+        this.ySize = 186;
         this.controller = controller;
-        pointer = 0;
+        this.scrolling = 0;
+        this.lastScrolling = 0;
     }
 
     @Override
     public void initGui() {
         super.initGui();
         if (informationList != null && !informationList.isEmpty()) addPortalButtons();
+        textField = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, this.guiLeft + xSize - 131, this.guiTop + 3, 100, 10);
+        textField.setFocused(true);
+        textField.setVisible(true);
+        textField.setEnableBackgroundDrawing(true);
     }
 
     public void refresh(List<PortalInformation> informationList) {
         this.informationList = informationList;
-        pointer = 0;
-        informationList.removeIf(information -> information.isPrivate() && !information.getOwner().equals(mc.player.getUniqueID()));
-        informationList.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
-        informationList.removeIf(information -> information.getDimension() == controller.getController().getWorld().provider.getDimension() && information.getLocation().equals(controller.getController().getPos()));
-        this.buttonList.clear();
         addPortalButtons();
     }
 
     private void addPortalButtons() {
-        buttonList.clear();
-        for (int i = 0; i < 4; i++) {
-            if (informationList.size() > pointer + i) {
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(pointer + i), i + 3, this.guiLeft + 5, this.guiTop + 6 + 39 * i, 166, 36, 0, 166, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"), controller.getController());
+        if (this.informationList == null) return;
+        List<PortalInformation> informationList = new ArrayList<>(this.informationList);
+        informationList.removeIf(information -> information.isPrivate() && !information.getOwner().equals(mc.player.getUniqueID()));
+        informationList.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
+        informationList.removeIf(information -> information.getDimension() == controller.getController().getWorld().provider.getDimension() && information.getLocation().equals(controller.getController().getPos()));
+        if (!textField.getText().isEmpty())
+            informationList.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText()));
+        this.buttonList.clear();
+        this.visiblePortalInformations = informationList.size();
+        int pointer = (int) ((informationList.size() / 7D) * scrolling);
+        for (int i = pointer; i < pointer + 7; i++) {
+            if (informationList.size() > i) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(i), i + 3, this.guiLeft + 9, this.guiTop + 19 + 23 * (i - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"), controller.getController());
                 this.addButton(buttonImage);
             }
         }
-        this.addButton(new TooltipGuiButton(0, this.guiLeft, this.guiTop + ySize, 20, 20, "<") {
-            @Override
-            public List<String> getTooltip() {
-                return Arrays.asList(I18n.format("portality.gui.portals.previous_page"));
-            }
-
-            @Override
-            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-                if (isMouseOver()) {
-                    pointer = Math.max(0, pointer - 4);
-                    addPortalButtons();
-                }
-                return super.mousePressed(mc, mouseX, mouseY);
-            }
-        });
-        this.addButton(new TooltipGuiButton(1, this.guiLeft + this.xSize - 20, this.guiTop + ySize, 20, 20, ">") {
-            @Override
-            public List<String> getTooltip() {
-                return Arrays.asList(I18n.format("portality.gui.portals.next_page"));
-            }
-
-            @Override
-            public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-                if (isMouseOver() && pointer + 4 < informationList.size()) {
-                    pointer += 4;
-                    addPortalButtons();
-                }
-                return super.mousePressed(mc, mouseX, mouseY);
-            }
-        });
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        drawDefaultBackground();
-        GlStateManager.color(1, 1, 1, 1);
-        mc.getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
+        drawDefaultBackground();
+        checkForScrolling(mouseX, mouseY);
+        drawRect(this.guiLeft + 5, this.guiTop + 15, this.guiLeft + 165 + 5, this.guiTop + 168 + 15, 0xff242424);
+        GlStateManager.color(1, 1, 1, 1);
+        //Render Buttons
+        mc.getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+        drawTexturedModalRect(this.guiLeft + xSize - 22, (float) (this.guiTop + 10 + 140 * scrolling), 200, 9, 18, 23);
 
+        textField.drawTextBox();
+        GlStateManager.color(1, 1, 1, 1);
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        if (informationList != null) {
-            String name = I18n.format("portality.gui.portals.page") + " " + ((int) Math.ceil(pointer / 4D) + 1 + "/" + ((int) Math.ceil(informationList.size() / 4D)));
-            fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, this.ySize + 7, 0xFFFFFF);
-        }
-
         for (GuiButton button : this.buttonList) {
             if (button instanceof IHasTooltip && button.isMouseOver()) {
                 this.drawHoveringText(((IHasTooltip) button).getTooltip(), mouseX - this.guiLeft, mouseY - this.guiTop);
@@ -106,5 +95,56 @@ public class GuiPortals extends GuiContainer {
         }
     }
 
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        textField.updateCursorCounter();
+        addPortalButtons();
+    }
 
+    @Override
+    protected void keyTyped(char c, int keyCode) {
+        if (keyCode == 1) {
+            this.mc.player.closeScreen();
+        }
+        String text = textField.getText();
+        textField.textboxKeyTyped(c, keyCode);
+        if (!text.equals(textField.getText())) {
+            this.scrolling = 0;
+            this.lastScrolling = 0;
+            addPortalButtons();
+        }
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        int mouseS = Mouse.getEventDWheel();
+        if (mouseS != 0) {
+            double step = 1 / (visiblePortalInformations / 7D);
+            if (mouseS < 0) {
+                lastScrolling = scrolling;
+                scrolling = Math.min(1, scrolling + step);
+            }
+            if (mouseS > 0) {
+                lastScrolling = scrolling;
+                scrolling = Math.max(0, scrolling - step);
+            }
+        }
+        super.handleMouseInput();
+    }
+
+    private void checkForScrolling(int mouseX, int mouseY) {
+        if (Mouse.isButtonDown(0)) {
+            if (!isDragging && mouseX > this.guiLeft + xSize - 22 && mouseX < this.guiLeft + xSize - 22 + 18 && mouseY > this.guiTop + 10 && mouseY < this.guiTop + 10 + 151) {
+                isDragging = true;
+            }
+            if (isDragging) {
+                mouseY -= (7 + 18 + this.guiTop);
+                lastScrolling = scrolling;
+                scrolling = MathHelper.clamp(mouseY / 128D, 0, 1);
+            }
+        } else {
+            isDragging = false;
+        }
+    }
 }

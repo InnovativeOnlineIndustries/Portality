@@ -2,6 +2,6 @@
   "parent": "portality:block/util_cube_glow_2_all",
   "textures": {
     "all": "portality:blocks/base/base_all",
-    "glow": "portality:blocks/frame/frame"
+    "glow": "portality:blocks/frame/frame_overlay"
   }
 }

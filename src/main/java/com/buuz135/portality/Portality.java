@@ -25,11 +25,11 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(
         modid = Portality.MOD_ID,
         name = Portality.MOD_NAME,
-        version = Portality.VERSION,
-        dependencies = "required-client:ctm"
+        version = Portality.VERSION
 )
 public class Portality {
-
+    //,
+//        dependencies = "required-client:ctm"
     public static final String MOD_ID = "portality";
     public static final String MOD_NAME = "Portality";
     public static final String VERSION = "1.0-SNAPSHOT";

@@ -1,0 +1,25 @@
+{
+  "parent": "portality:block/util_cube_glow_3",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#all",
+    "down": "#all",
+    "up": "#all",
+    "north": "#all",
+    "east": "#all",
+    "south": "#all",
+    "west": "#all",
+    "glow_down_below": "#glow_down_below",
+    "glow_up_below": "#glow_up_below",
+    "glow_north_below": "#glow_north_below",
+    "glow_east_below": "#glow_east_below",
+    "glow_south_below": "#glow_south_below",
+    "glow_west_below": "#glow_west_below",
+    "glow_down": "#glow_down",
+    "glow_up": "#glow_up",
+    "glow_north": "#glow_north",
+    "glow_east": "#glow_east",
+    "glow_south": "#glow_south",
+    "glow_west": "#glow_west"
+  }
+}
