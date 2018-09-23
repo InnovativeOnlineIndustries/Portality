@@ -8,10 +8,18 @@ buildscript {
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'com.selesse:gradle-git-changelog:0.2.+'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
 }
 
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.matthewprenger.cursegradle" version "1.1.0"
+}
 apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: 'com.selesse.git.changelog'
+apply plugin: 'java'
 
 String b = ""
 if (project.hasProperty("teamcity")) {
@@ -70,5 +78,59 @@ processResources {
 jar{
     manifest{
         attributes "FMLAT": "Portality_at.cfg"
+    }
+}
+
+changelog {
+    title = "Worldgen Indicators"
+    fileName = "CHANGELOG.md"
+    outputDirectory = file("$projectDir")
+    since = '1.0.5'
+    commitFormat = '%s (%an)'
+    markdown {
+        commitFormat = '* %s (%an)'
+    }
+    includeLines = {
+        !it.contains("Merge")
+    }
+    processLines = {
+        String input = it as String
+        if (input.contains('[ci skip] ')) {
+            input = input.minus('[ci skip] ')
+        }
+        input
+    }
+}
+
+tasks.curseforge.enabled =  project.hasProperty('curse_api')
+
+curseforge {
+    if (project.hasProperty('curse_api')) {
+        apiKey = project.curse_api
+    }
+    project {
+        id = '291493'
+        changelog = file('CHANGELOG.md')
+        changelogType = 'markdown'
+        releaseType = 'release'
+
+        mainArtifact(jar){
+            relations {
+                requiredDependency 'ctm'
+            }
+        }
+
+        addArtifact sourceJar
+    }
+}
+
+license {
+    header rootProject.file('HEADER')
+    include "**/*.java"
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'Buuz135'
+    ignoreFailures = true
+    mapping {
+        java='SLASHSTAR_STYLE'
     }
 }
