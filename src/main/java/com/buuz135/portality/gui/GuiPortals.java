@@ -45,6 +45,7 @@ public class GuiPortals extends GuiContainer {
     private double lastScrolling;
     private boolean isDragging;
     private int visiblePortalInformations;
+    private List<GuiButtonImagePortal> portalButtons;
 
     public GuiPortals(ContainerController controller) {
         super(controller);
@@ -53,6 +54,7 @@ public class GuiPortals extends GuiContainer {
         this.controller = controller;
         this.scrolling = 0;
         this.lastScrolling = 0;
+        this.portalButtons = new ArrayList<>();
     }
 
     @Override
@@ -78,13 +80,15 @@ public class GuiPortals extends GuiContainer {
         informationList.removeIf(information -> information.getDimension() == controller.getController().getWorld().provider.getDimension() && information.getLocation().equals(controller.getController().getPos()));
         if (!textField.getText().isEmpty())
             informationList.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText()));
-        this.buttonList.clear();
+        this.buttonList.removeIf(guiButton -> portalButtons.contains(guiButton));
+        this.portalButtons.clear();
         this.visiblePortalInformations = informationList.size();
         int pointer = (int) ((informationList.size() / 7D) * scrolling);
         for (int i = pointer; i < pointer + 7; i++) {
             if (informationList.size() > i) {
                 GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(i), i + 3, this.guiLeft + 9, this.guiTop + 19 + 23 * (i - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"), controller.getController());
                 this.addButton(buttonImage);
+                this.portalButtons.add(buttonImage);
             }
         }
     }
