@@ -120,7 +120,8 @@ public class TeleportHandler {
         for (Map.Entry<Entity, TeleportedEntityData> entry : entitesTeleported.entrySet()) {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
-                entry.getKey().world.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPacketCustomSound(PortalitySoundHandler.PORTAL_TP.getSoundName().toString(), SoundCategory.BLOCKS, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, 0.5f, 1f)));
+                if (entry.getKey().world.isRemote)
+                    entry.getKey().world.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPacketCustomSound(PortalitySoundHandler.PORTAL_TP.getSoundName().toString(), SoundCategory.BLOCKS, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
