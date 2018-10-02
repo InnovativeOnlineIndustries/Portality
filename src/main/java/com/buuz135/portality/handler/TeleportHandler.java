@@ -124,12 +124,14 @@ public class TeleportHandler {
                     entry.getKey().world.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPacketCustomSound(PortalitySoundHandler.PORTAL_TP.getSoundName().toString(), SoundCategory.BLOCKS, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
-                EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
-                Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
-                entry.getKey().motionX = vec3d.x;
-                entry.getKey().motionY = vec3d.y;
-                entry.getKey().motionZ = vec3d.z;
-                entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
+                if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof BlockController) {
+                    EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(BlockController.FACING);
+                    Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
+                    entry.getKey().motionX = vec3d.x;
+                    entry.getKey().motionY = vec3d.y;
+                    entry.getKey().motionZ = vec3d.z;
+                    entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
+                }
             }
             if (entry.getValue().ticks > 40) {
                 entityRemove.add(entry.getKey());

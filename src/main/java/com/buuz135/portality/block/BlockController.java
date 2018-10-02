@@ -94,4 +94,13 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         }
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity entity = worldIn.getTileEntity(pos);
+        if (entity instanceof TileController) {
+            ((TileController) entity).closeLink();
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
 }
