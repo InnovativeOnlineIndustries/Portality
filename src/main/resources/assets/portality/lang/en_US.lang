@@ -13,9 +13,9 @@ portility.controller.info.icon_changed=Portal icon changed!
 
 portality.display.private=Private
 portality.display.public=Public
-portality.display.dial=Click to dial the portal
-portality.display.dial_once=Shift+Click to dial once
-portality.display.force=Ctrl+Shift+Click to force a dial
+portality.display.dial=Dial
+portality.display.dial_once=Dial Once
+portality.display.force=Force
 portality.display.call_portal=Call Portal
 portality.display.close_portal=Close Portal
 portality.display.change_name=Change Portal Name

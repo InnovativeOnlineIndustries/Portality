@@ -23,6 +23,8 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.gui.button.IHasTooltip;
+import com.buuz135.portality.gui.button.TooltipGuiButton;
 import com.buuz135.portality.network.PortalCloseMessage;
 import com.buuz135.portality.network.PortalDisplayToggleMessage;
 import com.buuz135.portality.network.PortalNetworkMessage;

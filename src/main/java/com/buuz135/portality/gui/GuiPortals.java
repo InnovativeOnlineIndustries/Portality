@@ -23,6 +23,9 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.gui.button.GuiButtonImagePortal;
+import com.buuz135.portality.gui.button.IHasTooltip;
+import com.buuz135.portality.gui.button.PortalCallButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -46,6 +49,7 @@ public class GuiPortals extends GuiContainer {
     private boolean isDragging;
     private int visiblePortalInformations;
     private List<GuiButtonImagePortal> portalButtons;
+    private PortalInformation selectedPortal;
 
     public GuiPortals(ContainerController controller) {
         super(controller);
@@ -65,6 +69,10 @@ public class GuiPortals extends GuiContainer {
         textField.setFocused(true);
         textField.setVisible(true);
         textField.setEnableBackgroundDrawing(true);
+        this.addButton(new PortalCallButton(135, this.guiLeft + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.OPEN, this));
+        this.addButton(new PortalCallButton(136, this.guiLeft + 53 + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.ONCE, this));
+        this.addButton(new PortalCallButton(137, this.guiLeft + 53 * 2 + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.FORCE, this));
+        ;
     }
 
     public void refresh(List<PortalInformation> informationList) {
@@ -86,7 +94,16 @@ public class GuiPortals extends GuiContainer {
         int pointer = (int) ((informationList.size() / 7D) * scrolling);
         for (int i = pointer; i < pointer + 7; i++) {
             if (informationList.size() > i) {
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(i), i + 3, this.guiLeft + 9, this.guiTop + 19 + 23 * (i - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"), controller.getController());
+                int finalI = i;
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(finalI), finalI + 3, this.guiLeft + 9, this.guiTop + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
+                    @Override
+                    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+                        if (isMouseOver()) {
+                            selectedPortal = informationList.get(finalI);
+                        }
+                        return super.mousePressed(mc, mouseX, mouseY);
+                    }
+                };
                 this.addButton(buttonImage);
                 this.portalButtons.add(buttonImage);
             }
@@ -108,11 +125,18 @@ public class GuiPortals extends GuiContainer {
 
         textField.drawTextBox();
         GlStateManager.color(1, 1, 1, 1);
+
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+        for (GuiButtonImagePortal portalButton : portalButtons) {
+            if (selectedPortal != null && portalButton.getInformation().getId().equals(selectedPortal.getId())) {
+                mc.getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+                drawTexturedModalRect(portalButton.x - this.guiLeft, portalButton.y - this.guiTop, 0, 210, 157, 22);
+            }
+        }
         for (GuiButton button : this.buttonList) {
             if (button instanceof IHasTooltip && button.isMouseOver()) {
                 this.drawHoveringText(((IHasTooltip) button).getTooltip(), mouseX - this.guiLeft, mouseY - this.guiTop);
@@ -171,5 +195,9 @@ public class GuiPortals extends GuiContainer {
         } else {
             isDragging = false;
         }
+    }
+
+    public PortalInformation getSelectedPortal() {
+        return selectedPortal;
     }
 }
