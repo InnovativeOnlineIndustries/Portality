@@ -29,7 +29,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
-public class TileEntityItemModule extends TileBase {
+public class TileEntityItemModule extends TileFrame {
 
     public ItemStackHandler handler;
 

@@ -99,7 +99,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         TileEntity entity = worldIn.getTileEntity(pos);
         if (entity instanceof TileController) {
-            ((TileController) entity).closeLink();
+            ((TileController) entity).breakController();
         }
         super.breakBlock(worldIn, pos, state);
     }

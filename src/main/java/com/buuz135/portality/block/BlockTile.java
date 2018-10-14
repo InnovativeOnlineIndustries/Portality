@@ -71,9 +71,9 @@ public class BlockTile<T extends TileEntity> extends BlockBasic {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (guiID == -1) return false;
         if (!worldIn.isRemote) {
             playerIn.openGui(Portality.INSTANCE, guiID, worldIn, pos.getX(), pos.getY(), pos.getZ());
-
         }
         return true;
     }

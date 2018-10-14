@@ -34,7 +34,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 import javax.annotation.Nullable;
 
 
-public class TileEntityEnergyModule extends TileBase implements ITickable {
+public class TileEntityEnergyModule extends TileFrame implements ITickable {
 
     private CustomEnergyStorageHandler energy;
 

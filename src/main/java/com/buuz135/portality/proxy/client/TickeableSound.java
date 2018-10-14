@@ -26,6 +26,7 @@ import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,9 +34,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TickeableSound extends PositionedSound implements ITickableSound {
 
     private boolean done;
+    private World world;
 
-    public TickeableSound(BlockPos pos, SoundEvent soundIn) {
+    public TickeableSound(World world, BlockPos pos, SoundEvent soundIn) {
         super(soundIn, SoundCategory.BLOCKS);
+        this.world = world;
         this.xPosF = pos.getX();
         this.yPosF = pos.getY();
         this.zPosF = pos.getZ();
@@ -52,7 +55,9 @@ public class TickeableSound extends PositionedSound implements ITickableSound {
 
     @Override
     public void update() {
-
+        if (world.getTileEntity(new BlockPos(xPosF, yPosF, zPosF)) == null) {
+            setDone();
+        }
     }
 
     public void setDone() {

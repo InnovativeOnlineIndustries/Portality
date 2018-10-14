@@ -22,7 +22,6 @@
 package com.buuz135.portality.tile;
 
 import com.buuz135.portality.block.BlockController;
-import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
@@ -33,7 +32,6 @@ import com.buuz135.portality.handler.TeleportHandler;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
-import com.buuz135.portality.util.BlockPosUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -57,39 +55,43 @@ import java.util.UUID;
 
 public class TileController extends TileBase implements ITickable {
 
-
     private static String NBT_FORMED = "Formed";
-    private static String NBT_TICK = "Tick";
     private static String NBT_LENGTH = "Length";
+    private static String NBT_WIDTH = "Width";
+    private static String NBT_HEIGHT = "Height";
     private static String NBT_PORTAL = "Portal";
     private static String NBT_LINK = "Link";
     private static String NBT_DISPLAY = "Display";
     private static String NBT_ONCE = "Once";
 
     private boolean isFormed;
-    private int tick;
     private int length;
+    private int width;
+    private int height;
     private boolean onceCall;
     private boolean display;
     private PortalInformation information;
     private PortalLinkData linkData;
     private CustomEnergyStorageHandler energy;
+    private boolean shouldCheckForStructure;
 
     @SideOnly(Side.CLIENT)
     private TickeableSound sound;
 
     private TeleportHandler teleportHandler;
     private List<BlockPos> modules;
+    private List<BlockPos> frameBlocks;
 
     public TileController() {
         this.length = 0;
-        this.tick = 0;
         this.isFormed = false;
         this.onceCall = false;
         this.display = true;
         this.teleportHandler = new TeleportHandler(this);
         this.modules = new ArrayList<>();
+        this.frameBlocks = new ArrayList<>();
         this.energy = new CustomEnergyStorageHandler(PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0, 0);
+        this.shouldCheckForStructure = true;
     }
 
     @Override
@@ -108,24 +110,31 @@ public class TileController extends TileBase implements ITickable {
         }
         if (isActive() && linkData != null) {
             energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * length * PortalityConfig.POWER_PORTAL_TICK, false);
-            if (energy.getEnergyStored() == 0) {
+            if (energy.getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
         }
-        ++tick;
-        if (tick >= 10) {
-            tick = 0;
-            length = checkArea();
-            workModules();
-            getPortalInfo();
-            markForUpdate();
-            if (linkData != null) {
-                ChunkLoaderHandler.addPortalAsChunkloader(this);
-                TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
-                    this.closeLink();
+        if (this.world.getTotalWorldTime() % 10 == 0) {
+            if (shouldCheckForStructure) {
+                this.isFormed = checkArea();
+                if (this.isFormed) {
+                    shouldCheckForStructure = false;
+                } else {
+                    cancelFrameBlocks();
                 }
             }
+            if (isFormed) {
+                workModules();
+                getPortalInfo();
+                if (linkData != null) {
+                    ChunkLoaderHandler.addPortalAsChunkloader(this);
+                    TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
+                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                        this.closeLink();
+                    }
+                }
+            }
+            markForUpdate();
         }
     }
 
@@ -133,7 +142,7 @@ public class TileController extends TileBase implements ITickable {
     private void tickSound() {
         if (isActive()) {
             if (sound == null) {
-                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.pos, PortalitySoundHandler.PORTAL));
+                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.world, this.pos, PortalitySoundHandler.PORTAL));
             } else {
                 sound.increase();
             }
@@ -151,8 +160,9 @@ public class TileController extends TileBase implements ITickable {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
         compound.setBoolean(NBT_FORMED, isFormed);
-        compound.setInteger(NBT_TICK, tick);
         compound.setInteger(NBT_LENGTH, length);
+        compound.setInteger(NBT_WIDTH, width);
+        compound.setInteger(NBT_HEIGHT, height);
         energy.writeToNBT(compound);
         compound.setBoolean(NBT_ONCE, onceCall);
         compound.setBoolean(NBT_DISPLAY, display);
@@ -164,8 +174,9 @@ public class TileController extends TileBase implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
-        tick = compound.getInteger(NBT_TICK);
         length = compound.getInteger(NBT_LENGTH);
+        width = compound.getInteger(NBT_WIDTH);
+        height = compound.getInteger(NBT_HEIGHT);
         if (compound.hasKey(NBT_PORTAL))
             information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
         if (compound.hasKey(NBT_LINK))
@@ -176,33 +187,93 @@ public class TileController extends TileBase implements ITickable {
         super.readFromNBT(compound);
     }
 
-    private int checkArea() {
-        BlockPos center = this.pos.offset(EnumFacing.UP, 2);
+    private boolean checkArea() {
+        long time = System.currentTimeMillis();
+        checkPortalSize();
+        if (length < 3) return false;
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
-        boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
-        int length = 0;
         modules.clear();
-        while (true) {
-            AxisAlignedBB box = new AxisAlignedBB(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0),
-                    center.getX() + (isSouthNorth ? -2 : 0), center.getY() - 2, center.getZ() + (!isSouthNorth ? -2 : 0));
-            List<BlockPos> blocks = BlockPosUtils.getBlockPosInAABB(box);
-            BlockPos finalCenter = center;
-            blocks.removeIf(pos1 -> BlockPosUtils.getBlockPosInAABB(new AxisAlignedBB(finalCenter.getX() + (isSouthNorth ? 1 : 0), finalCenter.getY() + 1, finalCenter.getZ() + (!isSouthNorth ? 1 : 0),
-                    finalCenter.getX() + (isSouthNorth ? -1 : 0), finalCenter.getY() - 1, finalCenter.getZ() + (!isSouthNorth ? -1 : 0))).contains(pos1));
-            for (BlockPos pos : blocks) {
-                if (world.getBlockState(pos).getBlock() instanceof IPortalModule) {
-                    modules.add(pos);
-                    continue;
-                }
-                if (length == 0 && (pos.getX() == center.getX() && pos.getY() == center.getY() - 2 && pos.getZ() == center.getZ()) && this.world.getBlockState(pos).getBlock() instanceof BlockController)
-                    continue;
-                if (this.world.getBlockState(pos).getBlock() instanceof BlockFrame) continue;
-                return length;
-            }
-            ++length;
-            if (length > PortalityConfig.MAX_PORTAL_LENGTH) return length;
-            center = center.offset(facing.getOpposite());
+        if (!checkFramesInTheBox(this.pos.offset(facing.rotateY(), width), this.pos.offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), false)) { //BOTTOM
+            return false;
         }
+        if (!checkFramesInTheBox(this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 1), this.pos.offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(EnumFacing.UP, height - 1), false)) { //TOP
+            return false;
+        }
+        if (!checkFramesInTheBox(this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, 1), this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+            return false;
+        }
+        if (!checkFramesInTheBox(this.pos.offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, 1), this.pos.offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+            return false;
+        }
+        checkFramesInTheBox(this.pos.offset(facing.rotateY(), width), this.pos.offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 1), this.pos.offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(EnumFacing.UP, height - 1), true);
+        checkFramesInTheBox(this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, 1), this.pos.offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.pos.offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, 1), this.pos.offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
+        return true;
+    }
+
+    public boolean checkFramesInTheBox(BlockPos point1, BlockPos point2, boolean save) {
+        for (BlockPos blockPos : BlockPos.getAllInBox(point1, point2)) {
+            if (!blockPos.equals(this.pos) && !isValidFrame(blockPos)) {
+                return false;
+            } else if (save) {
+                frameBlocks.add(blockPos);
+                if (world.getBlockState(pos).getBlock() instanceof IPortalModule) {
+                    modules.add(blockPos);
+                }
+                TileEntity entity = world.getTileEntity(blockPos);
+                if (entity instanceof TileFrame) {
+                    ((TileFrame) entity).setControllerPos(this.pos);
+                    entity.markDirty();
+                }
+            }
+        }
+        return true;
+    }
+
+    private void cancelFrameBlocks() {
+        for (BlockPos frameBlock : frameBlocks) {
+            TileEntity entity = world.getTileEntity(frameBlock);
+            if (entity instanceof TileFrame) {
+                ((TileFrame) entity).setControllerPos(null);
+                entity.markDirty();
+            }
+        }
+        frameBlocks.clear();
+    }
+
+    public void breakController() {
+        closeLink();
+        cancelFrameBlocks();
+    }
+
+    private void checkPortalSize() {
+        EnumFacing controllerFacing = world.getBlockState(this.pos).getValue(BlockController.FACING);
+        if (controllerFacing.getAxis().isVertical()) return;
+        //Checking width
+        EnumFacing widthFacing = controllerFacing.rotateY();
+        int width = 1;
+        while (isValidFrame(this.getPos().offset(widthFacing, width)) && !isValidFrame(this.getPos().offset(widthFacing, width).offset(EnumFacing.UP))) {
+            ++width;
+        }
+        //Checking height
+        int height = 1;
+        while (isValidFrame(this.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height))) {
+            ++height;
+        }
+        EnumFacing lengthChecking = controllerFacing.getOpposite();
+        int length = 1;
+        while (isValidFrame(this.getPos().offset(lengthChecking, length))) {
+            ++length;
+        }
+        this.width = width;
+        this.height = height;
+        this.length = length;
+    }
+
+    private boolean isValidFrame(BlockPos pos) {
+        return this.world.getTileEntity(pos) instanceof TileFrame && (((TileFrame) this.world.getTileEntity(pos)).getControllerPos() == null
+                || ((TileFrame) this.world.getTileEntity(pos)).getControllerPos().equals(this.pos));
     }
 
     private void workModules() {
@@ -220,11 +291,9 @@ public class TileController extends TileBase implements ITickable {
     public AxisAlignedBB getPortalArea() {
         if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        BlockPos center = this.pos.offset(EnumFacing.UP, 2);
         EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
-        boolean isSouthNorth = facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH;
-        BlockPos corner1 = new BlockPos(center.getX() + (isSouthNorth ? 2 : 0), center.getY() + 2, center.getZ() + (!isSouthNorth ? 2 : 0)).offset(facing.getOpposite(), length - 1);
-        BlockPos corner2 = new BlockPos(center.getX() + (isSouthNorth ? -2 : 0), center.getY() - 2, center.getZ() + (!isSouthNorth ? -2 : 0));
+        BlockPos corner1 = this.pos.offset(facing.rotateY(), width - 1).offset(EnumFacing.UP);
+        BlockPos corner2 = this.pos.offset(facing.rotateY(), -width + 1).offset(EnumFacing.UP, height - 1).offset(facing.getOpposite(), length - 1);
         return new AxisAlignedBB(corner1, corner2);
     }
 
@@ -244,11 +313,7 @@ public class TileController extends TileBase implements ITickable {
     }
 
     public boolean isFormed() {
-        return length >= 3;
-    }
-
-    public int getTick() {
-        return tick;
+        return isFormed;
     }
 
     public int getLength() {
@@ -374,5 +439,21 @@ public class TileController extends TileBase implements ITickable {
             return true;
         }
         return false;
+    }
+
+    public boolean isShouldCheckForStructure() {
+        return shouldCheckForStructure;
+    }
+
+    public void setShouldCheckForStructure(boolean shouldCheckForStructure) {
+        this.shouldCheckForStructure = shouldCheckForStructure;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

@@ -21,9 +21,9 @@
  */
 package com.buuz135.portality.block.module;
 
-import com.buuz135.portality.block.BlockTile;
+import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.tile.TileController;
-import net.minecraft.block.material.Material;
+import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -47,13 +47,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class BlockCapabilityModule<T, S extends TileEntity> extends BlockTile<S> implements IPortalModule {
+public abstract class BlockCapabilityModule<T, S extends TileFrame> extends BlockFrame<S> implements IPortalModule {
 
     public static PropertyBool INPUT = PropertyBool.create("input");
 
 
     public BlockCapabilityModule(String name, Class<S> tileClass) {
-        super(name, tileClass, Material.ROCK, 0);
+        super(name, tileClass);
         this.setDefaultState(this.blockState.getBaseState().withProperty(INPUT, true));
 
     }

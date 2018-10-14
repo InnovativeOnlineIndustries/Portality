@@ -29,7 +29,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
 import javax.annotation.Nullable;
 
-public class TileEntityFluidModule extends TileBase {
+public class TileEntityFluidModule extends TileFrame {
 
     private FluidTank tank;
 

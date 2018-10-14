@@ -21,11 +21,29 @@
  */
 package com.buuz135.portality.block;
 
+import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public class BlockFrame extends BlockBasic {
+public class BlockFrame<T extends TileFrame> extends BlockTile<T> {
 
-    public BlockFrame() {
-        super("frame", Material.ROCK);
+    public BlockFrame(String name, Class<T> tileClass) {
+        super(name, tileClass, Material.ROCK, -1);
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if (tileEntity instanceof TileFrame && ((TileFrame) tileEntity).getControllerPos() != null) {
+            TileEntity controller = worldIn.getTileEntity(((TileFrame) tileEntity).getControllerPos());
+            if (controller instanceof TileController) {
+                ((TileController) controller).setShouldCheckForStructure(true);
+            }
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }

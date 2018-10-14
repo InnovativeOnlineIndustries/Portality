@@ -71,7 +71,7 @@ public class TeleportHandler {
         Random random = controller.getWorld().rand;
         BlockPos offset = controller.getPos().offset(facing);
         double mult = controller.getLength() / 20D;
-        controller.getWorld().spawnParticle(EnumParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * 2 - 1, offset.getY() + 2.5 + random.nextDouble() * 2 - 1, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult);
+        controller.getWorld().spawnParticle(EnumParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * (controller.getWidth() + 2) - (controller.getWidth() + 2) / 2D, offset.getY() + controller.getHeight() / 2D + random.nextDouble() * (controller.getHeight() - 2) - (controller.getHeight() - 2) / 2D, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult);
         List<Entity> entityRemove = new ArrayList<>();
         for (Map.Entry<Entity, TeleportData> entry : entityTimeToTeleport.entrySet()) {
             if (entry.getKey().isDead || !controller.getWorld().getEntitiesWithinAABB(Entity.class, controller.getPortalArea()).contains(entry.getKey())) {
@@ -82,11 +82,12 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            BlockPos destinationPos = controller.getPos().add(0, 2, 0).offset(facing, controller.getLength() - 1);
+            BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2, 0).offset(facing, controller.getLength() - 1);
             Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 0, 0.5);
             double distance = destinationPos.getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
-            if (distance <= 1) {
+            System.out.println(distance);
+            if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergy().extractEnergyInternal(PortalityConfig.TELEPORT_ENERGY_AMOUNT, true) == PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getMinecraftServer().getWorld(entry.getValue().data.getDimension());

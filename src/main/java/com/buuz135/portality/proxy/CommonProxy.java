@@ -32,6 +32,7 @@ import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.network.*;
 import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.TileFrame;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -46,7 +47,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommonProxy {
 
     public static final BlockController BLOCK_CONTROLLER = new BlockController();
-    public static final BlockFrame BLOCK_FRAME = new BlockFrame();
+    public static final BlockFrame BLOCK_FRAME = new BlockFrame("frame", TileFrame.class);
 
     public static final BlockInterdimensionalModule BLOCK_INTERDIMENSIONAL_MODULE = new BlockInterdimensionalModule();
     public static final BlockCapabilityItemModule BLOCK_CAPABILITY_ITEM_MODULE_INPUT = new BlockCapabilityItemModule();
