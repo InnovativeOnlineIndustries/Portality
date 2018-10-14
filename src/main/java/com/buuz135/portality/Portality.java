@@ -57,10 +57,11 @@ public class Portality {
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
     public static final CreativeTabs TAB = new CreativeTabs(MOD_ID) {
         @Override
-        public ItemStack getTabIconItem() {
+        public ItemStack createIcon() {
             return new ItemStack(CommonProxy.BLOCK_CONTROLLER);
         }
     };
+
     @Mod.Instance(MOD_ID)
     public static Portality INSTANCE;
     @SidedProxy(clientSide = "com.buuz135.portality.proxy.client.ClientProxy", serverSide = "com.buuz135.portality.proxy.CommonProxy")

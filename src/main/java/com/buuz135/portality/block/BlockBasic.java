@@ -45,7 +45,7 @@ public class BlockBasic extends Block {
     public BlockBasic(String name, Material materialIn) {
         super(materialIn);
         this.setRegistryName(new ResourceLocation(Portality.MOD_ID, name));
-        this.setUnlocalizedName(getRegistryName().toString());
+        this.setTranslationKey(getRegistryName().toString());
         this.setCreativeTab(Portality.TAB);
         this.setHardness(1.5F);
         this.setResistance(10.0F);
@@ -72,8 +72,9 @@ public class BlockBasic extends Block {
         return 1;
     }
 
+
     @Override
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 }

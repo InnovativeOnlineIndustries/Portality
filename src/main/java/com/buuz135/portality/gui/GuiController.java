@@ -216,7 +216,7 @@ public class GuiController extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        String name = new TextComponentTranslation(CommonProxy.BLOCK_CONTROLLER.getUnlocalizedName() + ".name").getFormattedText();
+        String name = new TextComponentTranslation(CommonProxy.BLOCK_CONTROLLER.getTranslationKey() + ".name").getFormattedText();
         fontRenderer.drawString(TextFormatting.DARK_AQUA + name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, 3, 0x000000);
 
         ContainerController containerController = (ContainerController) this.inventorySlots;

@@ -32,7 +32,6 @@ public class PortalitySoundHandler {
     public static final SoundEvent PORTAL = new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal")).setRegistryName(new ResourceLocation(Portality.MOD_ID, "portal"));
     public static final SoundEvent PORTAL_TP = new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")).setRegistryName(new ResourceLocation(Portality.MOD_ID, "portal_teleport"));
 
-
     @SubscribeEvent
     public void onSoundRegister(RegistryEvent.Register<SoundEvent> registry) {
         registry.getRegistry().registerAll(PORTAL, PORTAL_TP);

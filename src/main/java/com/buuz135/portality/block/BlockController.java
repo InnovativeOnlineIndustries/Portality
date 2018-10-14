@@ -39,6 +39,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,9 +67,16 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
+
     @Override
-    public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
-        super.onBlockDestroyedByPlayer(worldIn, pos, state);
+    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
+        super.onPlayerDestroy(worldIn, pos, state);
+        PortalDataManager.removeInformation(worldIn, pos);
+    }
+
+    @Override
+    public void onExplosionDestroy(World worldIn, BlockPos pos, Explosion explosionIn) {
+        super.onExplosionDestroy(worldIn, pos, explosionIn);
         PortalDataManager.removeInformation(worldIn, pos);
     }
 

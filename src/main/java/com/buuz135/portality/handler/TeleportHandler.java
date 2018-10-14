@@ -83,7 +83,7 @@ public class TeleportHandler {
                 continue;
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2, 0).offset(facing, controller.getLength() - 1);
-            Vec3d destination = new Vec3d(destinationPos).addVector(0.5, 0, 0.5);
+            Vec3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
             double distance = destinationPos.getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             System.out.println(distance);

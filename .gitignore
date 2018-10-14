@@ -25,3 +25,5 @@ hs_err_pid*
 run/
 .iml
 out/
+
+CHANGELOG.md
