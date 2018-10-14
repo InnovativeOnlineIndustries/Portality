@@ -44,6 +44,14 @@ public class PortalityConfig {
     @Config.Comment("How long the portal structure it can be")
     public static int MAX_PORTAL_LENGTH = 16;
 
+    @Config.Comment("How wide a portal can be without counting the controller(radius)")
+    @Config.RangeInt(min = 1)
+    public static int MAX_PORTAL_WIDTH = 7;
+
+    @Config.Comment("How tall a portal can be (diameter)")
+    @Config.RangeInt(min = 3)
+    public static int MAX_PORTAL_HEIGHT = 15;
+
     @Config.Comment("Portal energy buffer")
     @Config.RangeInt(min = 1)
     public static int MAX_PORTAL_POWER = 100000;

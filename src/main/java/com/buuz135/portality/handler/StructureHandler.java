@@ -2,6 +2,7 @@ package com.buuz135.portality.handler;
 
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.block.module.IPortalModule;
+import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.tileentity.TileEntity;
@@ -78,17 +79,17 @@ public class StructureHandler {
         //Checking width
         EnumFacing widthFacing = controllerFacing.rotateY();
         int width = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP))) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height))) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
             ++height;
         }
         EnumFacing lengthChecking = controllerFacing.getOpposite();
         int length = 1;
-        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length))) {
+        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.MAX_PORTAL_LENGTH) {
             ++length;
         }
         this.width = width;
