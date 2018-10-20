@@ -1,0 +1,18 @@
+{
+  "result": {
+    "item": "portality:module_items",
+    "data": 0
+  },
+  "pattern": [
+    "   ",
+    " q ",
+    "   "
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "q": {
+      "item": "portality:module_items",
+      "data": 1
+    }
+  }
+}
