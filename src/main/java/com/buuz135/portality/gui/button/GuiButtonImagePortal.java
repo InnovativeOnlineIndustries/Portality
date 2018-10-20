@@ -21,6 +21,7 @@
  */
 package com.buuz135.portality.gui.button;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -58,6 +59,12 @@ public class GuiButtonImagePortal extends GuiButtonImage {
         fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 28)), x + 28, 7 + y, isMouseOver() ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         GlStateManager.color(1, 1, 1, 1);
+        if (information.isPrivate()) {
+            GlStateManager.disableDepth();
+            Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/lock.png"));
+            drawModalRectWithCustomSizedTexture(x + 4, y + 14, 0, 0, 8, 8, 8, 8);
+            GlStateManager.enableDepth();
+        }
         GlStateManager.popMatrix();
     }
 

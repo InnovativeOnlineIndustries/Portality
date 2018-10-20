@@ -72,7 +72,6 @@ public class GuiPortals extends GuiContainer {
         this.addButton(new PortalCallButton(135, this.guiLeft + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.OPEN, this));
         this.addButton(new PortalCallButton(136, this.guiLeft + 53 + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.ONCE, this));
         this.addButton(new PortalCallButton(137, this.guiLeft + 53 * 2 + 9, this.guiTop + ySize + 2, controller.getController(), PortalCallButton.CallAction.FORCE, this));
-        ;
     }
 
     public void refresh(List<PortalInformation> informationList) {
