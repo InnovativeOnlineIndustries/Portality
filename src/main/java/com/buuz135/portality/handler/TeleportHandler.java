@@ -86,7 +86,6 @@ public class TeleportHandler {
             Vec3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
             double distance = destinationPos.getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
-            System.out.println(distance);
             if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergy().extractEnergyInternal(PortalityConfig.TELEPORT_ENERGY_AMOUNT, true) == PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
