@@ -3,16 +3,11 @@
     "item": "portality:module_items",
     "data": 1
   },
-  "pattern": [
-    "   ",
-    " q ",
-    "   "
-  ],
-  "type": "forge:ore_shaped",
-  "key": {
-    "q": {
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
       "item": "portality:module_items",
       "data": 0
     }
-  }
+  ]
 }
