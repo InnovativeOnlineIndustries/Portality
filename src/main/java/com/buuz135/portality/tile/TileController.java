@@ -95,6 +95,9 @@ public class TileController extends TileBase implements ITickable {
                     teleportHandler.addEntityToTeleport(entity, linkData);
                 }
             }
+            if (!world.isRemote) {
+                workModules();
+            }
         }
         if (world.isRemote) {
             tickSound();
@@ -116,7 +119,6 @@ public class TileController extends TileBase implements ITickable {
                 }
             }
             if (isFormed) {
-                workModules();
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);

@@ -60,7 +60,7 @@ public class StructureHandler {
                 return false;
             } else if (save) {
                 frameBlocks.add(blockPos);
-                if (this.controller.getWorld().getBlockState(this.controller.getPos()).getBlock() instanceof IPortalModule) {
+                if (this.controller.getWorld().getBlockState(blockPos).getBlock() instanceof IPortalModule) {
                     modules.add(blockPos);
                 }
                 TileEntity entity = this.controller.getWorld().getTileEntity(blockPos);
