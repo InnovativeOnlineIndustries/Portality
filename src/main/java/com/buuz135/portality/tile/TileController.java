@@ -95,9 +95,9 @@ public class TileController extends TileBase implements ITickable {
                     teleportHandler.addEntityToTeleport(entity, linkData);
                 }
             }
-            if (!world.isRemote) {
-                workModules();
-            }
+        }
+        if (!world.isRemote) {
+            workModules();
         }
         if (world.isRemote) {
             tickSound();
@@ -192,7 +192,7 @@ public class TileController extends TileBase implements ITickable {
             Block block = this.world.getBlockState(pos).getBlock();
             if (block instanceof IPortalModule) {
                 if (((IPortalModule) block).allowsInterdimensionalTravel()) interdimensional = true;
-                ((IPortalModule) block).work(this, pos);
+                if (isActive()) ((IPortalModule) block).work(this, pos);
             }
         }
         PortalDataManager.setPortalInterdimensional(this.world, this.pos, interdimensional);

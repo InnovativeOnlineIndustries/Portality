@@ -35,8 +35,12 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockTile<T extends TileEntity> extends BlockBasic {
+
+    private static List<Class<? extends TileEntity>> REGISTERED_TILES = new ArrayList<>();
 
     private final Class<T> tileClass;
     private final int guiID;
@@ -50,7 +54,10 @@ public class BlockTile<T extends TileEntity> extends BlockBasic {
     @Override
     public void registerObject(IForgeRegistry<Block> registry) {
         super.registerObject(registry);
-        GameRegistry.registerTileEntity(tileClass, this.getRegistryName().toString() + "_tile");
+        if (!REGISTERED_TILES.contains(tileClass)) {
+            GameRegistry.registerTileEntity(tileClass, this.getRegistryName());
+            REGISTERED_TILES.add(tileClass);
+        }
     }
 
     @Nullable
