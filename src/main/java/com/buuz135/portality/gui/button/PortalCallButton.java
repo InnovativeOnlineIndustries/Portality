@@ -26,7 +26,7 @@ public class PortalCallButton extends GuiButtonImage {
 
     @Override
     public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-        if (isMouseOver()) {
+        if (isMouseOver() && guiPortals.getSelectedPortal() != null) {
             Portality.NETWORK.sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().provider.getDimension(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
             mc.player.closeScreen();
         }
