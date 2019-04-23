@@ -129,10 +129,10 @@ public class PortalDataManager extends WorldSavedData {
 
     @Nonnull
     public static PortalDataManager getData(World world) {
-        PortalDataManager data = (PortalDataManager) world.getMapStorage().getOrLoadData(PortalDataManager.class, NAME);
+        PortalDataManager data = (PortalDataManager) world.getMapStorage().func_212426_a(world.getDimension().getType(), PortalDataManager::new, NAME);
         if (data == null) {
             data = new PortalDataManager();
-            world.getMapStorage().setData(NAME, data);
+            world.getMapStorage().func_212424_a(world.getDimension().getType(), NAME, data);
         }
         return data;
     }
@@ -148,17 +148,17 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt) {
+    public void read(NBTTagCompound nbt) {
         informationList.clear();
-        NBTTagCompound root = nbt.getCompoundTag(NAME);
-        for (String key : root.getKeySet()) {
-            NBTTagCompound info = root.getCompoundTag(key);
+        NBTTagCompound root = nbt.getCompound(NAME);
+        for (String key : root.keySet()) {
+            NBTTagCompound info = root.getCompound(key);
             informationList.add(PortalInformation.readFromNBT(info));
         }
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound write(NBTTagCompound compound) {
         NBTTagCompound tag = new NBTTagCompound();
         for (PortalInformation information : informationList) {
             tag.setTag(information.getId().toString(), information.writetoNBT());

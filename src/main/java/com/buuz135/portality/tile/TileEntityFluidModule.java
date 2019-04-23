@@ -21,44 +21,39 @@
  */
 package com.buuz135.portality.tile;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import com.buuz135.portality.proxy.CommonProxy;
+import com.hrznstudio.titanium.annotation.Save;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TileEntityFluidModule extends TileFrame {
 
+    @Save
     private FluidTank tank;
 
     public TileEntityFluidModule() {
+        super(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE);
         this.tank = new FluidTank(16000);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        tank.readFromNBT(compound.getCompoundTag("Tank"));
-        super.readFromNBT(compound);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound = super.writeToNBT(compound);
-        compound.setTag("Tank", tank.writeToNBT(new NBTTagCompound()));
-        return compound;
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return (T) tank;
-        return super.getCapability(capability, facing);
+    public <T> LazyOptional<T> getCapability(Capability<T> capability) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+            return LazyOptional.of(new NonNullSupplier<T>() {
+                @Nonnull
+                @Override
+                public T get() {
+                    return (T) tank;
+                }
+            });
+        return super.getCapability(capability);
     }
+
 }

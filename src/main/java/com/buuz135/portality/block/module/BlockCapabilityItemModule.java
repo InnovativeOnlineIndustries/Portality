@@ -22,15 +22,18 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.TileEntityItemModule;
+import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockCapabilityItemModule extends BlockCapabilityModule<IItemHandler, TileEntityItemModule> {
@@ -46,24 +49,34 @@ public class BlockCapabilityItemModule extends BlockCapabilityModule<IItemHandle
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        if (current.getTileEntity(myself).hasCapability(this.getCapability(), null)) {
-            IItemHandler handlerSelf = current.getTileEntity(myself).getCapability(this.getCapability(), null);
+        current.getTileEntity(myself).getCapability(this.getCapability(), null).ifPresent(handlerSelf -> {
             for (BlockPos otherPos : compatibleBlockPos) {
                 TileEntity otherTile = otherWorld.getTileEntity(otherPos);
-                if (otherTile != null && otherTile.hasCapability(this.getCapability(), null)) {
-                    IItemHandler handlerOther = otherTile.getCapability(this.getCapability(), null);
-                    for (int i = 0; i < handlerSelf.getSlots(); i++) {
-                        ItemStack stack = handlerSelf.getStackInSlot(i);
-                        if (stack.isEmpty()) continue;
-                        if (ItemHandlerHelper.insertItem(handlerOther, stack, true).isEmpty()) {
-                            ItemHandlerHelper.insertItem(handlerOther, stack.copy(), false);
-                            handlerSelf.getStackInSlot(i).setCount(0);
-                            return;
+                if (otherTile != null) {
+                    otherTile.getCapability(this.getCapability(), null).ifPresent(handlerOther -> {
+                        for (int i = 0; i < handlerSelf.getSlots(); i++) {
+                            ItemStack stack = handlerSelf.getStackInSlot(i);
+                            if (stack.isEmpty()) continue;
+                            if (ItemHandlerHelper.insertItem(handlerOther, stack, true).isEmpty()) {
+                                ItemHandlerHelper.insertItem(handlerOther, stack.copy(), false);
+                                handlerSelf.getStackInSlot(i).setCount(0);
+                                return;
+                            }
                         }
-                    }
+                    });
                 }
             }
-        }
+        });
+    }
 
+    @Override
+    public IFactory<TileEntityItemModule> getTileEntityFactory() {
+        return TileEntityItemModule::new;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new TileEntityItemModule();
     }
 }

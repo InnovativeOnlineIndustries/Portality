@@ -21,6 +21,7 @@
  */
 package com.buuz135.portality.block;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
@@ -30,24 +31,17 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implements IPortalModule {
 
     public BlockInterdimensionalModule() {
         super("module_interdimensional", TileFrame.class);
+        setItemGroup(Portality.TAB);
     }
 
     @Override
     public void work(TileController controller, BlockPos pos) {
 
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void registerRender() {
-        super.registerRender();
     }
 
     @Override
@@ -56,7 +50,7 @@ public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implement
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         return false;
     }
 }

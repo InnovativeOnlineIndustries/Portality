@@ -21,66 +21,55 @@
  */
 package com.buuz135.portality.tile;
 
-import com.buuz135.portality.handler.CustomEnergyStorageHandler;
-import net.minecraft.nbt.NBTTagCompound;
+
+import com.buuz135.portality.proxy.CommonProxy;
+import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.energy.NBTEnergyHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
 public class TileEntityEnergyModule extends TileFrame implements ITickable {
 
-    private CustomEnergyStorageHandler energy;
+    @Save
+    private NBTEnergyHandler energyHandler;
+    private LazyOptional<IEnergyStorage> energyCap;
 
     public TileEntityEnergyModule() {
-        energy = new CustomEnergyStorageHandler(100000, 5000, 5000, 0);
+        super(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE);
+        this.energyHandler = new NBTEnergyHandler(this, 10000);
+        this.energyCap = LazyOptional.of(() -> this.energyHandler);
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+        if (cap == CapabilityEnergy.ENERGY) return energyCap.cast();
+        return super.getCapability(cap, side);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        energy.readFromNBT(compound);
-        super.readFromNBT(compound);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound = super.writeToNBT(compound);
-        energy.writeToNBT(compound);
-        return compound;
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) return (T) energy;
-        return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public void update() {
-        for (EnumFacing facing : EnumFacing.VALUES) {
+    public void tick() {
+        for (EnumFacing facing : EnumFacing.values()) {
             BlockPos checking = this.pos.offset(facing);
             TileEntity checkingTile = this.world.getTileEntity(checking);
             if (checkingTile != null) {
-                if (checkingTile.hasCapability(CapabilityEnergy.ENERGY, facing.getOpposite())) {
-                    IEnergyStorage storage = checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite());
-                    int energy = storage.receiveEnergy(Math.min(this.energy.getEnergyStored(), 1000), false);
+                checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
+                    int energy = storage.receiveEnergy(Math.min(this.energyHandler.getEnergyStored(), 1000), false);
                     if (energy > 0) {
-                        this.energy.extractEnergy(energy, false);
+                        this.energyHandler.extractEnergy(energy, false);
                         return;
                     }
-                }
+                });
             }
         }
     }

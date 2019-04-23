@@ -22,16 +22,16 @@
 package com.buuz135.portality.proxy.client;
 
 import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.PositionedSound;
+import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TickeableSound extends PositionedSound implements ITickableSound {
+@OnlyIn(Dist.CLIENT)
+public class TickeableSound extends MovingSound implements ITickableSound {
 
     private boolean done;
     private World world;
@@ -39,9 +39,9 @@ public class TickeableSound extends PositionedSound implements ITickableSound {
     public TickeableSound(World world, BlockPos pos, SoundEvent soundIn) {
         super(soundIn, SoundCategory.BLOCKS);
         this.world = world;
-        this.xPosF = pos.getX();
-        this.yPosF = pos.getY();
-        this.zPosF = pos.getZ();
+        this.x = pos.getX();
+        this.y = pos.getY();
+        this.z = pos.getZ();
         this.repeat = true;
         this.done = false;
         this.volume = 0.35f;
@@ -51,13 +51,6 @@ public class TickeableSound extends PositionedSound implements ITickableSound {
     @Override
     public boolean isDonePlaying() {
         return done;
-    }
-
-    @Override
-    public void update() {
-        if (world.getTileEntity(new BlockPos(xPosF, yPosF, zPosF)) == null) {
-            setDone();
-        }
     }
 
     public void setDone() {
@@ -73,6 +66,13 @@ public class TickeableSound extends PositionedSound implements ITickableSound {
     public void decrease() {
         if (this.pitch > 0) {
             this.pitch -= 0.03;
+        }
+    }
+
+    @Override
+    public void tick() {
+        if (world.getTileEntity(new BlockPos(x, y, z)) == null) {
+            setDone();
         }
     }
 }

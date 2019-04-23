@@ -33,7 +33,7 @@ public class StructureHandler {
     public boolean checkArea() {
         checkPortalSize();
         if (length < 3) return false;
-        EnumFacing facing = this.controller.getWorld().getBlockState(this.controller.getPos()).getValue(BlockController.FACING);
+        EnumFacing facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
         modules.clear();
         if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), false)) { //BOTTOM
             return false;
@@ -74,22 +74,22 @@ public class StructureHandler {
     }
 
     private void checkPortalSize() {
-        EnumFacing controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).getValue(BlockController.FACING);
+        EnumFacing controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
         if (controllerFacing.getAxis().isVertical()) return;
         //Checking width
         EnumFacing widthFacing = controllerFacing.rotateY();
         int width = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP)) && width <= PortalityConfig.COMMON.MAX_PORTAL_WIDTH.get()) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height)) && height <= PortalityConfig.COMMON.MAX_PORTAL_HEIGHT.get()) {
             ++height;
         }
         EnumFacing lengthChecking = controllerFacing.getOpposite();
         int length = 1;
-        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.MAX_PORTAL_LENGTH) {
+        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get()) {
             ++length;
         }
         this.width = width;

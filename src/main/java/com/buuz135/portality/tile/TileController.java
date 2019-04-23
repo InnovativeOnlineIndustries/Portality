@@ -26,34 +26,37 @@ import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.gui.GuiController;
+import com.buuz135.portality.gui.button.PortalSettingButton;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
-import com.buuz135.portality.handler.CustomEnergyStorageHandler;
 import com.buuz135.portality.handler.StructureHandler;
 import com.buuz135.portality.handler.TeleportHandler;
+import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
+import com.hrznstudio.titanium.block.tile.TilePowered;
+import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TileController extends TileBase implements ITickable {
+public class TileController extends TilePowered {
 
     private static String NBT_FORMED = "Formed";
     private static String NBT_LENGTH = "Length";
@@ -69,25 +72,45 @@ public class TileController extends TileBase implements ITickable {
     private boolean display;
     private PortalInformation information;
     private PortalLinkData linkData;
-    private CustomEnergyStorageHandler energy;
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private TickeableSound sound;
 
     private TeleportHandler teleportHandler;
     private StructureHandler structureHandler;
 
     public TileController() {
+        super(CommonProxy.BLOCK_CONTROLLER);
         this.isFormed = false;
         this.onceCall = false;
         this.display = true;
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
-        this.energy = new CustomEnergyStorageHandler(PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0, 0);
+
+        this.addButton(new PortalSettingButton(-22, 12, new StateButtonInfo(0, PortalSettingButton.RENAME)) {
+            @Override
+            public int getState() {
+                return 0;
+            }
+        });
+
+        this.addButton(new PortalSettingButton(-22, 12 + 22, new StateButtonInfo(0, PortalSettingButton.PUBLIC), new StateButtonInfo(1, PortalSettingButton.PRIVATE)) {
+            @Override
+            public int getState() {
+                return information != null && information.isPrivate() ? 1 : 0;
+            }
+        }.setPredicate(nbtTagCompound -> togglePrivacy()));
+
+        this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN)) {
+            @Override
+            public int getState() {
+                return display ? 0 : 1;
+            }
+        }.setPredicate(nbtTagCompound -> setDisplayNameEnabled(!display)));
     }
 
     @Override
-    public void update() {
+    public void tick() {
         if (isActive()) {
             teleportHandler.tick();
             if (linkData != null) {
@@ -104,12 +127,12 @@ public class TileController extends TileBase implements ITickable {
             return;
         }
         if (isActive() && linkData != null) {
-            energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.POWER_PORTAL_TICK, false);
-            if (energy.getEnergyStored() == 0 || !isFormed) {
+            this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.COMMON.POWER_PORTAL_TICK.get(), false);
+            if (this.getEnergyStorage().getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
         }
-        if (this.world.getTotalWorldTime() % 10 == 0) {
+        if (this.world.getGameTime() % 10 == 0) {
             if (structureHandler.shouldCheckForStructure()) {
                 this.isFormed = structureHandler.checkArea();
                 if (this.isFormed) {
@@ -122,8 +145,8 @@ public class TileController extends TileBase implements ITickable {
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
-                    TileEntity tileEntity = this.world.getMinecraftServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.provider.getDimension() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    TileEntity tileEntity = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension())).getTileEntity(linkData.getPos());
+                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || !((TileController) tileEntity).getLinkData().getDimension().equals(this.world.getDimension().getType().getRegistryName()) || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
                         this.closeLink();
                     }
                 }
@@ -132,11 +155,11 @@ public class TileController extends TileBase implements ITickable {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void tickSound() {
         if (isActive()) {
             if (sound == null) {
-                FMLClientHandler.instance().getClient().getSoundHandler().playSound(sound = new TickeableSound(this.world, this.pos, PortalitySoundHandler.PORTAL));
+                Minecraft.getInstance().getSoundHandler().play(sound = new TickeableSound(this.world, this.pos, PortalitySoundHandler.PORTAL));
             } else {
                 sound.increase();
             }
@@ -151,13 +174,12 @@ public class TileController extends TileBase implements ITickable {
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound = super.writeToNBT(compound);
+    public NBTTagCompound write(NBTTagCompound compound) {
+        compound = super.write(compound);
         compound.setBoolean(NBT_FORMED, isFormed);
-        compound.setInteger(NBT_LENGTH, structureHandler.getLength());
-        compound.setInteger(NBT_WIDTH, structureHandler.getWidth());
-        compound.setInteger(NBT_HEIGHT, structureHandler.getHeight());
-        energy.writeToNBT(compound);
+        compound.setInt(NBT_LENGTH, structureHandler.getLength());
+        compound.setInt(NBT_WIDTH, structureHandler.getWidth());
+        compound.setInt(NBT_HEIGHT, structureHandler.getHeight());
         compound.setBoolean(NBT_ONCE, onceCall);
         compound.setBoolean(NBT_DISPLAY, display);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
@@ -166,19 +188,18 @@ public class TileController extends TileBase implements ITickable {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void read(NBTTagCompound compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
-        structureHandler.setLength(compound.getInteger(NBT_LENGTH));
-        structureHandler.setWidth(compound.getInteger(NBT_WIDTH));
-        structureHandler.setHeight(compound.getInteger(NBT_HEIGHT));
+        structureHandler.setLength(compound.getInt(NBT_LENGTH));
+        structureHandler.setWidth(compound.getInt(NBT_WIDTH));
+        structureHandler.setHeight(compound.getInt(NBT_HEIGHT));
         if (compound.hasKey(NBT_PORTAL))
-            information = PortalInformation.readFromNBT(compound.getCompoundTag(NBT_PORTAL));
+            information = PortalInformation.readFromNBT(compound.getCompound(NBT_PORTAL));
         if (compound.hasKey(NBT_LINK))
-            linkData = PortalLinkData.readFromNBT(compound.getCompoundTag(NBT_LINK));
-        energy.readFromNBT(compound);
+            linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
-        super.readFromNBT(compound);
+        super.read(compound);
     }
 
     public void breakController() {
@@ -201,7 +222,7 @@ public class TileController extends TileBase implements ITickable {
     public AxisAlignedBB getPortalArea() {
         if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        EnumFacing facing = world.getBlockState(this.pos).getValue(BlockController.FACING);
+        EnumFacing facing = world.getBlockState(this.pos).get(BlockController.FACING);
         BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth() - 1).offset(EnumFacing.UP);
         BlockPos corner2 = this.pos.offset(facing.rotateY(), -structureHandler.getWidth() + 1).offset(EnumFacing.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
         return new AxisAlignedBB(corner1, corner2);
@@ -240,15 +261,13 @@ public class TileController extends TileBase implements ITickable {
         return null;
     }
 
-    public String getName() {
+    public String getPortalDisplayName() {
         if (information != null) return information.getName();
         return "";
     }
 
-    public void setName(String name) {
-        PortalDataManager.setPortalName(this.world, this.getPos(), name);
-        getPortalInfo();
-        markForUpdate();
+    public void setDisplayName(String name) {
+        if (information != null) information.setName(name);
     }
 
     public boolean isInterdimensional() {
@@ -260,12 +279,6 @@ public class TileController extends TileBase implements ITickable {
         return ItemStack.EMPTY;
     }
 
-    public void setDisplayNameEnabled(ItemStack display) {
-        PortalDataManager.setPortalDisplay(this.world, this.pos, display);
-        getPortalInfo();
-        markForUpdate();
-    }
-
     public void linkTo(PortalLinkData data, PortalLinkData.PortalCallType type) {
         if (type == PortalLinkData.PortalCallType.FORCE) {
             closeLink();
@@ -273,16 +286,16 @@ public class TileController extends TileBase implements ITickable {
         if (linkData != null) return;
         if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
-            World world = this.world.getMinecraftServer().getWorld(data.getDimension());
+            World world = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension()));
             TileEntity entity = world.getTileEntity(data.getPos());
             if (entity instanceof TileController) {
-                data.setName(((TileController) entity).getName());
-                ((TileController) entity).linkTo(new PortalLinkData(this.world.provider.getDimension(), this.pos, false, this.getName()), type);
-                int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
+                data.setName(((TileController) entity).getPortalDisplayName());
+                ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getRegistryName(), this.pos, false, this.getPortalDisplayName()), type);
+                int power = PortalityConfig.COMMON.PORTAL_POWER_OPEN_INTERDIMENSIONAL.get();
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.getDistance(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY()) * structureHandler.getLength();
                 }
-                energy.extractEnergyInternal(power, false);
+                this.getEnergyStorage().extractEnergy(power, false);
             }
         }
         PortalDataManager.setActiveStatus(this.world, this.pos, true);
@@ -292,9 +305,9 @@ public class TileController extends TileBase implements ITickable {
     public void closeLink() {
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.world, this.pos, false);
-            World world = this.world.getMinecraftServer().getWorld(linkData.getDimension());
-            TileEntity entity = world.getTileEntity(linkData.getPos());
+            World world = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension()));
             linkData = null;
+            TileEntity entity = world.getTileEntity(linkData.getPos());
             if (entity instanceof TileController) {
                 ((TileController) entity).closeLink();
             }
@@ -310,32 +323,23 @@ public class TileController extends TileBase implements ITickable {
         return linkData;
     }
 
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
-    }
-
-    public CustomEnergyStorageHandler getEnergy() {
-        return energy;
-    }
-
     public boolean isDisplayNameEnabled() {
         return display;
     }
 
+    public void setDisplayNameEnabled(ItemStack display) {
+        PortalDataManager.setPortalDisplay(this.world, this.pos, display);
+        getPortalInfo();
+        markForUpdate();
+    }
+
     public void setDisplayNameEnabled(boolean display) {
         this.display = display;
+        markForUpdate();
     }
 
     public List<BlockPos> getModules() {
         return structureHandler.getModules();
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) return (T) energy;
-        return super.getCapability(capability, facing);
     }
 
     public boolean teleportedEntity() {
@@ -366,4 +370,19 @@ public class TileController extends TileBase implements ITickable {
     public int getLength() {
         return structureHandler.getLength();
     }
+
+    @Override
+    public boolean onActivated(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (!super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ)) {
+            if (!world.isRemote()) {
+                Minecraft.getInstance().addScheduledTask(() -> {
+                    Minecraft.getInstance().displayGuiScreen(new GuiController(this));
+                });
+                return true;
+            }
+
+        }
+        return false;
+    }
+
 }

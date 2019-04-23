@@ -23,6 +23,7 @@ package com.buuz135.portality.data;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
@@ -34,12 +35,12 @@ public class PortalInformation {
     private String name;
     private boolean isActive;
     private boolean isPrivate;
-    private int dimension;
+    private ResourceLocation dimension;
     private BlockPos location;
     private ItemStack display;
     private boolean interdimensional;
 
-    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
+    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, ResourceLocation dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
         this.id = id;
         this.owner = owner;
         this.isActive = isActive;
@@ -53,7 +54,7 @@ public class PortalInformation {
 
     public static PortalInformation readFromNBT(NBTTagCompound info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                info.getInteger("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), new ItemStack(info.getCompoundTag("Display")), info.getBoolean("Interdimensional"));
+                new ResourceLocation(info.getString("Dimension")), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
     }
 
     public UUID getId() {
@@ -80,7 +81,7 @@ public class PortalInformation {
         isPrivate = aPrivate;
     }
 
-    public int getDimension() {
+    public ResourceLocation getDimension() {
         return dimension;
     }
 
@@ -118,7 +119,7 @@ public class PortalInformation {
         infoTag.setUniqueId("Owner", getOwner());
         infoTag.setBoolean("Active", isActive());
         infoTag.setBoolean("Private", isPrivate());
-        infoTag.setInteger("Dimension", getDimension());
+        infoTag.setString("Dimension", getDimension().toString());
         infoTag.setLong("Position", getLocation().toLong());
         infoTag.setString("Name", getName());
         infoTag.setTag("Display", display.serializeNBT());

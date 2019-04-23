@@ -21,19 +21,23 @@
  */
 package com.buuz135.portality.tile;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import com.buuz135.portality.proxy.CommonProxy;
+import com.hrznstudio.titanium.annotation.Save;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 public class TileEntityItemModule extends TileFrame {
 
+    @Save
     public ItemStackHandler handler;
 
     public TileEntityItemModule() {
+        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE_INPUT);
         this.handler = new ItemStackHandler(8) {
             @Override
             protected void onContentsChanged(int slot) {
@@ -43,28 +47,16 @@ public class TileEntityItemModule extends TileFrame {
         };
     }
 
+    @Nonnull
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        handler.deserializeNBT(compound.getCompoundTag("Items"));
-        super.readFromNBT(compound);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        compound = super.writeToNBT(compound);
-        compound.setTag("Items", handler.serializeNBT());
-        return compound;
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return (T) handler;
-        return super.getCapability(capability, facing);
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return LazyOptional.of(new NonNullSupplier<T>() {
+            @Nonnull
+            @Override
+            public T get() {
+                return (T) handler;
+            }
+        });
+        return super.getCapability(cap);
     }
 }

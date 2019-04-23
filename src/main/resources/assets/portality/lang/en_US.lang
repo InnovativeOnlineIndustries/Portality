@@ -38,3 +38,7 @@ portality.gui.portals.page=PAGE:
 module.type.output=Type: Output
 module.type.input=Type: Input
 portality.display.copy_to_clipboard=Copy portal ID to clipboard
+
+portality.manual=Portality Manual
+portality.manual.category.basics=Portal Basics
+portality.manual.category.modules=Portal Modules

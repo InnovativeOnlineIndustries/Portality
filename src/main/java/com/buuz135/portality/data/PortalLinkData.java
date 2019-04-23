@@ -22,20 +22,21 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class PortalLinkData {
 
-    private int dimension;
+    private ResourceLocation dimension;
     private BlockPos pos;
     private boolean caller;
     private String name;
 
-    public PortalLinkData(int dimension, BlockPos pos, boolean caller) {
+    public PortalLinkData(ResourceLocation dimension, BlockPos pos, boolean caller) {
         this(dimension, pos, caller, "");
     }
 
-    public PortalLinkData(int dimension, BlockPos pos, boolean caller, String name) {
+    public PortalLinkData(ResourceLocation dimension, BlockPos pos, boolean caller, String name) {
         this.dimension = dimension;
         this.pos = pos;
         this.caller = caller;
@@ -43,10 +44,10 @@ public class PortalLinkData {
     }
 
     public static PortalLinkData readFromNBT(NBTTagCompound compound) {
-        return new PortalLinkData(compound.getInteger("Dimension"), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
+        return new PortalLinkData(new ResourceLocation(compound.getString("Dimension")), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
     }
 
-    public int getDimension() {
+    public ResourceLocation getDimension() {
         return dimension;
     }
 
@@ -68,7 +69,7 @@ public class PortalLinkData {
 
     public NBTTagCompound writeToNBT() {
         NBTTagCompound tagCompound = new NBTTagCompound();
-        tagCompound.setInteger("Dimension", dimension);
+        tagCompound.setString("Dimension", dimension.toString());
         tagCompound.setLong("Position", pos.toLong());
         tagCompound.setBoolean("Caller", caller);
         tagCompound.setString("Name", name);

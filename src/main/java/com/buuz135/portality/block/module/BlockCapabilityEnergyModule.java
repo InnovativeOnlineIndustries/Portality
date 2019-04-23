@@ -44,18 +44,19 @@ public class BlockCapabilityEnergyModule extends BlockCapabilityModule<IEnergySt
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        if (current.getTileEntity(myself).hasCapability(getCapability(), null)) {
-            IEnergyStorage storage = current.getTileEntity(myself).getCapability(getCapability(), null);
-            for (BlockPos pos : compatibleBlockPos) {
-                TileEntity entity = otherWorld.getTileEntity(pos);
-                if (entity.hasCapability(getCapability(), null)) {
-                    IEnergyStorage otherStorage = entity.getCapability(getCapability(), null);
-                    int energy = otherStorage.receiveEnergy(Math.min(storage.getEnergyStored(), 5000), false);
-                    storage.extractEnergy(energy, false);
-                    if (energy > 0) return;
+        {
+            current.getTileEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
+                for (BlockPos pos : compatibleBlockPos) {
+                    TileEntity entity = otherWorld.getTileEntity(pos);
+                    if (entity != null) {
+                        entity.getCapability(getCapability()).ifPresent(otherStorage -> {
+                            int energy = otherStorage.receiveEnergy(Math.min(storage.getEnergyStored(), 5000), false);
+                            storage.extractEnergy(energy, false);
+                            if (energy > 0) return;
+                        });
+                    }
                 }
-            }
-
+            });
         }
     }
 }

@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -37,11 +37,11 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
-public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
+public class TESRPortal extends TileEntityRenderer<TileController> {
 
     @Override
-    public void render(TileController te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        super.render(te, x, y, z, partialTicks, destroyStage, alpha);
+    public void render(TileController te, double x, double y, double z, float partialTicks, int destroyStage) {
+        //super.render(te, x, y, z, partialTicks, destroyStage);
         if (!te.isFormed()) return;
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -57,45 +57,45 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         }
         bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"));
         GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-        GlStateManager.translate(x, y, z);
+        GlStateManager.translated(x, y, z);
         //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
-        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockController.FACING);
+        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
         if (facing == EnumFacing.SOUTH) {
-            GlStateManager.translate(1, 0, 1);
-            GlStateManager.rotate(-180, 0, 1, 0);
+            GlStateManager.translated(1, 0, 1);
+            GlStateManager.rotatef(-180, 0, 1, 0);
         }
         if (facing == EnumFacing.EAST) {
-            GlStateManager.translate(1, 0, 0);
-            GlStateManager.rotate(-90, 0, 1, 0);
+            GlStateManager.translated(1, 0, 0);
+            GlStateManager.rotatef(-90, 0, 1, 0);
         }
         if (facing == EnumFacing.WEST) {
-            GlStateManager.translate(0, 0, 1);
-            GlStateManager.rotate(90, 0, 1, 0);
+            GlStateManager.translated(0, 0, 1);
+            GlStateManager.rotatef(90, 0, 1, 0);
         }
-        double frame = (te.getWorld().getTotalWorldTime() % 60) / 60D;
+        double frame = (te.getWorld().getGameTime() % 60) / 60D;
         //frame = 0.4;
         //TOP
-        GlStateManager.translate(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
+        GlStateManager.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
         renderTop(tessellator, buffer, te, frame, j, k, 0.4, te.getWidth() * 2);
-        GlStateManager.translate(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
+        GlStateManager.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
         //RIGHT
-        GlStateManager.translate(3 - te.getWidth() + 2, 2.1, 0);
-        GlStateManager.rotate(90, 0, 0, 1);
+        GlStateManager.translated(3 - te.getWidth() + 2, 2.1, 0);
+        GlStateManager.rotatef(90, 0, 0, 1);
         renderTop(tessellator, buffer, te, frame, j, k, 0.2, te.getHeight() - 1);
-        GlStateManager.rotate(-90, 0, 0, 1);
-        GlStateManager.translate(-3 - (-te.getWidth() + 2), -2.1, 0);
+        GlStateManager.rotatef(-90, 0, 0, 1);
+        GlStateManager.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
         //LEFT
-        GlStateManager.translate(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
-        GlStateManager.rotate(-90, 0, 0, 1);
+        GlStateManager.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
+        GlStateManager.rotatef(-90, 0, 0, 1);
         renderTop(tessellator, buffer, te, frame, j, k, 0, te.getHeight() - 1);
-        GlStateManager.rotate(90, 0, 0, 1);
-        GlStateManager.translate(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
+        GlStateManager.rotatef(90, 0, 0, 1);
+        GlStateManager.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
         //BOTTOM
-        GlStateManager.translate(0.9 + te.getWidth() - 2, 5, 0);
-        GlStateManager.rotate(-180, 0, 0, 1);
+        GlStateManager.translated(0.9 + te.getWidth() - 2, 5, 0);
+        GlStateManager.rotatef(-180, 0, 0, 1);
         renderTop(tessellator, buffer, te, frame, j, k, 0.6, te.getWidth() * 2);
-        GlStateManager.rotate(190, 0, 0, 1);
-        GlStateManager.translate(-0.9 - (+te.getWidth() - 2), -5, 0);
+        GlStateManager.rotatef(190, 0, 0, 1);
+        GlStateManager.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
 
         buffer.setTranslation(0, 0, 0);
         RenderHelper.enableStandardItemLighting();
@@ -113,10 +113,10 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
         float y = 3.99f;
         float off = /*0.0278*/ 4 - y;
         //GlStateManager.scale(scale, 1, 1);
-        GlStateManager.enableAlpha();
+        GlStateManager.enableAlphaTest();
         for (double posX = 0; posX < width; ++posX) {
             for (int posZ = 0; posZ < te.getLength(); ++posZ) {
-                GlStateManager.translate(posX - 2.1 + frame + off, 0, posZ);
+                GlStateManager.translated(posX - 2.1 + frame + off, 0, posZ);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
                 double pX1 = 1;
                 double u = 1;
@@ -141,7 +141,7 @@ public class TESRPortal extends TileEntitySpecialRenderer<TileController> {
                 buffer.pos(pX2, y, 1).tex(u2, 1).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
                 tessellator.draw();
 
-                GlStateManager.translate(-(posX - 2.1 + frame + off), 0, -posZ);
+                GlStateManager.translated(-(posX - 2.1 + frame + off), 0, -posZ);
 
             }
         }

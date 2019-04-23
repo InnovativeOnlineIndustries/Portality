@@ -21,57 +21,55 @@
  */
 package com.buuz135.portality.block;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
-import com.buuz135.portality.gui.GuiHandler;
 import com.buuz135.portality.proxy.CommonProxy;
-import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
+import com.hrznstudio.titanium.api.IFactory;
+import com.hrznstudio.titanium.block.BlockRotation;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.dimension.DimensionType;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class BlockController extends BlockTileHorizontal<TileController> {
+public class BlockController extends BlockRotation<TileController> {
 
     public BlockController() {
-        super("controller", TileController.class, Material.ROCK, GuiHandler.CONTROLLER);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void registerRender() {
-        super.registerRender();
-        ClientRegistry.bindTileEntitySpecialRenderer(TileController.class, new TESRPortal());
+        super("controller", Block.Properties.create(Material.ROCK), TileController.class);
+        setItemGroup(Portality.TAB);
     }
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.provider.getDimension(), pos, "Dim: " + worldIn.provider.getDimension() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, DimensionType.func_212678_a(worldIn.getDimension().getType()), pos, "Dim: " + worldIn.getDimension().getType().getRegistryName() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
         PortalDataManager.addInformation(worldIn, information);
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
-
     @Override
-    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
+    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, IBlockState state) {
         super.onPlayerDestroy(worldIn, pos, state);
-        PortalDataManager.removeInformation(worldIn, pos);
+        PortalDataManager.removeInformation(worldIn.getWorld(), pos);
     }
 
     @Override
@@ -81,9 +79,9 @@ public class BlockController extends BlockTileHorizontal<TileController> {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (worldIn.isRemote) return true;
+        if (worldIn.isRemote()) return true;
         if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
             if (!controller.isFormed()) {
@@ -100,15 +98,37 @@ public class BlockController extends BlockTileHorizontal<TileController> {
                 return true;
             }
         }
-        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, side, hitX, hitY, hitZ);
+    }
+
+    @Nullable
+    @Override
+    public IBlockState getStateForPlacement(BlockItemUseContext context) {
+        return this.getDefaultState().with(FACING, context.getPlayer().getHorizontalFacing().getOpposite());
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void onReplaced(IBlockState state, World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
         TileEntity entity = worldIn.getTileEntity(pos);
         if (entity instanceof TileController) {
             ((TileController) entity).breakController();
         }
-        super.breakBlock(worldIn, pos, state);
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override
+    public IFactory<TileController> getTileEntityFactory() {
+        return TileController::new;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new TileController();
+    }
+
+    @Override
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 }

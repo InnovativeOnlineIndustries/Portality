@@ -22,13 +22,16 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.TileEntityFluidModule;
+import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockCapabilityFluidModule extends BlockCapabilityModule<IFluidHandler, TileEntityFluidModule> {
@@ -44,19 +47,30 @@ public class BlockCapabilityFluidModule extends BlockCapabilityModule<IFluidHand
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        if (current.getTileEntity(myself).hasCapability(getCapability(), null)) {
-            IFluidHandler handler = current.getTileEntity(myself).getCapability(getCapability(), null);
+        current.getTileEntity(myself).getCapability(getCapability(), null).ifPresent(handler -> {
             if (handler.drain(500, false) != null) {
                 for (BlockPos pos : compatibleBlockPos) {
                     TileEntity otherTile = otherWorld.getTileEntity(pos);
-                    if (otherTile != null && otherTile.hasCapability(getCapability(), null)) {
-                        IFluidHandler otherHandler = otherTile.getCapability(getCapability(), null);
-                        int filled = otherHandler.fill(handler.drain(500, false), true);
-                        handler.drain(filled, true);
-                        if (filled > 0) return;
+                    if (otherTile != null) {
+                        otherTile.getCapability(getCapability(), null).ifPresent(otherHandler -> {
+                            int filled = otherHandler.fill(handler.drain(500, false), true);
+                            handler.drain(filled, true);
+                            if (filled > 0) return;
+                        });
                     }
                 }
             }
-        }
+        });
+    }
+
+    @Override
+    public IFactory<TileEntityFluidModule> getTileEntityFactory() {
+        return TileEntityFluidModule::new;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new TileEntityFluidModule();
     }
 }

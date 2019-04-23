@@ -21,55 +21,35 @@
  */
 package com.buuz135.portality.network;
 
-import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.tile.TileController;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketBuffer;
+import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.io.IOException;
+public class PortalCloseMessage extends Message {
 
-public class PortalCloseMessage implements IMessage {
+    private ResourceLocation dimension;
+    private BlockPos pos;
 
-    private PortalLinkData data;
-
-    public PortalCloseMessage(PortalLinkData data) {
-        this.data = data;
+    public PortalCloseMessage(ResourceLocation dimension, BlockPos pos) {
+        this.dimension = dimension;
+        this.pos = pos;
     }
 
     public PortalCloseMessage() {
     }
 
     @Override
-    public void fromBytes(ByteBuf buf) {
-        PacketBuffer buffer = new PacketBuffer(buf);
-        try {
-            data = PortalLinkData.readFromNBT(buffer.readCompoundTag());
-        } catch (IOException e) {
-            e.printStackTrace();
+    protected void handleMessage(NetworkEvent.Context context) {
+        World world = context.getSender().world.getServer().getWorld(DimensionType.byName(dimension));
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity instanceof TileController) {
+            ((TileController) tileEntity).closeLink();
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
-        PacketBuffer buffer = new PacketBuffer(buf);
-        buffer.writeCompoundTag(data.writeToNBT());
-    }
-
-    public static class Handler implements IMessageHandler<PortalCloseMessage, IMessage> {
-
-        @Override
-        public IMessage onMessage(PortalCloseMessage message, MessageContext ctx) {
-            World world = ctx.getServerHandler().player.world.getMinecraftServer().getWorld(message.data.getDimension());
-            TileEntity tileEntity = world.getTileEntity(message.data.getPos());
-            if (tileEntity instanceof TileController) {
-                ((TileController) tileEntity).closeLink();
-            }
-            return null;
-        }
-    }
 }

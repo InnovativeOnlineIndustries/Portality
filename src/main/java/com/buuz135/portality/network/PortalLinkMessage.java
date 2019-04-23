@@ -23,17 +23,18 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.tile.TileController;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketBuffer;
+import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.io.IOException;
 
-public class PortalLinkMessage implements IMessage {
+public class PortalLinkMessage extends Message {
+
+    static {
+        map(PortalLinkData.class, buf -> PortalLinkData.readFromNBT(buf.readCompoundTag()), (buf, portalLinkData) -> buf.writeCompoundTag(portalLinkData.writeToNBT()));
+    }
 
     private int type;
     private PortalLinkData linkSender;
@@ -49,35 +50,12 @@ public class PortalLinkMessage implements IMessage {
     }
 
     @Override
-    public void fromBytes(ByteBuf buf) {
-        PacketBuffer packet = new PacketBuffer(buf);
-        type = packet.readInt();
-        try {
-            linkSender = PortalLinkData.readFromNBT(packet.readCompoundTag());
-            linkReceiver = PortalLinkData.readFromNBT(packet.readCompoundTag());
-        } catch (IOException e) {
-            e.printStackTrace();
+    protected void handleMessage(NetworkEvent.Context context) {
+        World world = context.getSender().world.getServer().getWorld(DimensionType.byName(linkSender.getDimension()));
+        TileEntity tileEntity = world.getTileEntity(linkSender.getPos());
+        if (tileEntity instanceof TileController) {
+            ((TileController) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[type]);
         }
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
-        PacketBuffer packet = new PacketBuffer(buf);
-        packet.writeInt(type);
-        packet.writeCompoundTag(linkSender.writeToNBT());
-        packet.writeCompoundTag(linkReceiver.writeToNBT());
-    }
-
-    public static class Handler implements IMessageHandler<PortalLinkMessage, IMessage> {
-
-        @Override
-        public IMessage onMessage(PortalLinkMessage message, MessageContext ctx) {
-            World world = ctx.getServerHandler().player.world.getMinecraftServer().getWorld(message.linkSender.getDimension());
-            TileEntity tileEntity = world.getTileEntity(message.linkSender.getPos());
-            if (tileEntity instanceof TileController) {
-                ((TileController) tileEntity).linkTo(new PortalLinkData(message.linkReceiver.getDimension(), message.linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[message.type]);
-            }
-            return null;
-        }
-    }
 }

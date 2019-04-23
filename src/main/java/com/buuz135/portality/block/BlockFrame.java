@@ -21,22 +21,34 @@
  */
 package com.buuz135.portality.block;
 
+import com.buuz135.portality.Portality;
+import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
+import com.hrznstudio.titanium.api.IFactory;
+import com.hrznstudio.titanium.block.BlockTileBase;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-public class BlockFrame<T extends TileFrame> extends BlockTile<T> {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class BlockFrame<T extends TileFrame> extends BlockTileBase<T> {
 
     public BlockFrame(String name, Class<T> tileClass) {
-        super(name, tileClass, Material.ROCK, -1);
+        super(name, Block.Properties.create(Material.ROCK), tileClass);
+        setItemGroup(Portality.TAB);
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void onReplaced(IBlockState state, World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity instanceof TileFrame && ((TileFrame) tileEntity).getControllerPos() != null) {
             TileEntity controller = worldIn.getTileEntity(((TileFrame) tileEntity).getControllerPos());
@@ -44,6 +56,33 @@ public class BlockFrame<T extends TileFrame> extends BlockTile<T> {
                 ((TileController) controller).setShouldCheckForStructure(true);
             }
         }
-        super.breakBlock(worldIn, pos, state);
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override
+    public IFactory<T> getTileEntityFactory() {
+        return new IFactory<T>() {
+            @Nonnull
+            @Override
+            public T create() {
+                return (T) new TileFrame(CommonProxy.BLOCK_FRAME);
+            }
+        };
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new TileFrame(CommonProxy.BLOCK_FRAME);
+    }
+
+    @Override
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+        super.fillStateContainer(builder);
     }
 }
