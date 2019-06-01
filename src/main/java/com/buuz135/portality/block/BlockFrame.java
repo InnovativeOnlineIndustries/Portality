@@ -46,4 +46,14 @@ public class BlockFrame<T extends TileFrame> extends BlockTile<T> {
         }
         super.breakBlock(worldIn, pos, state);
     }
+
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity entity = worldIn.getTileEntity(pos);
+        if (entity instanceof TileFrame) {
+            ((TileFrame) entity).setControllerPos(null);
+            ((TileFrame) entity).markForUpdate();
+        }
+    }
+
 }

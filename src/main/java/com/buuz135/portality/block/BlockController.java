@@ -68,6 +68,14 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(worldIn, pos, state);
+        TileEntity entity = worldIn.getTileEntity(pos);
+        if (entity instanceof TileController) {
+            ((TileController) entity).clear();
+        }
+    }
 
     @Override
     public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {

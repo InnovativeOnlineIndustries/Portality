@@ -91,6 +91,10 @@ public class TileController extends TileBase implements ITickable {
 
     @Override
     public void update() {
+        if (information == null || !information.getLocation().equals(this.pos)) {
+            getPortalInfo();
+            markForUpdate();
+        }
         if (isActive()) {
             teleportHandler.tick();
             if (linkData != null) {
@@ -153,6 +157,16 @@ public class TileController extends TileBase implements ITickable {
                 sound = null;
             }
         }
+    }
+
+    public void clear() {
+        isFormed = false;
+        onceCall = false;
+        display = true;
+        getPortalInfo();
+        linkData = null;
+        structureHandler.setShouldCheckForStructure(true);
+        markForUpdate();
     }
 
     @Override

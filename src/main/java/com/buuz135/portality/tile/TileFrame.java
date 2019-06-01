@@ -18,14 +18,6 @@ public class TileFrame extends TileBase {
         return compound;
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
-        if (compound.hasKey("X")) {
-            controllerPos = new BlockPos(compound.getInteger("X"), compound.getInteger("Y"), compound.getInteger("Z"));
-        }
-    }
-
     public BlockPos getControllerPos() {
         return controllerPos;
     }
