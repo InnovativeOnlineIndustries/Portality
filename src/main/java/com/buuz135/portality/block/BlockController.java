@@ -24,6 +24,7 @@ package com.buuz135.portality.block;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiHandler;
+import com.buuz135.portality.item.CreativeCreatorItem;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
@@ -86,6 +87,9 @@ public class BlockController extends BlockTileHorizontal<TileController> {
         if (worldIn.isRemote) return true;
         if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
+            if (controller.isCreative() && !playerIn.canUseCommandBlock()) {
+                return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+            }
             if (!controller.isFormed()) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
                 return true;
@@ -94,7 +98,12 @@ public class BlockController extends BlockTileHorizontal<TileController> {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
                 return true;
             }
-            if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
+            ItemStack stack = playerIn.getHeldItem(hand);
+            if (!stack.isEmpty() && stack.getItem().equals(CreativeCreatorItem.INSTANCE)) {
+                controller.setCreative(true);
+                return true;
+            }
+            if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !stack.isEmpty() && !stack.isItemEqual(controller.getDisplay())) {
                 playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
                 controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                 return true;

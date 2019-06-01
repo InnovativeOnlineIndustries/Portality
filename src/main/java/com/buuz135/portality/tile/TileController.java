@@ -63,6 +63,7 @@ public class TileController extends TileBase implements ITickable {
     private static String NBT_LINK = "Link";
     private static String NBT_DISPLAY = "Display";
     private static String NBT_ONCE = "Once";
+    private static String NBT_CREATIVE = "Creative";
 
     private boolean isFormed;
     private boolean onceCall;
@@ -70,6 +71,7 @@ public class TileController extends TileBase implements ITickable {
     private PortalInformation information;
     private PortalLinkData linkData;
     private CustomEnergyStorageHandler energy;
+    private boolean creative;
 
     @SideOnly(Side.CLIENT)
     private TickeableSound sound;
@@ -84,6 +86,7 @@ public class TileController extends TileBase implements ITickable {
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
         this.energy = new CustomEnergyStorageHandler(PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0, 0);
+        this.creative = false;
     }
 
     @Override
@@ -104,7 +107,8 @@ public class TileController extends TileBase implements ITickable {
             return;
         }
         if (isActive() && linkData != null) {
-            energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.POWER_PORTAL_TICK, false);
+            if (!creative)
+                energy.extractEnergyInternal((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.POWER_PORTAL_TICK, false);
             if (energy.getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
@@ -128,6 +132,7 @@ public class TileController extends TileBase implements ITickable {
                     }
                 }
             }
+            if (creative) energy.receiveEnergyInternal(Integer.MAX_VALUE, false);
             markForUpdate();
         }
     }
@@ -162,6 +167,7 @@ public class TileController extends TileBase implements ITickable {
         compound.setBoolean(NBT_DISPLAY, display);
         if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
+        compound.setBoolean(NBT_CREATIVE, creative);
         return compound;
     }
 
@@ -178,6 +184,8 @@ public class TileController extends TileBase implements ITickable {
         energy.readFromNBT(compound);
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
+        if (compound.hasKey(NBT_CREATIVE))
+            creative = compound.getBoolean(NBT_CREATIVE);
         super.readFromNBT(compound);
     }
 
@@ -251,6 +259,15 @@ public class TileController extends TileBase implements ITickable {
         markForUpdate();
     }
 
+    public boolean isCreative() {
+        return creative;
+    }
+
+    public void setCreative(boolean creative) {
+        this.creative = creative;
+        markForUpdate();
+    }
+
     public boolean isInterdimensional() {
         return information != null && information.isInterdimensional();
     }
@@ -282,7 +299,7 @@ public class TileController extends TileBase implements ITickable {
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.getDistance(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY()) * structureHandler.getLength();
                 }
-                energy.extractEnergyInternal(power, false);
+                if (!creative) energy.extractEnergyInternal(power, false);
             }
         }
         PortalDataManager.setActiveStatus(this.world, this.pos, true);

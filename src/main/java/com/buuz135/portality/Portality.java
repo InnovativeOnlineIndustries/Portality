@@ -23,6 +23,7 @@ package com.buuz135.portality;
 
 import com.buuz135.portality.block.BlockBasic;
 import com.buuz135.portality.block.module.BlockCapabilityModule;
+import com.buuz135.portality.item.CreativeCreatorItem;
 import com.buuz135.portality.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -112,6 +113,8 @@ public class Portality {
                     event.getRegistry().register(new ItemBlock(blockBasic).setRegistryName(blockBasic.getRegistryName()));
                 if (FMLCommonHandler.instance().getSide() == Side.CLIENT) blockBasic.registerRender();
             });
+            event.getRegistry().register(CreativeCreatorItem.INSTANCE);
+            if (FMLCommonHandler.instance().getSide() == Side.CLIENT) CreativeCreatorItem.INSTANCE.registerRender();
         }
 
         @SubscribeEvent
