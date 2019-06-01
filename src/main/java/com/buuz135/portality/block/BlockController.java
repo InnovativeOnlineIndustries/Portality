@@ -30,7 +30,6 @@ import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -38,6 +37,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.Explosion;
@@ -99,11 +99,11 @@ public class BlockController extends BlockTileHorizontal<TileController> {
                 return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
             }
             if (!controller.isFormed()) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
+                playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("portality.controller.error.size").getFormattedText()), true);
                 return true;
             }
             if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
+                playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("portality.controller.error.privacy").getFormattedText()), true);
                 return true;
             }
             ItemStack stack = playerIn.getHeldItem(hand);
@@ -112,7 +112,7 @@ public class BlockController extends BlockTileHorizontal<TileController> {
                 return true;
             }
             if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !stack.isEmpty() && !stack.isItemEqual(controller.getDisplay())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
+                playerIn.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + new TextComponentTranslation("portility.controller.info.icon_changed").getFormattedText()), true);
                 controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                 return true;
             }
