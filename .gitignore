@@ -27,3 +27,6 @@ run/
 out/
 
 CHANGELOG.md
+# Project exclude paths
+/build/
+/.gradle/

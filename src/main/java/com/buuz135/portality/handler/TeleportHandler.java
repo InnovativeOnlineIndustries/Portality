@@ -30,17 +30,18 @@ import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.TeleportUtil;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.network.play.server.SPacketCustomSound;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.SPlaySoundPacket;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -68,7 +69,7 @@ public class TeleportHandler {
             controller.closeLink();
             return;
         }
-        EnumFacing facing = controller.getWorld().getBlockState(controller.getPos()).get(BlockController.FACING).getOpposite();
+        Direction facing = controller.getWorld().getBlockState(controller.getPos()).get(BlockController.FACING).getOpposite();
         Random random = controller.getWorld().rand;
         BlockPos offset = controller.getPos().offset(facing);
         double mult = controller.getLength() / 20D;
@@ -79,40 +80,38 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            if (entry.getKey() instanceof EntityPlayer && entry.getKey().isSneaking()) {
+            if (entry.getKey() instanceof PlayerEntity && entry.getKey().isSneaking()) {
                 entityRemove.add(entry.getKey());
                 continue;
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2, 0).offset(facing, controller.getLength() - 1);
             Vec3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
-            double distance = destinationPos.getDistance(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ());
+            double distance = destinationPos.distanceSq(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), true) == PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get()) {
                         World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.byName(entry.getValue().data.getDimension()));
-                        EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
+                        Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportUtil.teleportEntity(entry.getKey(), DimensionType.byName(entry.getValue().data.getDimension()), new BlockPos(pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5), tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), false);
-                        if (entry.getKey() instanceof EntityPlayerMP)
-                            NetworkHandler.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((EntityPlayerMP) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                        if (entry.getKey() instanceof ServerPlayerEntity)
+                            NetworkHandler.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((ServerPlayerEntity) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
                         if (controller.teleportedEntity()) {
                             return;
                         }
                     } else {
-                        if (entry.getKey() instanceof EntityLivingBase && PortalityConfig.COMMON.HURT_PLAYERS.get()) {
-                            ((EntityLivingBase) entry.getKey()).addPotionEffect(new PotionEffect(MobEffects.WITHER, 5 * 20, 1));
+                        if (entry.getKey() instanceof LivingEntity && PortalityConfig.COMMON.HURT_PLAYERS.get()) {
+                            ((LivingEntity) entry.getKey()).addPotionEffect(new EffectInstance(Effects.WITHER, 5 * 20, 1));
                         }
                     }
                 }
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            entry.getKey().motionX = destination.x;
-            entry.getKey().motionY = destination.y;
-            entry.getKey().motionZ = destination.z;
+            entry.getKey().setMotion(destination.x, destination.y, destination.z);
         }
         for (Entity entity : entityRemove) {
             entityTimeToTeleport.remove(entity);
@@ -122,15 +121,13 @@ public class TeleportHandler {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
                 if (entry.getKey().world.isRemote)
-                    entry.getKey().world.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPacketCustomSound(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vec3d(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ), 0.5f, 1f)));
+                    entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ, entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vec3d(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ), 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof BlockController) {
-                    EnumFacing tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
+                    Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
                     Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get());
-                    entry.getKey().motionX = vec3d.x;
-                    entry.getKey().motionY = vec3d.y;
-                    entry.getKey().motionZ = vec3d.z;
+                    entry.getKey().setMotion(vec3d.x, vec3d.y, vec3d.z);
                     entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
                 }
             }

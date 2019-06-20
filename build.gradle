@@ -35,7 +35,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20180921-1.13'
+    mappings channel: 'snapshot', version: '20190616-1.14.2'
     runs {
         client = {
             // recommended logging data for a userdev environment
@@ -65,8 +65,8 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.149'
-    deobf 'com.hrznstudio:titanium:2.0.+'
+    minecraft 'net.minecraftforge:forge:1.14.2-26.0.32'
+    compile fg.deobf('com.hrznstudio:titanium:2.1.31')
 }
 
 afterEvaluate {

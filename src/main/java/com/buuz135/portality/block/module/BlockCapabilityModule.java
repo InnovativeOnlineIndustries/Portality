@@ -26,8 +26,8 @@ import com.buuz135.portality.block.BlockFrame;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -66,7 +66,7 @@ public abstract class BlockCapabilityModule<T, S extends TileFrame> extends Bloc
 
     public abstract Capability<T> getCapability();
 
-    public boolean isInput(IBlockState state) {
+    public boolean isInput(BlockState state) {
         return state.get(INPUT);
     }
 
@@ -77,22 +77,22 @@ public abstract class BlockCapabilityModule<T, S extends TileFrame> extends Bloc
         return false;
     }
 
-    public IBlockState getStateFromMeta(int meta) {
+    public BlockState getStateFromMeta(int meta) {
         return meta == 0 ? this.getDefaultState().with(INPUT, true) : this.getDefaultState().with(INPUT, false);
     }
 
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(BlockState state) {
         return state.get(INPUT) ? 0 : 1;
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(INPUT);
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
         return new ItemStack(this, 1);
     }
 

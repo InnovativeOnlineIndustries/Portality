@@ -2,7 +2,7 @@ package com.buuz135.portality.tile;
 
 import com.hrznstudio.titanium.block.BlockTileBase;
 import com.hrznstudio.titanium.block.tile.TileBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
 public class TileFrame extends TileBase {
@@ -14,20 +14,20 @@ public class TileFrame extends TileBase {
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
+    public CompoundNBT write(CompoundNBT compound) {
         compound = super.write(compound);
         if (controllerPos != null) {
-            compound.setInt("X", controllerPos.getX());
-            compound.setInt("Y", controllerPos.getY());
-            compound.setInt("Z", controllerPos.getZ());
+            compound.putInt("X", controllerPos.getX());
+            compound.putInt("Y", controllerPos.getY());
+            compound.putInt("Z", controllerPos.getZ());
         }
         return compound;
     }
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(CompoundNBT compound) {
         super.read(compound);
-        if (compound.hasKey("X")) {
+        if (compound.hasUniqueId("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }
     }

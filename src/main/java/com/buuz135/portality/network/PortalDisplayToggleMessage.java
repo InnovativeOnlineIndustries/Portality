@@ -23,7 +23,6 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -42,16 +41,16 @@ public class PortalDisplayToggleMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        EntityPlayerMP serverPlayer = context.getSender();
-        serverPlayer.getServerWorld().addScheduledTask(() -> {
-            World world = serverPlayer.world;
+        context.enqueueWork(() -> {
+            World world = context.getSender().world;
             BlockPos pos = BlockPos.fromLong(tileLocation);
             if (world.getTileEntity(pos) instanceof TileController) {
                 TileController controller = (TileController) world.getTileEntity(pos);
-                if (controller.getOwner().equals(serverPlayer.getUniqueID()))
+                if (controller.getOwner().equals(context.getSender().getUniqueID()))
                     controller.setDisplayNameEnabled(!controller.isDisplayNameEnabled());
             }
         });
+
     }
 
 }

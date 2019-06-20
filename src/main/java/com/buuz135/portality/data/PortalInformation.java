@@ -22,7 +22,7 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
@@ -52,7 +52,7 @@ public class PortalInformation {
         this.interdimensional = interdimensional;
     }
 
-    public static PortalInformation readFromNBT(NBTTagCompound info) {
+    public static PortalInformation readFromNBT(CompoundNBT info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
                 new ResourceLocation(info.getString("Dimension")), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
     }
@@ -113,17 +113,17 @@ public class PortalInformation {
         this.interdimensional = interdimensional;
     }
 
-    public NBTTagCompound writetoNBT() {
-        NBTTagCompound infoTag = new NBTTagCompound();
-        infoTag.setUniqueId("ID", getId());
-        infoTag.setUniqueId("Owner", getOwner());
-        infoTag.setBoolean("Active", isActive());
-        infoTag.setBoolean("Private", isPrivate());
-        infoTag.setString("Dimension", getDimension().toString());
-        infoTag.setLong("Position", getLocation().toLong());
-        infoTag.setString("Name", getName());
-        infoTag.setTag("Display", display.serializeNBT());
-        infoTag.setBoolean("Interdimensional", interdimensional);
+    public CompoundNBT writetoNBT() {
+        CompoundNBT infoTag = new CompoundNBT();
+        infoTag.putUniqueId("ID", getId());
+        infoTag.putUniqueId("Owner", getOwner());
+        infoTag.putBoolean("Active", isActive());
+        infoTag.putBoolean("Private", isPrivate());
+        infoTag.putString("Dimension", getDimension().toString());
+        infoTag.putLong("Position", getLocation().toLong());
+        infoTag.putString("Name", getName());
+        infoTag.put("Display", display.serializeNBT());
+        infoTag.putBoolean("Interdimensional", interdimensional);
         return infoTag;
     }
 

@@ -22,7 +22,7 @@
 package com.buuz135.portality.proxy.client;
 
 import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.MovingSound;
+import net.minecraft.client.audio.LocatableSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +31,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class TickeableSound extends MovingSound implements ITickableSound {
+public class TickeableSound extends LocatableSound implements ITickableSound {
 
     private boolean done;
     private World world;

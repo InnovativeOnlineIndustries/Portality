@@ -12,10 +12,11 @@ import com.hrznstudio.titanium.client.gui.ITileContainer;
 import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
 import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -42,7 +43,8 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
         this.x = this.width / 2 - background.getArea().width / 2;
         this.y = this.height / 2 - background.getArea().height / 2;
 
-        String name = new TextComponentTranslation(CommonProxy.BLOCK_CONTROLLER.getTranslationKey()).getFormattedText();
+        String name = new TranslationTextComponent(CommonProxy.BLOCK_CONTROLLER.getTranslationKey()).getFormattedText();
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         fontRenderer.drawString(TextFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.getStringWidth(name) / 2, this.y + 3, 0x000000);
 
         fontRenderer.drawString(I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 28)), this.x + 10, this.y + 21, 0xFFFFFF);
@@ -68,14 +70,14 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
             }
 
             @Override
-            public void drawGuiContainerBackgroundLayer(GuiScreen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
+            public void drawGuiContainerBackgroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
                 IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
                 Minecraft.getInstance().getTextureManager().bindTexture(background.getResourceLocation());
-                drawTexturedModalRect(x - 25, y + 9, 0, 110, 25, 97);
+                guiScreen.blit(x - 25, y + 9, 0, 110, 25, 97);
             }
 
             @Override
-            public void drawGuiContainerForegroundLayer(GuiScreen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3) {
+            public void drawGuiContainerForegroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3) {
 
             }
         });
@@ -84,7 +86,7 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
 

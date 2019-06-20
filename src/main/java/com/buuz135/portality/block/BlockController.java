@@ -29,20 +29,20 @@ import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.BlockRotation;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -60,14 +60,14 @@ public class BlockController extends BlockRotation<TileController> {
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, DimensionType.func_212678_a(worldIn.getDimension().getType()), pos, "Dim: " + worldIn.getDimension().getType().getRegistryName() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, DimensionType.getKey(worldIn.getDimension().getType()), pos, "Dim: " + worldIn.getDimension().getType().getRegistryName() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
         PortalDataManager.addInformation(worldIn, information);
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
     @Override
-    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, IBlockState state) {
+    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
         super.onPlayerDestroy(worldIn, pos, state);
         PortalDataManager.removeInformation(worldIn.getWorld(), pos);
     }
@@ -79,36 +79,35 @@ public class BlockController extends BlockRotation<TileController> {
     }
 
     @Override
-    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (worldIn.isRemote()) return true;
         if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
             if (!controller.isFormed()) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
+                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
                 return true;
             }
             if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
+                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
                 return true;
             }
             if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                playerIn.sendStatusMessage(new TextComponentTranslation(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
+                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
                 controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                 return true;
             }
         }
-        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, side, hitX, hitY, hitZ);
-    }
-
-    @Nullable
-    @Override
-    public IBlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING, context.getPlayer().getHorizontalFacing().getOpposite());
+        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, ray);
     }
 
     @Override
-    public void onReplaced(IBlockState state, World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
+    public BlockState getStateForPlacement(BlockState state, Direction facing, BlockState state2, IWorld world, BlockPos pos1, BlockPos pos2, Hand hand) {
+        return this.getDefaultState().with(FACING, facing);
+    }
+
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         TileEntity entity = worldIn.getTileEntity(pos);
         if (entity instanceof TileController) {
             ((TileController) entity).breakController();

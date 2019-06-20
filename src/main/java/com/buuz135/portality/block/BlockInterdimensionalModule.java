@@ -25,11 +25,11 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 
 public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implements IPortalModule {
@@ -50,7 +50,8 @@ public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implement
     }
 
     @Override
-    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
         return false;
     }
+
 }

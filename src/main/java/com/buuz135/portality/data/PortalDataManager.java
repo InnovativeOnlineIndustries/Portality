@@ -22,12 +22,13 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,14 +128,18 @@ public class PortalDataManager extends WorldSavedData {
         }
     }
 
-    @Nonnull
+    @Nullable
     public static PortalDataManager getData(World world) {
-        PortalDataManager data = (PortalDataManager) world.getMapStorage().func_212426_a(world.getDimension().getType(), PortalDataManager::new, NAME);
-        if (data == null) {
-            data = new PortalDataManager();
-            world.getMapStorage().func_212424_a(world.getDimension().getType(), NAME, data);
+        if (world instanceof ServerWorld) {
+            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD);
+            PortalDataManager data = serverWorld.getSavedData().getOrCreate(PortalDataManager::new, NAME);
+            //if (data == null) {
+            //    data = new PortalDataManager();
+            //    world.getMapStorage().func_212424_a(world.getDimension().getType(), NAME, data);
+            //}
+            return data;
         }
-        return data;
+        return null;
     }
 
     public static void setActiveStatus(World world, BlockPos pos, boolean active) {
@@ -148,22 +153,22 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     @Override
-    public void read(NBTTagCompound nbt) {
+    public void read(CompoundNBT nbt) {
         informationList.clear();
-        NBTTagCompound root = nbt.getCompound(NAME);
+        CompoundNBT root = nbt.getCompound(NAME);
         for (String key : root.keySet()) {
-            NBTTagCompound info = root.getCompound(key);
+            CompoundNBT info = root.getCompound(key);
             informationList.add(PortalInformation.readFromNBT(info));
         }
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
-        NBTTagCompound tag = new NBTTagCompound();
+    public CompoundNBT write(CompoundNBT compound) {
+        CompoundNBT tag = new CompoundNBT();
         for (PortalInformation information : informationList) {
-            tag.setTag(information.getId().toString(), information.writetoNBT());
+            tag.put(information.getId().toString(), information.writetoNBT());
         }
-        compound.setTag(NAME, tag);
+        compound.put(NAME, tag);
         return compound;
     }
 

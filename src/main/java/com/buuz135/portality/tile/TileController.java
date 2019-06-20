@@ -40,14 +40,15 @@ import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -99,14 +100,14 @@ public class TileController extends TilePowered {
             public int getState() {
                 return information != null && information.isPrivate() ? 1 : 0;
             }
-        }.setPredicate(nbtTagCompound -> togglePrivacy()));
+        }.setPredicate(CompoundNBT -> togglePrivacy()));
 
         this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN)) {
             @Override
             public int getState() {
                 return display ? 0 : 1;
             }
-        }.setPredicate(nbtTagCompound -> setDisplayNameEnabled(!display)));
+        }.setPredicate(CompoundNBT -> setDisplayNameEnabled(!display)));
     }
 
     @Override
@@ -174,28 +175,28 @@ public class TileController extends TilePowered {
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
+    public CompoundNBT write(CompoundNBT compound) {
         compound = super.write(compound);
-        compound.setBoolean(NBT_FORMED, isFormed);
-        compound.setInt(NBT_LENGTH, structureHandler.getLength());
-        compound.setInt(NBT_WIDTH, structureHandler.getWidth());
-        compound.setInt(NBT_HEIGHT, structureHandler.getHeight());
-        compound.setBoolean(NBT_ONCE, onceCall);
-        compound.setBoolean(NBT_DISPLAY, display);
-        if (information != null) compound.setTag(NBT_PORTAL, information.writetoNBT());
-        if (linkData != null) compound.setTag(NBT_LINK, linkData.writeToNBT());
+        compound.putBoolean(NBT_FORMED, isFormed);
+        compound.putInt(NBT_LENGTH, structureHandler.getLength());
+        compound.putInt(NBT_WIDTH, structureHandler.getWidth());
+        compound.putInt(NBT_HEIGHT, structureHandler.getHeight());
+        compound.putBoolean(NBT_ONCE, onceCall);
+        compound.putBoolean(NBT_DISPLAY, display);
+        if (information != null) compound.put(NBT_PORTAL, information.writetoNBT());
+        if (linkData != null) compound.put(NBT_LINK, linkData.writeToNBT());
         return compound;
     }
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(CompoundNBT compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
         structureHandler.setHeight(compound.getInt(NBT_HEIGHT));
-        if (compound.hasKey(NBT_PORTAL))
+        if (compound.hasUniqueId(NBT_PORTAL))
             information = PortalInformation.readFromNBT(compound.getCompound(NBT_PORTAL));
-        if (compound.hasKey(NBT_LINK))
+        if (compound.hasUniqueId(NBT_LINK))
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
@@ -222,9 +223,9 @@ public class TileController extends TilePowered {
     public AxisAlignedBB getPortalArea() {
         if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        EnumFacing facing = world.getBlockState(this.pos).get(BlockController.FACING);
-        BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth() - 1).offset(EnumFacing.UP);
-        BlockPos corner2 = this.pos.offset(facing.rotateY(), -structureHandler.getWidth() + 1).offset(EnumFacing.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
+        Direction facing = world.getBlockState(this.pos).get(BlockController.FACING);
+        BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth() - 1).offset(Direction.UP);
+        BlockPos corner2 = this.pos.offset(facing.rotateY(), -structureHandler.getWidth() + 1).offset(Direction.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
         return new AxisAlignedBB(corner1, corner2);
     }
 
@@ -293,7 +294,7 @@ public class TileController extends TilePowered {
                 ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getRegistryName(), this.pos, false, this.getPortalDisplayName()), type);
                 int power = PortalityConfig.COMMON.PORTAL_POWER_OPEN_INTERDIMENSIONAL.get();
                 if (entity.getWorld().equals(this.world)) {
-                    power = (int) this.pos.getDistance(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY()) * structureHandler.getLength();
+                    power = (int) this.pos.distanceSq(new Vec3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
                 }
                 this.getEnergyStorage().extractEnergy(power, false);
             }
@@ -372,10 +373,10 @@ public class TileController extends TilePowered {
     }
 
     @Override
-    public boolean onActivated(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
         if (!super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ)) {
             if (!world.isRemote()) {
-                Minecraft.getInstance().addScheduledTask(() -> {
+                Minecraft.getInstance().deferTask(() -> {
                     Minecraft.getInstance().displayGuiScreen(new GuiController(this));
                 });
                 return true;

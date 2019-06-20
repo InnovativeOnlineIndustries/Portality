@@ -28,8 +28,8 @@ import com.buuz135.portality.tile.TileFrame;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.BlockTileBase;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -48,7 +48,7 @@ public class BlockFrame<T extends TileFrame> extends BlockTileBase<T> {
     }
 
     @Override
-    public void onReplaced(IBlockState state, World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity instanceof TileFrame && ((TileFrame) tileEntity).getControllerPos() != null) {
             TileEntity controller = worldIn.getTileEntity(((TileFrame) tileEntity).getControllerPos());
@@ -82,7 +82,7 @@ public class BlockFrame<T extends TileFrame> extends BlockTileBase<T> {
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
     }
 }

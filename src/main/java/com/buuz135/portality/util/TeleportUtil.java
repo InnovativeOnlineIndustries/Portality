@@ -23,9 +23,7 @@ package com.buuz135.portality.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.util.ITeleporter;
 
 /**
  * Created by brandon3055.
@@ -46,7 +44,7 @@ public class TeleportUtil {
      * @return the entity. This may be a new instance so be sure to keep that in mind.
      */
     public static Entity teleportEntity(Entity entity, DimensionType dimension, BlockPos pos, float yaw, float pitch) {
-        return entity.changeDimension(dimension, new PortalTeleporter(pos));
+        return entity;//entity.changeDimension(dimension, new PortalTeleporter(pos));
 //        if (entity == null || entity.world.isRemote) {
 //            return entity;
 //        }
@@ -71,19 +69,19 @@ public class TeleportUtil {
 //        return rider.entity;
     }
 
-    public static class PortalTeleporter implements ITeleporter {
-
-        private final BlockPos targetPos;
-
-        private PortalTeleporter(BlockPos targetPos) {
-            this.targetPos = targetPos;
-        }
-
-        @Override
-        public void placeEntity(World world, Entity entity, float yaw) {
-            entity.moveToBlockPosAndAngles(targetPos, yaw, entity.rotationPitch);
-        }
-    }
+//    public static class PortalTeleporter implements ITeleporter {
+//
+//        private final BlockPos targetPos;
+//
+//        private PortalTeleporter(BlockPos targetPos) {
+//            this.targetPos = targetPos;
+//        }
+//
+//        @Override
+//        public void placeEntity(World world, Entity entity, float yaw) {
+//            entity.moveToBlockPosAndAngles(targetPos, yaw, entity.rotationPitch);
+//        }
+//    }
 //
 //    /**
 //     * Convenience method that does not require pitch and yaw.
@@ -107,14 +105,14 @@ public class TeleportUtil {
 //        }
 //
 //        if (interDimensional) {
-//            if (entity instanceof EntityPlayerMP) {
-//                return teleportPlayerInterdimentional((EntityPlayerMP) entity, server, sourceDim, targetDim, xCoord, yCoord, zCoord, yaw, pitch);
+//            if (entity instanceof ServerPlayerEntity) {
+//                return teleportPlayerInterdimentional((ServerPlayerEntity) entity, server, sourceDim, targetDim, xCoord, yCoord, zCoord, yaw, pitch);
 //            } else {
 //                return teleportEntityInterdimentional(entity, server, sourceDim, targetDim, xCoord, yCoord, zCoord, yaw, pitch);
 //            }
 //        } else {
-//            if (entity instanceof EntityPlayerMP) {
-//                EntityPlayerMP player = (EntityPlayerMP) entity;
+//            if (entity instanceof ServerPlayerEntity) {
+//                ServerPlayerEntity player = (ServerPlayerEntity) entity;
 //                player.connection.setPlayerLocation(xCoord, yCoord, zCoord, yaw, pitch);
 //                player.setRotationYawHead(yaw);
 //            } else {
@@ -169,7 +167,7 @@ public class TeleportUtil {
 //    /**
 //     * This is the black magic responsible for teleporting players between dimensions!
 //     */
-//    private static EntityPlayer teleportPlayerInterdimentional(EntityPlayerMP player, MinecraftServer server, int sourceDim, int targetDim, double xCoord, double yCoord, double zCoord, float yaw, float pitch) {
+//    private static EntityPlayer teleportPlayerInterdimentional(ServerPlayerEntity player, MinecraftServer server, int sourceDim, int targetDim, double xCoord, double yCoord, double zCoord, float yaw, float pitch) {
 //        WorldServer sourceWorld = server.getWorld(sourceDim);
 //        WorldServer targetWorld = server.getWorld(targetDim);
 //        PlayerList playerList = server.getPlayerList();
@@ -274,8 +272,8 @@ public class TeleportUtil {
 //         * This method sends update packets to any players that were teleported with the entity stack.
 //         */
 //        public void updateClients() {
-//            if (entity instanceof EntityPlayerMP) {
-//                updateClient((EntityPlayerMP) entity);
+//            if (entity instanceof ServerPlayerEntity) {
+//                updateClient((ServerPlayerEntity) entity);
 //            }
 //            for (PassengerHelper passenger : passengers) {
 //                passenger.updateClients();
@@ -287,7 +285,7 @@ public class TeleportUtil {
 //         *
 //         * @param playerMP The Player.
 //         */
-//        private void updateClient(EntityPlayerMP playerMP) {
+//        private void updateClient(ServerPlayerEntity playerMP) {
 //            if (entity.isBeingRidden()) {
 //                playerMP.connection.sendPacket(new SPacketSetPassengers(entity));
 //            }

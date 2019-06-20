@@ -24,14 +24,14 @@ package com.buuz135.portality.proxy.client.render;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.tile.TileController;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -59,16 +59,16 @@ public class TESRPortal extends TileEntityRenderer<TileController> {
         GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         GlStateManager.translated(x, y, z);
         //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
-        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
-        if (facing == EnumFacing.SOUTH) {
+        Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
+        if (facing == Direction.SOUTH) {
             GlStateManager.translated(1, 0, 1);
             GlStateManager.rotatef(-180, 0, 1, 0);
         }
-        if (facing == EnumFacing.EAST) {
+        if (facing == Direction.EAST) {
             GlStateManager.translated(1, 0, 0);
             GlStateManager.rotatef(-90, 0, 1, 0);
         }
-        if (facing == EnumFacing.WEST) {
+        if (facing == Direction.WEST) {
             GlStateManager.translated(0, 0, 1);
             GlStateManager.rotatef(90, 0, 1, 0);
         }

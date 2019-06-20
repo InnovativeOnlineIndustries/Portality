@@ -30,8 +30,8 @@ import com.buuz135.portality.block.module.BlockCapabilityItemModule;
 import com.buuz135.portality.network.*;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
+import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.network.NetworkHandler;
-import com.hrznstudio.titanium.util.TitaniumMod;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -57,13 +57,13 @@ public class CommonProxy {
         NetworkHandler.registerMessage(PortalTeleportMessage.class);
         NetworkHandler.registerMessage(PortalDisplayToggleMessage.class);
         //ForgeChunkManager.setForcedChunkLoadingCallback(Portality.INSTANCE, new ChunkLoaderHandler());
+        EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
     }
 
     public void onClient() {
 
     }
 
-    @TitaniumMod.EventReceiver
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
         if (event.getEntityPlayer().isSneaking() && event.getEntityPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
             TileController controller = (TileController) event.getWorld().getTileEntity(event.getPos());

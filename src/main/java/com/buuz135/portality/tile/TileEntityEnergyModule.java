@@ -25,9 +25,9 @@ package com.buuz135.portality.tile;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -38,7 +38,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class TileEntityEnergyModule extends TileFrame implements ITickable {
+public class TileEntityEnergyModule extends TileFrame implements ITickableTileEntity {
 
     @Save
     private NBTEnergyHandler energyHandler;
@@ -52,14 +52,14 @@ public class TileEntityEnergyModule extends TileFrame implements ITickable {
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityEnergy.ENERGY) return energyCap.cast();
         return super.getCapability(cap, side);
     }
 
     @Override
     public void tick() {
-        for (EnumFacing facing : EnumFacing.values()) {
+        for (Direction facing : Direction.values()) {
             BlockPos checking = this.pos.offset(facing);
             TileEntity checkingTile = this.world.getTileEntity(checking);
             if (checkingTile != null) {

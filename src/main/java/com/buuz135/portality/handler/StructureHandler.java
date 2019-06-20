@@ -6,7 +6,7 @@ import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
@@ -33,29 +33,29 @@ public class StructureHandler {
     public boolean checkArea() {
         checkPortalSize();
         if (length < 3) return false;
-        EnumFacing facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
+        Direction facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
         modules.clear();
         if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), false)) { //BOTTOM
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(EnumFacing.UP, height - 1), false)) { //TOP
+        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(Direction.UP, height - 1), false)) { //TOP
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
             return false;
         }
         checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(EnumFacing.UP, height - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(EnumFacing.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(Direction.UP, height - 1), true);
+        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
         return true;
     }
 
     public boolean checkFramesInTheBox(BlockPos point1, BlockPos point2, boolean save) {
-        for (BlockPos blockPos : BlockPos.getAllInBox(point1, point2)) {
+        for (BlockPos blockPos : BlockPos.getAllInBoxMutable(point1, point2)) {
             if (!blockPos.equals(this.controller.getPos()) && !isValidFrame(blockPos)) {
                 return false;
             } else if (save) {
@@ -74,20 +74,20 @@ public class StructureHandler {
     }
 
     private void checkPortalSize() {
-        EnumFacing controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
+        Direction controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
         if (controllerFacing.getAxis().isVertical()) return;
         //Checking width
-        EnumFacing widthFacing = controllerFacing.rotateY();
+        Direction widthFacing = controllerFacing.rotateY();
         int width = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP)) && width <= PortalityConfig.COMMON.MAX_PORTAL_WIDTH.get()) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP)) && width <= PortalityConfig.COMMON.MAX_PORTAL_WIDTH.get()) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(EnumFacing.UP, height)) && height <= PortalityConfig.COMMON.MAX_PORTAL_HEIGHT.get()) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP, height)) && height <= PortalityConfig.COMMON.MAX_PORTAL_HEIGHT.get()) {
             ++height;
         }
-        EnumFacing lengthChecking = controllerFacing.getOpposite();
+        Direction lengthChecking = controllerFacing.getOpposite();
         int length = 1;
         while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get()) {
             ++length;

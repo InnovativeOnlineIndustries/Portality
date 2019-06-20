@@ -25,8 +25,8 @@ import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -46,16 +46,14 @@ public class PortalTeleportMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        Minecraft.getInstance().addScheduledTask(() -> {
+        Minecraft.getInstance().deferTask(() -> {
             //Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
             Minecraft.getInstance().player.playSound(PortalitySoundHandler.PORTAL_TP, 0.1f, 1f);
             if (PortalityConfig.COMMON.LAUNCH_PLAYERS.get()) {
-                EnumFacing facing = EnumFacing.values()[this.facing];
+                Direction facing = Direction.values()[this.facing];
                 Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * length / (double) PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get());
-                EntityPlayerSP player = Minecraft.getInstance().player;
-                player.motionX = vector.x;
-                player.motionY = vector.y;
-                player.motionZ = vector.z;
+                ClientPlayerEntity player = Minecraft.getInstance().player;
+                player.setMotion(vector.x, vector.y, vector.z);
             }
         });
     }

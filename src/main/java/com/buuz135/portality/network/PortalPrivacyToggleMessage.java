@@ -23,7 +23,7 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -42,8 +42,8 @@ public class PortalPrivacyToggleMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        EntityPlayerMP serverPlayer = context.getSender();
-        serverPlayer.getServerWorld().addScheduledTask(() -> {
+        ServerPlayerEntity serverPlayer = context.getSender();
+        context.enqueueWork(() -> {
             World world = serverPlayer.world;
             if (world.getTileEntity(tileLocation) instanceof TileController) {
                 TileController controller = (TileController) world.getTileEntity(tileLocation);

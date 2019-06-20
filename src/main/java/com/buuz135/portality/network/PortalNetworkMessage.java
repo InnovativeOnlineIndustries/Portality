@@ -30,6 +30,7 @@ import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -57,7 +58,7 @@ public class PortalNetworkMessage {
 
         @Override
         protected void handleMessage(NetworkEvent.Context context) {
-            context.getSender().getServer().addScheduledTask(() -> {
+            context.enqueueWork(() -> {
                 List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(context.getSender().world).getInformationList());
                 infos.removeIf(information -> {
                     World world = context.getSender().getServer().getWorld(DimensionType.byName(information.getDimension()));
@@ -68,7 +69,7 @@ public class PortalNetworkMessage {
                 infos.removeIf(information -> {
                     World world = context.getSender().world.getServer().getWorld(DimensionType.byName(information.getDimension()));
                     TileEntity entity = world.getTileEntity(information.getLocation());
-                    return entity instanceof TileController && !interdimensional && context.getSender().getServerWorld().getDimension().getType().getRegistryName().equals(information.getDimension()) && (information.getLocation().getDistance(pos.getX(), pos.getY(), pos.getZ()) >= distance || information.getLocation().getDistance(pos.getX(), pos.getY(), pos.getZ()) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
+                    return entity instanceof TileController && !interdimensional && context.getSender().getServerWorld().getDimension().getType().getRegistryName().equals(information.getDimension()) && (information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
                 });
                 NetworkHandler.NETWORK.sendTo(new Response(infos), context.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
             });
@@ -90,7 +91,7 @@ public class PortalNetworkMessage {
 
         @Override
         protected void handleMessage(NetworkEvent.Context context) {
-            Minecraft.getInstance().addScheduledTask(() -> {
+            Minecraft.getInstance().enqueue(() -> {
 //                if (Minecraft.getInstance().currentScreen instanceof GuiPortals) {
 //                    ((GuiPortals) Minecraft.getInstance().currentScreen).refresh(information);
 //                }
