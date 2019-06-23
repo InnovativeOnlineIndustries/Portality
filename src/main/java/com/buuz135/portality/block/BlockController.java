@@ -34,10 +34,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -49,6 +49,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
@@ -78,6 +79,18 @@ public class BlockController extends BlockRotation<TileController> {
         PortalDataManager.removeInformation(worldIn, pos);
     }
 
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
+        return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
+    }
+
+    @Nonnull
+    @Override
+    public RotationType getRotationType() {
+        return RotationType.FOUR_WAY;
+    }
+
     @Override
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
@@ -99,11 +112,6 @@ public class BlockController extends BlockRotation<TileController> {
             }
         }
         return super.onBlockActivated(state, worldIn, pos, playerIn, hand, ray);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockState state, Direction facing, BlockState state2, IWorld world, BlockPos pos1, BlockPos pos2, Hand hand) {
-        return this.getDefaultState().with(FACING, facing);
     }
 
     @Override

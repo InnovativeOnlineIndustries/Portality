@@ -49,15 +49,19 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     public static void addInformation(World world, PortalInformation information) {
-        PortalDataManager dataManager = getData(world);
-        dataManager.getInformationList().add(information);
-        dataManager.markDirty();
+        if (world instanceof ServerWorld) {
+            PortalDataManager dataManager = getData(world);
+            dataManager.getInformationList().add(information);
+            dataManager.markDirty();
+        }
     }
 
     public static void removeInformation(World world, BlockPos blockPos) {
-        PortalDataManager dataManager = getData(world);
-        dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos));
-        dataManager.markDirty();
+        if (world instanceof ServerWorld) {
+            PortalDataManager dataManager = getData(world);
+            dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos));
+            dataManager.markDirty();
+        }
     }
 
     @Nullable

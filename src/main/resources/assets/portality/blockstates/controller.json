@@ -4,12 +4,6 @@
     "model": "portality:controller"
   },
   "variants": {
-    "normal": [
-      {}
-    ],
-    "inventory": [
-      {}
-    ],
     "facing": {
       "north": {},
       "south": {

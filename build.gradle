@@ -35,7 +35,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190616-1.14.2'
+    mappings channel: 'snapshot', version: '20190618-1.14.2'
     runs {
         client = {
             // recommended logging data for a userdev environment
@@ -65,8 +65,14 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.32'
-    compile fg.deobf('com.hrznstudio:titanium:2.1.31')
+    minecraft 'net.minecraftforge:forge:1.14.2-26.0.33'
+    if (project(':titanium') != null) {
+        compile project(':titanium')
+    } else {
+        compile fg.deobf (project.dependencies.create('com.hrznstudio:titanium:2.1.31') {
+            transitive = false
+        })
+    }
 }
 
 afterEvaluate {
