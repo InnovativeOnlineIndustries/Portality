@@ -27,6 +27,7 @@ import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.gui.GuiController;
+import com.buuz135.portality.gui.GuiRenameController;
 import com.buuz135.portality.gui.button.PortalSettingButton;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.handler.StructureHandler;
@@ -35,10 +36,14 @@ import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
+import com.hrznstudio.titanium.api.IFactory;
+import com.hrznstudio.titanium.api.client.IGuiAddon;
 import com.hrznstudio.titanium.block.tile.TilePowered;
+import com.hrznstudio.titanium.client.gui.addon.StateButtonAddon;
 import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -54,6 +59,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,21 +94,36 @@ public class TileController extends TilePowered {
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
 
-        this.addButton(new PortalSettingButton(-22, 12, new StateButtonInfo(0, PortalSettingButton.RENAME)) {
+        this.addButton(new PortalSettingButton(-22, 12, new StateButtonInfo(0, PortalSettingButton.RENAME, "portality.display.change_name")) {
             @Override
             public int getState() {
                 return 0;
             }
+
+            @Override
+            public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
+                return Collections.singletonList(() -> new StateButtonAddon(this, this.getInfos()) {
+                    @Override
+                    public int getState() {
+                        return 0;
+                    }
+
+                    @Override
+                    public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
+                        Minecraft.getInstance().displayGuiScreen(new GuiRenameController(TileController.this));
+                    }
+                });
+            }
         });
 
-        this.addButton(new PortalSettingButton(-22, 12 + 22, new StateButtonInfo(0, PortalSettingButton.PUBLIC), new StateButtonInfo(1, PortalSettingButton.PRIVATE)) {
+        this.addButton(new PortalSettingButton(-22, 12 + 22, new StateButtonInfo(0, PortalSettingButton.PUBLIC, "portality.display.make_private"), new StateButtonInfo(1, PortalSettingButton.PRIVATE, "portality.display.make_public")) {
             @Override
             public int getState() {
                 return information != null && information.isPrivate() ? 1 : 0;
             }
         }.setPredicate(CompoundNBT -> togglePrivacy()));
 
-        this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN)) {
+        this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN, "portality.display.hide_name"), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN, "portality.display.show_name")) {
             @Override
             public int getState() {
                 return display ? 0 : 1;

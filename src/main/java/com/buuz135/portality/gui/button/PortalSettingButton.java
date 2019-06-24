@@ -43,4 +43,7 @@ public abstract class PortalSettingButton extends PosButton {
 
     public abstract int getState();
 
+    public StateButtonInfo[] getInfos() {
+        return infos;
+    }
 }

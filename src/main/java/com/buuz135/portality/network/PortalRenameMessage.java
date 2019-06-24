@@ -30,7 +30,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PortalRenameMessage extends Message {
 
-    private long tileLocation;
+    private BlockPos tileLocation;
     private String name;
 
     public PortalRenameMessage() {
@@ -39,7 +39,7 @@ public class PortalRenameMessage extends Message {
 
     public PortalRenameMessage(String name, BlockPos tile) {
         this.name = name;
-        this.tileLocation = tile.toLong();
+        this.tileLocation = tile;
     }
 
     @Override
@@ -47,9 +47,8 @@ public class PortalRenameMessage extends Message {
         ServerPlayerEntity serverPlayer = context.getSender();
         context.enqueueWork(() -> {
             World world = serverPlayer.world;
-            BlockPos pos = BlockPos.fromLong(tileLocation);
-            if (world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof TileController) {
-                TileController controller = (TileController) world.getTileEntity(pos);
+            if (world.getTileEntity(tileLocation) != null && world.getTileEntity(tileLocation) instanceof TileController) {
+                TileController controller = (TileController) world.getTileEntity(tileLocation);
                 if (controller.getOwner().equals(serverPlayer.getUniqueID())) controller.setDisplayName(name);
             }
         });

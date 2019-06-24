@@ -25,34 +25,36 @@ import java.util.List;
 public class GuiController extends GuiAddonScreen implements ITileContainer<TileController> {
 
     private TileController controller;
-    private int x;
-    private int y;
 
     public GuiController(TileController controller) {
         super(PortalityAssetProvider.PROVIDER, true);
         this.controller = controller;
-        IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
-        this.x = this.width / 2 - background.getArea().width / 2;
-        this.y = this.height / 2 - background.getArea().height / 2;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         super.render(mouseX, mouseY, partialTicks);
-        IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
-        this.x = this.width / 2 - background.getArea().width / 2;
-        this.y = this.height / 2 - background.getArea().height / 2;
+    }
 
+
+    @Override
+    public void renderBackground(int mouseX, int mouseY, float partialTicks) {
+        super.renderBackground(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public void renderForeground(int mouseX, int mouseY, float partialTicks) {
+        IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
         String name = new TranslationTextComponent(CommonProxy.BLOCK_CONTROLLER.getTranslationKey()).getFormattedText();
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         fontRenderer.drawString(TextFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.getStringWidth(name) / 2, this.y + 3, 0x000000);
-
         fontRenderer.drawString(I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 28)), this.x + 10, this.y + 21, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.private") + " " + controller.isPrivate(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(controller.getLength()), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.power") + " " + new DecimalFormat().format(controller.getEnergyStorage().getEnergyStored()) + " FE", this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.link") + " " + (controller.isActive() ? I18n.format("portality.gui.controller.link_active") : I18n.format("portality.gui.controller.link_missing")), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
+        super.renderForeground(mouseX, mouseY, partialTicks);
     }
 
     @Override
