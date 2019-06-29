@@ -35,7 +35,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190618-1.14.2'
+    mappings channel: 'snapshot', version: '20190629-1.14.3'
     runs {
         client = {
             // recommended logging data for a userdev environment
@@ -65,7 +65,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.33'
+    minecraft 'net.minecraftforge:forge:1.14.3-27.0.16'
     if (project(':titanium') != null) {
         compile project(':titanium')
     } else {
