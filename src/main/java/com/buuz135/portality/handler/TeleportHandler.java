@@ -91,10 +91,10 @@ public class TeleportHandler {
             if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), true) == PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get()) {
-                        World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.byName(entry.getValue().data.getDimension()));
+                        World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.getById(entry.getValue().data.getDimension()));
                         Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
-                        Entity entity = TeleportUtil.teleportEntity(entry.getKey(), DimensionType.byName(entry.getValue().data.getDimension()), new BlockPos(pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5), tpFacing.getHorizontalAngle(), 0);
+                        Entity entity = TeleportUtil.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), new BlockPos(pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5), tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), false);
                         if (entry.getKey() instanceof ServerPlayerEntity)

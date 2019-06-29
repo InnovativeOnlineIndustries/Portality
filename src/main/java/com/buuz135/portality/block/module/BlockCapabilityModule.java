@@ -55,7 +55,7 @@ public abstract class BlockCapabilityModule<T, S extends TileFrame> extends Bloc
     @Override
     public void work(TileController controller, BlockPos blockPos) {
         if (controller.getLinkData() == null) return;
-        TileEntity other = controller.getWorld().getServer().getWorld(DimensionType.byName(controller.getLinkData().getDimension())).getTileEntity(controller.getLinkData().getPos());
+        TileEntity other = controller.getWorld().getServer().getWorld(DimensionType.getById(controller.getLinkData().getDimension())).getTileEntity(controller.getLinkData().getPos());
         if (other instanceof TileController && this.isInput(controller.getWorld().getBlockState(blockPos))) {
             TileController otherController = (TileController) other;
             internalWork(controller.getWorld(), blockPos, other.getWorld(), otherController.getModules().stream().filter(pos -> otherController.getWorld().getBlockState(pos).getBlock() instanceof BlockCapabilityModule

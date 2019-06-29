@@ -50,7 +50,6 @@ public class CommonProxy {
         NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
         NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
         NetworkHandler.registerMessage(PortalRenameMessage.class);
-        NetworkHandler.registerMessage(PortalNetworkMessage.Request.class);
         NetworkHandler.registerMessage(PortalNetworkMessage.Response.class);
         NetworkHandler.registerMessage(PortalLinkMessage.class);
         NetworkHandler.registerMessage(PortalCloseMessage.class);

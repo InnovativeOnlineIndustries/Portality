@@ -23,11 +23,14 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.gui.GuiPortals;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.network.Message;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -41,60 +44,44 @@ import java.util.List;
 
 public class PortalNetworkMessage {
 
-    public static class Request extends Message {
-
-        private boolean interdimensional;
-        private BlockPos pos;
-        private int distance;
-
-        public Request() {
-        }
-
-        public Request(boolean interdimensional, BlockPos pos, int distance) {
-            this.interdimensional = interdimensional;
-            this.pos = pos;
-            this.distance = distance;
-        }
-
-        @Override
-        protected void handleMessage(NetworkEvent.Context context) {
-            context.enqueueWork(() -> {
-                List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(context.getSender().world).getInformationList());
-                infos.removeIf(information -> {
-                    World world = context.getSender().getServer().getWorld(DimensionType.byName(information.getDimension()));
-                    return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
-                });
-                infos.removeIf(information -> !interdimensional && !context.getSender().getServerWorld().getDimension().getType().getRegistryName().equals(information.getDimension()));
-                infos.removeIf(information -> interdimensional && !context.getSender().getServerWorld().getDimension().getType().getRegistryName().equals(information.getDimension()) && !information.isInterdimensional());
-                infos.removeIf(information -> {
-                    World world = context.getSender().world.getServer().getWorld(DimensionType.byName(information.getDimension()));
-                    TileEntity entity = world.getTileEntity(information.getLocation());
-                    return entity instanceof TileController && !interdimensional && context.getSender().getServerWorld().getDimension().getType().getRegistryName().equals(information.getDimension()) && (information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
-                });
-                NetworkHandler.NETWORK.sendTo(new Response(infos), context.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-            });
-        }
-
+    public static void sendInformationToPlayer(ServerPlayerEntity playerEntity, boolean interdimensional, BlockPos pos, int distance) {
+        List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(playerEntity.world).getInformationList());
+        infos.removeIf(information -> information.getDimension() == playerEntity.getServerWorld().getDimension().getType().getId() && information.getLocation().equals(pos));
+        infos.removeIf(information -> {
+            World world = playerEntity.getServer().getWorld(DimensionType.getById(information.getDimension()));
+            return world.getTileEntity(information.getLocation()) instanceof TileController && !((TileController) world.getTileEntity(information.getLocation())).isFormed();
+        });
+        infos.removeIf(information -> !interdimensional && playerEntity.getServerWorld().getDimension().getType().getId() != information.getDimension());
+        infos.removeIf(information -> interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() != information.getDimension() && !information.isInterdimensional());
+        infos.removeIf(information -> {
+            World world = playerEntity.getEntityWorld().getServer().getWorld(DimensionType.getById(information.getDimension()));
+            TileEntity entity = world.getTileEntity(information.getLocation());
+            return entity instanceof TileController && !interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() == information.getDimension() && (information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
+        });
+        NetworkHandler.NETWORK.sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static class Response extends Message {
 
-        private List<PortalInformation> information;
+        private CompoundNBT compoundNBT;
 
         public Response() {
-            information = new ArrayList<>();
+            compoundNBT = new CompoundNBT();
         }
 
         public Response(List<PortalInformation> information) {
-            this.information = information;
+            compoundNBT = new CompoundNBT();
+            information.forEach(portalInformation -> compoundNBT.put(portalInformation.getId().toString(), portalInformation.writetoNBT()));
         }
 
         @Override
         protected void handleMessage(NetworkEvent.Context context) {
             Minecraft.getInstance().enqueue(() -> {
-//                if (Minecraft.getInstance().currentScreen instanceof GuiPortals) {
-//                    ((GuiPortals) Minecraft.getInstance().currentScreen).refresh(information);
-//                }
+                if (Minecraft.getInstance().currentScreen instanceof GuiPortals) {
+                    List<PortalInformation> information = new ArrayList<>();
+                    compoundNBT.keySet().forEach(s -> information.add(PortalInformation.readFromNBT(compoundNBT.getCompound(s))));
+                    ((GuiPortals) Minecraft.getInstance().currentScreen).refresh(information);
+                }
             });
         }
 

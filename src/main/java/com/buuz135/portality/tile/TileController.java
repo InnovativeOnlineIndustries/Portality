@@ -27,15 +27,19 @@ import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.gui.GuiController;
+import com.buuz135.portality.gui.GuiPortals;
 import com.buuz135.portality.gui.GuiRenameController;
 import com.buuz135.portality.gui.button.PortalSettingButton;
+import com.buuz135.portality.gui.button.TextPortalButton;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
 import com.buuz135.portality.handler.StructureHandler;
 import com.buuz135.portality.handler.TeleportHandler;
+import com.buuz135.portality.network.PortalNetworkMessage;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
+import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IGuiAddon;
 import com.hrznstudio.titanium.block.tile.TilePowered;
@@ -46,6 +50,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -121,14 +126,24 @@ public class TileController extends TilePowered {
             public int getState() {
                 return information != null && information.isPrivate() ? 1 : 0;
             }
-        }.setPredicate(CompoundNBT -> togglePrivacy()));
+        }.setPredicate((playerEntity, compoundNBT) -> {
+            if (information.getOwner().equals(playerEntity.getUniqueID())) togglePrivacy();
+        }));
 
         this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN, "portality.display.hide_name"), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN, "portality.display.show_name")) {
             @Override
             public int getState() {
                 return display ? 0 : 1;
             }
-        }.setPredicate(CompoundNBT -> setDisplayNameEnabled(!display)));
+        }.setPredicate((playerEntity, compoundNBT) -> {
+            if (information.getOwner().equals(playerEntity.getUniqueID()))
+                setDisplayNameEnabled(!isDisplayNameEnabled());
+        }));
+        this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
+                .setClientConsumer(screen -> Minecraft.getInstance().displayGuiScreen(new GuiPortals(this)))
+                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength())))
+        );
+        this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()));
     }
 
     @Override
@@ -150,6 +165,7 @@ public class TileController extends TilePowered {
         }
         if (isActive() && linkData != null) {
             this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.COMMON.POWER_PORTAL_TICK.get(), false);
+            System.out.println(isActive());
             if (this.getEnergyStorage().getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
@@ -167,8 +183,8 @@ public class TileController extends TilePowered {
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
-                    TileEntity tileEntity = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension())).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || !((TileController) tileEntity).getLinkData().getDimension().equals(this.world.getDimension().getType().getRegistryName()) || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    TileEntity tileEntity = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension())).getTileEntity(linkData.getPos());
+                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.getDimension().getType().getId() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
                         this.closeLink();
                     }
                 }
@@ -308,11 +324,11 @@ public class TileController extends TilePowered {
         if (linkData != null) return;
         if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
-            World world = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension()));
+            World world = this.world.getServer().getWorld(DimensionType.getById(data.getDimension()));
             TileEntity entity = world.getTileEntity(data.getPos());
             if (entity instanceof TileController) {
                 data.setName(((TileController) entity).getPortalDisplayName());
-                ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getRegistryName(), this.pos, false, this.getPortalDisplayName()), type);
+                ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getId(), this.pos, false, this.getPortalDisplayName()), type);
                 int power = PortalityConfig.COMMON.PORTAL_POWER_OPEN_INTERDIMENSIONAL.get();
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.distanceSq(new Vec3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
@@ -327,9 +343,9 @@ public class TileController extends TilePowered {
     public void closeLink() {
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.world, this.pos, false);
-            World world = this.world.getServer().getWorld(DimensionType.byName(linkData.getDimension()));
-            linkData = null;
+            World world = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension()));
             TileEntity entity = world.getTileEntity(linkData.getPos());
+            linkData = null;
             if (entity instanceof TileController) {
                 ((TileController) entity).closeLink();
             }
@@ -391,6 +407,11 @@ public class TileController extends TilePowered {
 
     public int getLength() {
         return structureHandler.getLength();
+    }
+
+    public PortalInformation getInformation() {
+        getPortalInfo();
+        return information;
     }
 
     @Override
