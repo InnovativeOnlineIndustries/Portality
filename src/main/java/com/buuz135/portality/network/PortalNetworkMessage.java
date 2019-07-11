@@ -56,7 +56,7 @@ public class PortalNetworkMessage {
         infos.removeIf(information -> {
             World world = playerEntity.getEntityWorld().getServer().getWorld(DimensionType.getById(information.getDimension()));
             TileEntity entity = world.getTileEntity(information.getLocation());
-            return entity instanceof TileController && !interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() == information.getDimension() && (information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().distanceSq(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
+            return entity instanceof TileController && !interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() == information.getDimension() && (information.getLocation().manhattanDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().manhattanDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
         });
         NetworkHandler.NETWORK.sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }

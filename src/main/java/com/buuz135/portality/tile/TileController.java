@@ -165,7 +165,6 @@ public class TileController extends TilePowered {
         }
         if (isActive() && linkData != null) {
             this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.COMMON.POWER_PORTAL_TICK.get(), false);
-            System.out.println(isActive());
             if (this.getEnergyStorage().getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
@@ -231,9 +230,9 @@ public class TileController extends TilePowered {
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
         structureHandler.setHeight(compound.getInt(NBT_HEIGHT));
-        if (compound.hasUniqueId(NBT_PORTAL))
+        if (compound.contains(NBT_PORTAL))
             information = PortalInformation.readFromNBT(compound.getCompound(NBT_PORTAL));
-        if (compound.hasUniqueId(NBT_LINK))
+        if (compound.contains(NBT_LINK))
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
@@ -273,6 +272,7 @@ public class TileController extends TilePowered {
 
     private void getPortalInfo() {
         information = PortalDataManager.getInfoFromPos(this.world, this.pos);
+        markForUpdate();
     }
 
     public void togglePrivacy() {

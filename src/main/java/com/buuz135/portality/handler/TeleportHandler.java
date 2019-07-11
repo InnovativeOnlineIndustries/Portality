@@ -27,13 +27,14 @@ import com.buuz135.portality.network.PortalTeleportMessage;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.util.TeleportUtil;
 import com.hrznstudio.titanium.network.NetworkHandler;
+import com.hrznstudio.titanium.util.TeleportationUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.play.server.SPlaySoundPacket;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
@@ -73,7 +74,7 @@ public class TeleportHandler {
         Random random = controller.getWorld().rand;
         BlockPos offset = controller.getPos().offset(facing);
         double mult = controller.getLength() / 20D;
-        //controller.getWorld().spawnParticle(EnumParti.END_ROD, offset.getX() + 0.5 + random.nextDouble() * (controller.getWidth() + 2) - (controller.getWidth() + 2) / 2D, offset.getY() + controller.getHeight() / 2D + random.nextDouble() * (controller.getHeight() - 2) - (controller.getHeight() - 2) / 2D, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult); TODO
+        controller.getWorld().addParticle(ParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * (controller.getWidth() + 2) - (controller.getWidth() + 2) / 2D, offset.getY() + controller.getHeight() / 2D + random.nextDouble() * (controller.getHeight() - 2) - (controller.getHeight() - 2) / 2D, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getDirectionVec().getX() * mult, facing.getDirectionVec().getY() * mult, facing.getDirectionVec().getZ() * mult);
         List<Entity> entityRemove = new ArrayList<>();
         for (Map.Entry<Entity, TeleportData> entry : entityTimeToTeleport.entrySet()) {
             if (!entry.getKey().isAlive() || !controller.getWorld().getEntitiesWithinAABB(Entity.class, controller.getPortalArea()).contains(entry.getKey())) {
@@ -86,7 +87,7 @@ public class TeleportHandler {
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2, 0).offset(facing, controller.getLength() - 1);
             Vec3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
-            double distance = destinationPos.distanceSq(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
+            double distance = destinationPos.manhattanDistance(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
@@ -94,7 +95,7 @@ public class TeleportHandler {
                         World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.getById(entry.getValue().data.getDimension()));
                         Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
-                        Entity entity = TeleportUtil.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), new BlockPos(pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5), tpFacing.getHorizontalAngle(), 0);
+                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), false);
                         if (entry.getKey() instanceof ServerPlayerEntity)
