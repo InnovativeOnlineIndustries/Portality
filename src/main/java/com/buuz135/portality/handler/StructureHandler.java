@@ -59,9 +59,9 @@ public class StructureHandler {
             if (!blockPos.equals(this.controller.getPos()) && !isValidFrame(blockPos)) {
                 return false;
             } else if (save) {
-                frameBlocks.add(blockPos);
+                frameBlocks.add(blockPos.toImmutable());
                 if (this.controller.getWorld().getBlockState(blockPos).getBlock() instanceof IPortalModule) {
-                    modules.add(blockPos);
+                    modules.add(blockPos.toImmutable());
                 }
                 TileEntity entity = this.controller.getWorld().getTileEntity(blockPos);
                 if (entity instanceof TileFrame) {
