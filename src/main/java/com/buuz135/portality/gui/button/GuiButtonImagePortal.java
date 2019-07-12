@@ -3,6 +3,7 @@ package com.buuz135.portality.gui.button;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.gui.GuiPortals;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,11 +15,13 @@ import net.minecraft.util.text.TextFormatting;
 public class GuiButtonImagePortal extends ImageButton {
 
     private PortalInformation information;
+    private GuiPortals portals;
 
-    public GuiButtonImagePortal(PortalInformation information, int x, int y, int xSize, int ySize, int textureX, int textureY, int offset, ResourceLocation location) {
+    public GuiButtonImagePortal(GuiPortals guiPortals, PortalInformation information, int x, int y, int xSize, int ySize, int textureX, int textureY, int offset, ResourceLocation location) {
         super(x, y, xSize, ySize, textureX, textureY, offset, location, p_onPress_1_ -> {
         });
         this.information = information;
+        this.portals = guiPortals;
     }
 
     @Override
@@ -42,6 +45,10 @@ public class GuiButtonImagePortal extends ImageButton {
             GlStateManager.enableDepthTest();
         }
         RenderHelper.disableStandardItemLighting();
+        if (portals.getSelectedPortal() == information) {
+            Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+            blit(x, y, 0, 210, 157, 22);
+        }
         GlStateManager.popMatrix();
     }
 

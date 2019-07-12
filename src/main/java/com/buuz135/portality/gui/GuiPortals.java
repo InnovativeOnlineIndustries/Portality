@@ -69,7 +69,7 @@ public class GuiPortals extends GuiAddonScreen {
         for (int i = pointer; i < pointer + 7; i++) {
             if (informationList.size() > i) {
                 int finalI = i;
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(informationList.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, informationList.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
                         if (isMouseOver(mouseX, mouseY)) {
