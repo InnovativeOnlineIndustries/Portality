@@ -50,6 +50,7 @@ public class GuiPortals extends GuiAddonScreen {
         textField.setFocused2(true);
         textField.setVisible(true);
         textField.setEnableBackgroundDrawing(true);
+        this.setFocused(textField);
         getAddons().add(new PortalCallButton(x + 9, y + guiHeight + 2, controller, PortalCallButton.CallAction.OPEN, this));
         getAddons().add(new PortalCallButton(x + 53 + 9, y + guiHeight + 2, controller, PortalCallButton.CallAction.ONCE, this));
         getAddons().add(new PortalCallButton(x + 53 * 2 + 9, y + guiHeight + 2, controller, PortalCallButton.CallAction.FORCE, this));
@@ -84,6 +85,17 @@ public class GuiPortals extends GuiAddonScreen {
         }
     }
 
+    @Override
+    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+        boolean pressed = super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+        Minecraft.getInstance().enqueue(() -> {
+            this.scrolling = 0;
+            this.lastScrolling = 0;
+            addPortalButtons();
+        });
+        return pressed;
+    }
+
     public void refresh(List<PortalInformation> informationList) {
         this.informationList = informationList;
         addPortalButtons();
@@ -112,7 +124,6 @@ public class GuiPortals extends GuiAddonScreen {
     public PortalInformation getSelectedPortal() {
         return selectedPortal;
     }
-
 
     @Override
     public boolean isPauseScreen() {
