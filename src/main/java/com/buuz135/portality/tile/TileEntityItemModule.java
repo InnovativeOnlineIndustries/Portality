@@ -32,17 +32,15 @@ public class TileEntityItemModule extends TileModule {
     @Save
     public PosInvHandler handler;
 
-
     public TileEntityItemModule() {
         super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE_INPUT);
-        this.input = true;
         this.addInventory(this.handler = new SidedInvHandler("inventory", 54, 20, 3 * 4, 0)
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)
                 .setTile(this)
                 .setRange(4, 3)
-                .setInputFilter((itemStack, integer) -> input)
-                .setOutputFilter((itemStack, integer) -> !input));
+                .setInputFilter((itemStack, integer) -> this.isInput())
+                .setOutputFilter((itemStack, integer) -> !this.isInput()));
     }
 
 }

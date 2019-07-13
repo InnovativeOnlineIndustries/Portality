@@ -9,6 +9,7 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
 import com.hrznstudio.titanium.api.client.AssetTypes;
+import com.hrznstudio.titanium.api.client.GenericAssetType;
 import com.hrznstudio.titanium.api.client.IAsset;
 import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.api.client.assets.types.IBackgroundAsset;
@@ -179,10 +180,35 @@ public final class TileAssetProvider implements IAssetProvider {
             return LOCATION;
         }
     };
+    public static final IAssetType<IAsset> AA_BUTTON_IO_INPUT = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
+    public static final IAssetType<IAsset> AA_BUTTON_IO_OUTPUT = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
     private final IAsset BUTTON_SIDENESS_MANAGER = new IAsset() {
         @Override
         public Rectangle getArea() {
             return new Rectangle(1, 231, 14, 14);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return LOCATION;
+        }
+    };
+    private final IAsset BUTTON_IO_INPUT = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(178, 141, 14, 14);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return LOCATION;
+        }
+    };
+
+    private final IAsset BUTTON_IO_OUTPUT = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(178, 156, 14, 14);
         }
 
         @Override
@@ -223,6 +249,10 @@ public final class TileAssetProvider implements IAssetProvider {
             return assetType.castOrDefault(BUTTON_SIDENESS_PUSH);
         if (assetType == AssetTypes.BUTTON_SIDENESS_MANAGER)
             return assetType.castOrDefault(BUTTON_SIDENESS_MANAGER);
+        if (assetType == AA_BUTTON_IO_INPUT)
+            return assetType.castOrDefault(BUTTON_IO_INPUT);
+        if (assetType == AA_BUTTON_IO_OUTPUT)
+            return assetType.castOrDefault(BUTTON_IO_OUTPUT);
         return null;
     }
 }
