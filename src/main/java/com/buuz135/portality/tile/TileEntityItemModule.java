@@ -38,9 +38,7 @@ public class TileEntityItemModule extends TileModule {
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)
                 .setTile(this)
-                .setRange(4, 3)
-                .setInputFilter((itemStack, integer) -> this.isInput())
-                .setOutputFilter((itemStack, integer) -> !this.isInput()));
+                .setRange(4, 3));
     }
 
 }
