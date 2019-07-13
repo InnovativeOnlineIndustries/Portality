@@ -26,7 +26,7 @@ import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.block.BlockTileBase;
+import com.hrznstudio.titanium.block.BlockRotation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BlockFrame<T extends TileFrame> extends BlockTileBase<T> {
+public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
 
     public BlockFrame(String name, Class<T> tileClass) {
         super(name, Block.Properties.create(Material.ROCK), tileClass);
@@ -57,6 +57,12 @@ public class BlockFrame<T extends TileFrame> extends BlockTileBase<T> {
             }
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Nonnull
+    @Override
+    public RotationType getRotationType() {
+        return RotationType.NONE;
     }
 
     @Override

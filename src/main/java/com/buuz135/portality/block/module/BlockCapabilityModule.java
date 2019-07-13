@@ -39,6 +39,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.Capability;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,12 @@ public abstract class BlockCapabilityModule<T, S extends TileFrame> extends Bloc
         }
     }
 
+    @Nonnull
+    @Override
+    public RotationType getRotationType() {
+        return RotationType.FOUR_WAY;
+    }
+
     public abstract Capability<T> getCapability();
 
     public boolean isInput(BlockState state) {
@@ -75,14 +82,6 @@ public abstract class BlockCapabilityModule<T, S extends TileFrame> extends Bloc
     @Override
     public boolean allowsInterdimensionalTravel() {
         return false;
-    }
-
-    public BlockState getStateFromMeta(int meta) {
-        return meta == 0 ? this.getDefaultState().with(INPUT, true) : this.getDefaultState().with(INPUT, false);
-    }
-
-    public int getMetaFromState(BlockState state) {
-        return state.get(INPUT) ? 0 : 1;
     }
 
     @Override

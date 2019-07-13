@@ -1,11 +1,11 @@
 package com.buuz135.portality.tile;
 
 import com.hrznstudio.titanium.block.BlockTileBase;
-import com.hrznstudio.titanium.block.tile.TileBase;
+import com.hrznstudio.titanium.block.tile.TileActive;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
-public class TileFrame extends TileBase {
+public class TileFrame extends TileActive {
 
     private BlockPos controllerPos;
 
