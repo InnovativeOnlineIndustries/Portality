@@ -32,7 +32,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileEntityFluidModule extends TileFrame {
+public class TileEntityFluidModule extends TileModule {
 
     @Save
     private FluidTank tank;

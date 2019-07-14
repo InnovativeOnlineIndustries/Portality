@@ -22,13 +22,16 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.TileEntityEnergyModule;
+import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockCapabilityEnergyModule extends BlockCapabilityModule<IEnergyStorage, TileEntityEnergyModule> {
@@ -44,8 +47,7 @@ public class BlockCapabilityEnergyModule extends BlockCapabilityModule<IEnergySt
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        {
-            current.getTileEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
+        current.getTileEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
                 for (BlockPos pos : compatibleBlockPos) {
                     TileEntity entity = otherWorld.getTileEntity(pos);
                     if (entity != null) {
@@ -57,6 +59,16 @@ public class BlockCapabilityEnergyModule extends BlockCapabilityModule<IEnergySt
                     }
                 }
             });
-        }
+    }
+
+    @Override
+    public IFactory<TileEntityEnergyModule> getTileEntityFactory() {
+        return TileEntityEnergyModule::new;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new TileEntityEnergyModule();
     }
 }

@@ -24,8 +24,8 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.client.gui.addon.EnergyBarGuiAddon;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
-import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -38,7 +38,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class TileEntityEnergyModule extends TileFrame implements ITickableTileEntity {
+public class TileEntityEnergyModule extends TileModule {
 
     @Save
     private NBTEnergyHandler energyHandler;
@@ -48,6 +48,7 @@ public class TileEntityEnergyModule extends TileFrame implements ITickableTileEn
         super(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE);
         this.energyHandler = new NBTEnergyHandler(this, 10000);
         this.energyCap = LazyOptional.of(() -> this.energyHandler);
+        this.addGuiAddonFactory(() -> new EnergyBarGuiAddon(10, 20, energyHandler));
     }
 
     @Nonnull
@@ -59,17 +60,19 @@ public class TileEntityEnergyModule extends TileFrame implements ITickableTileEn
 
     @Override
     public void tick() {
-        for (Direction facing : Direction.values()) {
-            BlockPos checking = this.pos.offset(facing);
-            TileEntity checkingTile = this.world.getTileEntity(checking);
-            if (checkingTile != null) {
-                checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
-                    int energy = storage.receiveEnergy(Math.min(this.energyHandler.getEnergyStored(), 1000), false);
-                    if (energy > 0) {
-                        this.energyHandler.extractEnergy(energy, false);
-                        return;
-                    }
-                });
+        if (!isInput()) {
+            for (Direction facing : Direction.values()) {
+                BlockPos checking = this.pos.offset(facing);
+                TileEntity checkingTile = this.world.getTileEntity(checking);
+                if (checkingTile != null) {
+                    checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
+                        int energy = storage.receiveEnergy(Math.min(this.energyHandler.getEnergyStored(), 1000), false);
+                        if (energy > 0) {
+                            this.energyHandler.extractEnergy(energy, false);
+                            return;
+                        }
+                    });
+                }
             }
         }
     }
