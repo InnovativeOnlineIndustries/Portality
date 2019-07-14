@@ -18,7 +18,6 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
     id 'java'
 }
 apply plugin: 'net.minecraftforge.gradle'
