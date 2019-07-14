@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "portality:blocks/generator_top",
+    "north": "portality:blocks/generator_side",
+    "west": "portality:blocks/generator_side",
+    "east": "portality:blocks/generator_side",
+    "south": "portality:blocks/generator_front_on",
+    "up": "portality:blocks/generator_top",
+    "down": "portality:blocks/generator_top"
+  }
+}

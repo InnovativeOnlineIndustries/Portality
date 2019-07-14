@@ -6,6 +6,7 @@
   "block.portality.module_items": "Item Module",
   "block.portality.module_fluids": "Fluid Module",
   "block.portality.module_energy": "Energy Module",
+  "block.portality.generator": "Low Efficiency Generator",
   "portality.controller.error.size": "ERROR: Portal Structure Invalid!",
   "portality.controller.error.privacy": "ERROR: This portal is private!",
   "portility.controller.info.icon_changed": "Portal icon changed!",

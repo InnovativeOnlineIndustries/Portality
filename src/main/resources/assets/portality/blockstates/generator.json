@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "portality:block/generator"
+    },
+    "facing=south": {
+      "model": "portality:block/generator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "portality:block/generator",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "portality:block/generator",
+      "y": 90
+    },
+    "facing=up": {
+      "model": "portality:block/generator"
+    },
+    "facing=down": {
+      "model": "portality:block/generator"
+    }
+  }
+}
