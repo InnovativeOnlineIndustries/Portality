@@ -34,7 +34,7 @@ public class TileEntityItemModule extends TileModule {
 
     public TileEntityItemModule() {
         super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE_INPUT);
-        this.addInventory(this.handler = new SidedInvHandler("inventory", 54, 20, 3 * 4, 0)
+        this.addInventory(this.handler = new SidedInvHandler("inventory", 52, 20, 3 * 4, 0)
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)
                 .setTile(this)
