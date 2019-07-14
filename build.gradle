@@ -25,7 +25,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
 def BUILD_NUMBER = System.getenv("BUILD_NUMBER") ?: "0"
-version = "0.1.0.$BUILD_NUMBER"
+version = "${mod_version}.$BUILD_NUMBER"
 group = "com.buuz135"
 archivesBaseName = "Portality"
 
