@@ -106,6 +106,7 @@ public class GuiPortals extends GuiAddonScreen {
         renderBackground();
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         blit(x, y, 0, 0, guiWidth, guiHeight);
+        blit(this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
         super.renderBackground(mouseX, mouseY, partialTicks);
         textField.render(mouseX, mouseY, partialTicks);
     }
@@ -129,4 +130,5 @@ public class GuiPortals extends GuiAddonScreen {
     public boolean isPauseScreen() {
         return false;
     }
+
 }

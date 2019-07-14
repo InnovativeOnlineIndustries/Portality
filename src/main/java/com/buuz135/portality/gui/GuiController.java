@@ -48,7 +48,7 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
         String name = new TranslationTextComponent(CommonProxy.BLOCK_CONTROLLER.getTranslationKey()).getFormattedText();
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         fontRenderer.drawString(TextFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.getStringWidth(name) / 2, this.y + 3, 0x000000);
-        fontRenderer.drawString(I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 28)), this.x + 10, this.y + 21, 0xFFFFFF);
+        fontRenderer.drawString(I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.private") + " " + controller.isPrivate(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(controller.getLength()), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
         fontRenderer.drawString(I18n.format("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
