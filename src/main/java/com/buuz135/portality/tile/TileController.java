@@ -165,7 +165,7 @@ public class TileController extends TilePowered {
             return;
         }
         if (isActive() && linkData != null) {
-            this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.COMMON.POWER_PORTAL_TICK.get(), false);
+            this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.POWER_PORTAL_TICK, false);
             if (this.getEnergyStorage().getEnergyStored() == 0 || !isFormed) {
                 closeLink();
             }
@@ -330,7 +330,7 @@ public class TileController extends TilePowered {
             if (entity instanceof TileController) {
                 data.setName(((TileController) entity).getPortalDisplayName());
                 ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getId(), this.pos, false, this.getPortalDisplayName()), type);
-                int power = PortalityConfig.COMMON.PORTAL_POWER_OPEN_INTERDIMENSIONAL.get();
+                int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.distanceSq(new Vec3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
                 }
@@ -424,13 +424,12 @@ public class TileController extends TilePowered {
                 });
                 return true;
             }
-
         }
         return false;
     }
 
     @Override
     protected IFactory<NBTEnergyHandler> getEnergyHandlerFactory() {
-        return () -> new NBTEnergyHandler(this, 1_000_000);
+        return () -> new NBTEnergyHandler(this, PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0);
     }
 }

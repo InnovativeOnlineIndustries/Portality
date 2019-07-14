@@ -79,17 +79,17 @@ public class StructureHandler {
         //Checking width
         Direction widthFacing = controllerFacing.rotateY();
         int width = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP)) && width <= PortalityConfig.COMMON.MAX_PORTAL_WIDTH.get()) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP, height)) && height <= PortalityConfig.COMMON.MAX_PORTAL_HEIGHT.get()) {
+        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
             ++height;
         }
         Direction lengthChecking = controllerFacing.getOpposite();
         int length = 1;
-        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get()) {
+        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.MAX_PORTAL_LENGTH) {
             ++length;
         }
         this.width = width;

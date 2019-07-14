@@ -91,20 +91,20 @@ public class TeleportHandler {
             destination = destination.subtract(entry.getKey().posX, entry.getKey().posY, entry.getKey().posZ).scale((entry.getValue().time += 0.05) / distance);
             if (distance <= 1.5) {
                 if (!entry.getKey().world.isRemote) {
-                    if (controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), true) == PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get()) {
+                    if (controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, true) == PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.getById(entry.getValue().data.getDimension()));
                         Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
-                        controller.getEnergyStorage().extractEnergy(PortalityConfig.COMMON.TELEPORT_ENERGY_AMOUNT.get(), false);
+                        controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
                         if (entry.getKey() instanceof ServerPlayerEntity)
                             NetworkHandler.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((ServerPlayerEntity) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
                         if (controller.teleportedEntity()) {
                             return;
                         }
                     } else {
-                        if (entry.getKey() instanceof LivingEntity && PortalityConfig.COMMON.HURT_PLAYERS.get()) {
+                        if (entry.getKey() instanceof LivingEntity && PortalityConfig.HURT_PLAYERS) {
                             ((LivingEntity) entry.getKey()).addPotionEffect(new EffectInstance(Effects.WITHER, 5 * 20, 1));
                         }
                     }
@@ -127,7 +127,7 @@ public class TeleportHandler {
                 World tpWorld = entry.getKey().world;
                 if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof BlockController) {
                     Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
-                    Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get());
+                    Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                     entry.getKey().setMotion(vec3d.x, vec3d.y, vec3d.z);
                     entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
                 }

@@ -22,7 +22,6 @@
 package com.buuz135.portality;
 
 import com.buuz135.portality.proxy.CommonProxy;
-import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
 import com.hrznstudio.titanium.event.handler.EventManager;
@@ -34,9 +33,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -57,7 +54,6 @@ public class Portality extends ModuleController {
 
     public Portality() {
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PortalityConfig.BUILDER.build());
         EventManager.mod(FMLCommonSetupEvent.class).process(this::onCommon).subscribe();
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClient).subscribe();
     }

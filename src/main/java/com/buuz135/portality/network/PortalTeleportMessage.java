@@ -49,9 +49,9 @@ public class PortalTeleportMessage extends Message {
         Minecraft.getInstance().deferTask(() -> {
             //Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
             Minecraft.getInstance().player.playSound(PortalitySoundHandler.PORTAL_TP, 0.1f, 1f);
-            if (PortalityConfig.COMMON.LAUNCH_PLAYERS.get()) {
+            if (PortalityConfig.LAUNCH_PLAYERS) {
                 Direction facing = Direction.values()[this.facing];
-                Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * length / (double) PortalityConfig.COMMON.MAX_PORTAL_LENGTH.get());
+                Vec3d vector = new Vec3d(facing.getDirectionVec()).scale(2 * length / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                 ClientPlayerEntity player = Minecraft.getInstance().player;
                 player.setMotion(vector.x, vector.y, vector.z);
             }
