@@ -80,6 +80,9 @@ afterEvaluate {
         options.compilerArgs << "-Xmaxerrs" << "2000"
     }
 }
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.9'
+}
 
 processResources {
     // this will ensure that this task is redone when the versions change.
