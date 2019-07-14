@@ -1,20 +1,22 @@
-
 {
   "result": {
-    "item": "portality:module_energy"
+    "item": "portality:generator"
   },
   "pattern": [
-    "f f",
-    " q ",
-    "f f"
+    "fff",
+    "fqf",
+    "fdf"
   ],
   "type": "minecraft:crafting_shaped",
   "key": {
     "f": {
       "item": "portality:frame"
     },
+    "d": {
+      "item": "minecraft:iron_block"
+    },
     "q": {
-      "item": "minecraft:redstone_block"
+      "item": "minecraft:blast_furnace"
     }
   }
 }
