@@ -1,20 +1,19 @@
 {
   "result": {
-    "item": "portality:module_energy",
-    "data": 0
+    "item": "portality:module_fluids"
   },
   "pattern": [
     "f f",
     " q ",
     "f f"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "f": {
       "item": "portality:frame"
     },
     "q": {
-      "item": "minecraft:redstone_block"
+      "item": "minecraft:bucket"
     }
   }
 }

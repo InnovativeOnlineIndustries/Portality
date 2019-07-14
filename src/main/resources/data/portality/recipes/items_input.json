@@ -1,14 +1,13 @@
 {
   "result": {
-    "item": "portality:module_items",
-    "data": 0
+    "item": "portality:module_items"
   },
   "pattern": [
     "f f",
     " q ",
     "f f"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "f": {
       "item": "portality:frame"
