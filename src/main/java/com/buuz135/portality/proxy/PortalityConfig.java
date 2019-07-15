@@ -31,7 +31,7 @@ public class PortalityConfig {
 
     @ConfigVal(comment = "The amount of energy it will be consumed to teleport an entity")
     @ConfigVal.InRangeInt(min = 1)
-    public static int TELEPORT_ENERGY_AMOUNT = 5000;
+    public static int TELEPORT_ENERGY_AMOUNT = 500;
 
     @ConfigVal(comment = "If true players will get the wither effect if there isn't enough power to teleport")
     public static boolean HURT_PLAYERS = true;
@@ -60,7 +60,7 @@ public class PortalityConfig {
 
     @ConfigVal(comment = "How much power it will be consumed to open the portal interdimensionally")
     @ConfigVal.InRangeInt(min = 1)
-    public static int PORTAL_POWER_OPEN_INTERDIMENSIONAL = 50000;
+    public static int PORTAL_POWER_OPEN_INTERDIMENSIONAL = 10000;
 
     @ConfigVal(comment = "How much power it will be consumed/tick based on the portal length and if it is the caller. (portalLength*ThisValue). If it is the portal the created the link the power will be double")
     @ConfigVal.InRangeInt(min = 1)
