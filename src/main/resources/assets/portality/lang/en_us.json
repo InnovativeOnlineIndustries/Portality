@@ -39,5 +39,6 @@
   "portality.display.copy_to_clipboard": "Copy portal ID to clipboard",
   "portality.manual": "Portality Manual",
   "portality.manual.category.basics": "Portal Basics",
-  "portality.manual.category.modules": "Portal Modules"
+  "portality.manual.category.modules": "Portal Modules",
+  "tooltip.titanium.facing_handler.inventory": "Items"
 }

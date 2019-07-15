@@ -53,8 +53,8 @@ public class TileModule extends TileFrame {
             @Override
             public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(button,
-                        new StateButtonInfo(0, TileAssetProvider.AA_BUTTON_IO_INPUT, "input"),
-                        new StateButtonInfo(1, TileAssetProvider.AA_BUTTON_IO_OUTPUT, "output")) {
+                        new StateButtonInfo(0, TileAssetProvider.AA_BUTTON_IO_INPUT, "module.type.input"),
+                        new StateButtonInfo(1, TileAssetProvider.AA_BUTTON_IO_OUTPUT, "module.type.output")) {
                     @Override
                     public int getState() {
                         return input ? 0 : 1;
