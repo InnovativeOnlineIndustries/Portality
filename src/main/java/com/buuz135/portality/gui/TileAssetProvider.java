@@ -40,10 +40,20 @@ import java.awt.*;
 public final class TileAssetProvider implements IAssetProvider {
 
     public static TileAssetProvider PROVIDER = new TileAssetProvider();
+    private static final ResourceLocation LOCATION = new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
     private final Point HOTBAR_POS = new Point(8, 160);
     private final Point INV_POS = new Point(8, 102);
-    private final IAsset PROGRESS_BAR_BORDER = () -> new Rectangle(211, 1, 11, 56);
-    ResourceLocation LOCATION = new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+    private final IAsset PROGRESS_BAR_BORDER = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(211, 1, 11, 56);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return LOCATION;
+        }
+    };
     private final IAsset SLOT = new IAsset() {
         @Override
         public Rectangle getArea() {
