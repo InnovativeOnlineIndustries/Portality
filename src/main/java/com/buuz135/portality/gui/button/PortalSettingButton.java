@@ -32,9 +32,11 @@ import com.hrznstudio.titanium.block.tile.button.PosButton;
 import com.hrznstudio.titanium.client.gui.addon.StateButtonAddon;
 import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
 import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class PortalSettingButton extends PosButton {
 
@@ -48,10 +50,12 @@ public abstract class PortalSettingButton extends PosButton {
     public static final IAssetType<IAsset> RECEIVE = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
 
     private StateButtonInfo[] infos;
+    private Supplier<Runnable> supplier;
 
-    public PortalSettingButton(int posX, int posY, StateButtonInfo... infos) {
+    public PortalSettingButton(int posX, int posY, Supplier<Runnable> runnableSupplier, StateButtonInfo... infos) {
         super(posX, posY, 20, 20);
         this.infos = infos;
+        this.supplier = runnableSupplier;
     }
 
     @Override
@@ -61,6 +65,11 @@ public abstract class PortalSettingButton extends PosButton {
             public int getState() {
                 return PortalSettingButton.this.getState();
             }
+
+            @Override
+            public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
+                supplier.get().run();
+            }
         });
     }
 
@@ -69,4 +78,5 @@ public abstract class PortalSettingButton extends PosButton {
     public StateButtonInfo[] getInfos() {
         return infos;
     }
+
 }

@@ -36,16 +36,17 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class TextPortalButton extends PosButton {
 
     private final String display;
-    private Consumer<Screen> screenConsumer;
+    private Supplier<Consumer<Screen>> screenConsumer;
 
     public TextPortalButton(int posX, int posY, int sizeX, int sizeY, String display) {
         super(posX, posY, sizeX, sizeY);
         this.display = display;
-        this.screenConsumer = screen -> {
+        this.screenConsumer = () -> screen -> {
         };
     }
 
@@ -53,14 +54,14 @@ public class TextPortalButton extends PosButton {
         return display;
     }
 
-    public TextPortalButton setClientConsumer(Consumer<Screen> screenConsumer) {
+    public TextPortalButton setClientConsumer(Supplier<Consumer<Screen>> screenConsumer) {
         this.screenConsumer = screenConsumer;
         return this;
     }
 
     @Override
     public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
-        return Collections.singletonList(() -> new TextButtonAddon(this, display, screenConsumer));
+        return Collections.singletonList(() -> new TextButtonAddon(this, display, screenConsumer.get()));
     }
 
     public class TextButtonAddon extends BasicButtonAddon {

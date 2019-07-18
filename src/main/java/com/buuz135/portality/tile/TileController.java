@@ -43,14 +43,11 @@ import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
 import com.hrznstudio.titanium.block.tile.TilePowered;
-import com.hrznstudio.titanium.client.gui.addon.StateButtonAddon;
 import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -67,7 +64,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -102,29 +98,17 @@ public class TileController extends TilePowered {
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
 
-        this.addButton(new PortalSettingButton(-22, 12, new StateButtonInfo(0, PortalSettingButton.RENAME, "portality.display.change_name")) {
+        this.addButton(new PortalSettingButton(-22, 12, () -> () -> {
+            OpenGui.open(1, TileController.this);
+        }, new StateButtonInfo(0, PortalSettingButton.RENAME, "portality.display.change_name")) {
             @Override
             public int getState() {
                 return 0;
             }
-
-            @Override
-            public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
-                return Collections.singletonList(() -> new StateButtonAddon(this, this.getInfos()) {
-                    @Override
-                    public int getState() {
-                        return 0;
-                    }
-
-                    @Override
-                    public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-                        Minecraft.getInstance().displayGuiScreen(new GuiRenameController(TileController.this));
-                    }
-                });
-            }
         });
 
-        this.addButton(new PortalSettingButton(-22, 12 + 22, new StateButtonInfo(0, PortalSettingButton.PUBLIC, "portality.display.make_private"), new StateButtonInfo(1, PortalSettingButton.PRIVATE, "portality.display.make_public")) {
+        this.addButton(new PortalSettingButton(-22, 12 + 22, () -> () -> {
+        }, new StateButtonInfo(0, PortalSettingButton.PUBLIC, "portality.display.make_private"), new StateButtonInfo(1, PortalSettingButton.PRIVATE, "portality.display.make_public")) {
             @Override
             public int getState() {
                 return information != null && information.isPrivate() ? 1 : 0;
@@ -133,7 +117,8 @@ public class TileController extends TilePowered {
             if (information.getOwner().equals(playerEntity.getUniqueID())) togglePrivacy();
         }));
 
-        this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN, "portality.display.hide_name"), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN, "portality.display.show_name")) {
+        this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, () -> () -> {
+        }, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN, "portality.display.hide_name"), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN, "portality.display.show_name")) {
             @Override
             public int getState() {
                 return display ? 0 : 1;
@@ -143,7 +128,9 @@ public class TileController extends TilePowered {
                 setDisplayNameEnabled(!isDisplayNameEnabled());
         }));
         this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
-                .setClientConsumer(screen -> Minecraft.getInstance().displayGuiScreen(new GuiPortals(this)))
+                .setClientConsumer(() -> screen -> {
+                    OpenGui.open(2, TileController.this);
+                })
                 .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength())))
         );
         this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()));
@@ -417,12 +404,13 @@ public class TileController extends TilePowered {
         return information;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public boolean onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
         if (!super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ)) {
             if (!world.isRemote()) {
                 Minecraft.getInstance().deferTask(() -> {
-                    Minecraft.getInstance().displayGuiScreen(new GuiController(this));
+                    OpenGui.open(0, this);
                 });
                 return true;
             }
@@ -433,5 +421,22 @@ public class TileController extends TilePowered {
     @Override
     protected IFactory<NBTEnergyHandler> getEnergyHandlerFactory() {
         return () -> new NBTEnergyHandler(this, PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static class OpenGui {
+        public static void open(int id, TileController controller) {
+            switch (id) {
+                case 0:
+                    Minecraft.getInstance().displayGuiScreen(new GuiController(controller));
+                    return;
+                case 1:
+                    Minecraft.getInstance().displayGuiScreen(new GuiRenameController(controller));
+                    return;
+                case 2:
+                    Minecraft.getInstance().displayGuiScreen(new GuiPortals(controller));
+                    return;
+            }
+        }
     }
 }
