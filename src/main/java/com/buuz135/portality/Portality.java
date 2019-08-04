@@ -43,6 +43,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -77,10 +78,7 @@ public class Portality extends ModuleController {
         try {
             giver.addReward(new Reward(new ResourceLocation(Portality.MOD_ID, "aura"), new URL("https://raw.githubusercontent.com/Buuz135/Industrial-Foregoing/master/contributors.json"), () -> dist -> {
                 if (dist == Dist.CLIENT) {
-                    Minecraft instance = Minecraft.getInstance();
-                    EntityRendererManager manager = instance.getRenderManager();
-                    manager.getSkinMap().get("default").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
-                    manager.getSkinMap().get("slim").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
+                    registerAura();
                 }
             }, Arrays.stream(AuraType.values()).map(Enum::toString).collect(Collectors.toList()).toArray(new String[]{})));
         } catch (MalformedURLException e) {
@@ -137,5 +135,13 @@ public class Portality extends ModuleController {
         public boolean isEnableBlend() {
             return enableBlend;
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void registerAura() {
+        Minecraft instance = Minecraft.getInstance();
+        EntityRendererManager manager = instance.getRenderManager();
+        manager.getSkinMap().get("default").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
+        manager.getSkinMap().get("slim").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
     }
 }
