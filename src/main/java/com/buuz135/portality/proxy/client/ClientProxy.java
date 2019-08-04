@@ -26,13 +26,14 @@ package com.buuz135.portality.proxy.client;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
 import com.buuz135.portality.tile.TileController;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void onClient() {
-        super.onClient();
+    public void onClient(Minecraft instance) {
+        super.onClient(instance);
         ClientRegistry.bindTileEntitySpecialRenderer(TileController.class, new TESRPortal());
     }
 }

@@ -35,6 +35,9 @@ import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.network.NetworkHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -63,7 +66,8 @@ public class CommonProxy {
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
     }
 
-    public void onClient() {
+    @OnlyIn(Dist.CLIENT)
+    public void onClient(Minecraft instance) {
 
     }
 

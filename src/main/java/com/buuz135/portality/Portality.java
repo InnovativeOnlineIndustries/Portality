@@ -26,18 +26,33 @@ package com.buuz135.portality;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
+import com.buuz135.portality.proxy.client.render.AuraRender;
+import com.hrznstudio.titanium.TitaniumClient;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.Feature;
 import com.hrznstudio.titanium.module.Module;
 import com.hrznstudio.titanium.module.ModuleController;
+import com.hrznstudio.titanium.reward.Reward;
+import com.hrznstudio.titanium.reward.RewardGiver;
+import com.hrznstudio.titanium.reward.RewardManager;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mod("portality")
 public class Portality extends ModuleController {
@@ -58,6 +73,19 @@ public class Portality extends ModuleController {
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
         EventManager.mod(FMLCommonSetupEvent.class).process(this::onCommon).subscribe();
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClient).subscribe();
+        RewardGiver giver = RewardManager.get().getGiver(UUID.fromString("d28b7061-fb92-4064-90fb-7e02b95a72a6"), "Buuz135");
+        try {
+            giver.addReward(new Reward(new ResourceLocation(Portality.MOD_ID, "aura"), new URL("https://raw.githubusercontent.com/Buuz135/Industrial-Foregoing/master/contributors.json"), () -> dist -> {
+                if (dist == Dist.CLIENT) {
+                    Minecraft instance = Minecraft.getInstance();
+                    EntityRendererManager manager = instance.getRenderManager();
+                    manager.getSkinMap().get("default").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
+                    manager.getSkinMap().get("slim").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
+                }
+            }, Arrays.stream(AuraType.values()).map(Enum::toString).collect(Collectors.toList()).toArray(new String[]{})));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -81,7 +109,33 @@ public class Portality extends ModuleController {
     }
 
     public void onClient(FMLClientSetupEvent event) {
-        proxy.onClient();
+        proxy.onClient(event.getMinecraftSupplier().get());
     }
 
+    public enum AuraType {
+        PORTAL(new ResourceLocation(Portality.MOD_ID, "textures/blocks/player_render.png"), true),
+        FORCE_FIELD(new ResourceLocation("textures/misc/forcefield.png"), true),
+        UNDERWATER(new ResourceLocation("textures/misc/underwater.png"), true),
+        SPOOK(new ResourceLocation("textures/misc/pumpkinblur.png"), true),
+        END(new ResourceLocation("textures/environment/end_sky.png"), true),
+        CLOUDS(new ResourceLocation("textures/environment/clouds.png"), true),
+        RAIN(new ResourceLocation("textures/environment/rain.png"), true),
+        SGA(new ResourceLocation("textures/font/ascii_sga.png"), true);
+
+        private final ResourceLocation resourceLocation;
+        private final boolean enableBlend;
+
+        AuraType(ResourceLocation resourceLocation, boolean enableBlend) {
+            this.resourceLocation = resourceLocation;
+            this.enableBlend = enableBlend;
+        }
+
+        public ResourceLocation getResourceLocation() {
+            return resourceLocation;
+        }
+
+        public boolean isEnableBlend() {
+            return enableBlend;
+        }
+    }
 }

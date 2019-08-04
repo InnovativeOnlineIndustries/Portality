@@ -62,7 +62,6 @@ public class TileGenerator extends TilePowered {
                 .setTile(this)
                 .setBarDirection(PosProgressBar.BarDirection.VERTICAL_UP)
                 .setOnStart(() -> {
-                    System.out.println(!fuel.getStackInSlot(0).isEmpty() && FurnaceTileEntity.getBurnTimes().get(fuel.getStackInSlot(0).getItem()) != null);
                     bar.setMaxProgress(FurnaceTileEntity.getBurnTimes().getOrDefault(fuel.getStackInSlot(0).getItem(), 100));
                     fuel.getStackInSlot(0).shrink(1);
                     markForUpdate();
