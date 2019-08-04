@@ -1,7 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "portality:controller"
+    "model": "portality:block/controller"
   },
   "variants": {
     "facing": {
