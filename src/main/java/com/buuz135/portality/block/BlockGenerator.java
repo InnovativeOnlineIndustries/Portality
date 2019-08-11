@@ -23,7 +23,8 @@
  */
 package com.buuz135.portality.block;
 
-import com.buuz135.portality.tile.TileGenerator;
+import com.buuz135.portality.Portality;
+import com.buuz135.portality.tile.TileLowEfficiencyGenerator;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.BlockRotation;
 import net.minecraft.block.Block;
@@ -31,15 +32,16 @@ import net.minecraft.block.material.Material;
 
 import javax.annotation.Nonnull;
 
-public class BlockGenerator extends BlockRotation<TileGenerator> {
+public class BlockGenerator extends BlockRotation<TileLowEfficiencyGenerator> {
 
     public BlockGenerator() {
-        super("generator", Block.Properties.create(Material.ROCK), TileGenerator.class);
+        super("generator", Block.Properties.create(Material.ROCK), TileLowEfficiencyGenerator.class);
+        setItemGroup(Portality.TAB);
     }
 
     @Override
-    public IFactory<TileGenerator> getTileEntityFactory() {
-        return TileGenerator::new;
+    public IFactory<TileLowEfficiencyGenerator> getTileEntityFactory() {
+        return TileLowEfficiencyGenerator::new;
     }
 
     @Nonnull
