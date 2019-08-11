@@ -255,15 +255,15 @@ public final class TileAssetProvider implements IAssetProvider {
             return assetType.castOrDefault(ENERGY_BAR);
         if (assetType == AssetTypes.ENERGY_BAR)
             return assetType.castOrDefault(ENERGY_FILL);
-        if (assetType == AssetTypes.PROGRESS_BAR_BACKGROUND)
+        if (assetType == AssetTypes.PROGRESS_BAR_BACKGROUND_VERTICAL)
             return assetType.castOrDefault(PROGRESS_BAR_BACKGROUND);
-        if (assetType == AssetTypes.PROGRESS_BAR)
+        if (assetType == AssetTypes.PROGRESS_BAR_VERTICAL)
             return assetType.castOrDefault(PROGRESS_BAR_FILL);
         if (assetType == AssetTypes.SLOT)
             return assetType.castOrDefault(SLOT);
         if (assetType == AssetTypes.TANK)
             return assetType.castOrDefault(TANK);
-        if (assetType == AssetTypes.PROGRESS_BAR_BORDER)
+        if (assetType == AssetTypes.PROGRESS_BAR_BORDER_VERTICAL)
             return assetType.castOrDefault(PROGRESS_BAR_BORDER);
         if (assetType == AssetTypes.BUTTON_SIDENESS_DISABLED)
             return assetType.castOrDefault(BUTTON_SIDENESS_DISABLED);
