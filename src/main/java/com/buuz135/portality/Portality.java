@@ -114,7 +114,7 @@ public class Portality extends ModuleController {
         PORTAL(new ResourceLocation(Portality.MOD_ID, "textures/blocks/player_render.png"), true),
         FORCE_FIELD(new ResourceLocation("textures/misc/forcefield.png"), true),
         UNDERWATER(new ResourceLocation("textures/misc/underwater.png"), true),
-        SPOOK(new ResourceLocation("textures/misc/pumpkinblur.png"), true),
+        SPOOK(new ResourceLocation("textures/misc/pumpkinblur.png"), false),
         END(new ResourceLocation("textures/environment/end_sky.png"), true),
         CLOUDS(new ResourceLocation("textures/environment/clouds.png"), true),
         RAIN(new ResourceLocation("textures/environment/rain.png"), true),
