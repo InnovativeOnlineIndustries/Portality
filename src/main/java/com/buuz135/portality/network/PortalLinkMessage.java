@@ -25,6 +25,7 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.tile.TileController;
+import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -35,7 +36,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class PortalLinkMessage extends Message {
 
     static {
-        map(PortalLinkData.class, buf -> PortalLinkData.readFromNBT(buf.readCompoundTag()), (buf, portalLinkData) -> buf.writeCompoundTag(portalLinkData.writeToNBT()));
+        CompoundSerializableDataHandler.map(PortalLinkData.class, buf -> PortalLinkData.readFromNBT(buf.readCompoundTag()), (buf, portalLinkData) -> buf.writeCompoundTag(portalLinkData.writeToNBT()));
     }
 
     private int type;
