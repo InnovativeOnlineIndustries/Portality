@@ -50,7 +50,7 @@ public class TileFrame extends TileActive {
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-        if (compound.hasUniqueId("X")) {
+        if (compound.contains("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }
     }
