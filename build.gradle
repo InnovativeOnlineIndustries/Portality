@@ -26,7 +26,7 @@ apply plugin: 'eclipse'
 def BUILD_NUMBER = System.getenv("BUILD_NUMBER") ?: "0"
 version = "${minecraftVersion}-${mod_version}.$BUILD_NUMBER"
 group = "com.buuz135"
-archivesBaseName = "Portality"
+archivesBaseName = "portality"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -64,7 +64,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.55'
     if (findProject(':titanium') != null) {
         compile project(':titanium')
     } else {
