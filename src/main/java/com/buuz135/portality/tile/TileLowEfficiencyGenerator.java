@@ -84,7 +84,7 @@ public class TileLowEfficiencyGenerator extends TileGenerator {
 
     @Override
     public PosProgressBar getProgressBar() {
-        return new PosProgressBar(30, 20, 100, 100)
+        return new PosProgressBar(30, 20, 0, 100)
                 .setTile(this)
                 .setBarDirection(PosProgressBar.BarDirection.VERTICAL_UP)
                 .setColor(DyeColor.CYAN);
