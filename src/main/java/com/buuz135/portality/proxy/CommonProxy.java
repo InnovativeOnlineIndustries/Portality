@@ -62,7 +62,6 @@ public class CommonProxy {
         NetworkHandler.registerMessage(PortalCloseMessage.class);
         NetworkHandler.registerMessage(PortalTeleportMessage.class);
         NetworkHandler.registerMessage(PortalDisplayToggleMessage.class);
-        //ForgeChunkManager.setForcedChunkLoadingCallback(Portality.INSTANCE, new ChunkLoaderHandler());
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
     }
 
