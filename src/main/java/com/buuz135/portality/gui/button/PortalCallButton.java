@@ -29,7 +29,7 @@ import com.buuz135.portality.gui.GuiPortals;
 import com.buuz135.portality.network.PortalLinkMessage;
 import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
-import com.hrznstudio.titanium.client.gui.addon.IClickable;
+import com.hrznstudio.titanium.client.gui.addon.interfaces.IClickable;
 import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import com.mojang.blaze3d.platform.GlStateManager;
