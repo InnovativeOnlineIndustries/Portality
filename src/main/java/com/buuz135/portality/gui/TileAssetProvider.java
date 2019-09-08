@@ -261,7 +261,7 @@ public final class TileAssetProvider implements IAssetProvider {
             return assetType.castOrDefault(PROGRESS_BAR_FILL);
         if (assetType == AssetTypes.SLOT)
             return assetType.castOrDefault(SLOT);
-        if (assetType == AssetTypes.TANK)
+        if (assetType == AssetTypes.TANK_NORMAL)
             return assetType.castOrDefault(TANK);
         if (assetType == AssetTypes.PROGRESS_BAR_BORDER_VERTICAL)
             return assetType.castOrDefault(PROGRESS_BAR_BORDER);
