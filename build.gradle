@@ -19,12 +19,13 @@ buildscript {
 }
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
-def BUILD_NUMBER = System.getenv("BUILD_NUMBER") ?: "0"
-version = "${minecraftVersion}-${mod_version}.$BUILD_NUMBER"
+def BUILD_NUMBER = System.getenv("COMMIT") ? "${project.api_version}-${System.getenv("COMMIT")}" : "${project.api_version}"
+version = "${minecraftVersion}-$BUILD_NUMBER"
 group = "com.buuz135"
 archivesBaseName = "portality"
 
@@ -68,7 +69,7 @@ dependencies {
     if (findProject(':titanium') != null) {
         compile project(':titanium')
     } else {
-        compile fg.deobf (project.dependencies.create('com.hrznstudio:titanium:2.1.+') {
+        compile fg.deobf (project.dependencies.create('com.hrznstudio:titanium:2.2.+') {
             transitive = false
         })
     }
@@ -99,5 +100,38 @@ processResources {
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META_INF/mods.toml'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task deobfJar(type:Jar) {
+    from sourceSets.main.output
+    classifier 'deobf'
+}
+
+artifacts {
+    archives sourcesJar
+    archives deobfJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            artifact deobfJar
+        }
+    }
+    repositories {
+        maven {
+            url "s3://cdn.hrzn.studio/maven"
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
+        }
     }
 }
