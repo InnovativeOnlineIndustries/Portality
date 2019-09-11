@@ -100,7 +100,7 @@ public final class TileAssetProvider implements IAssetProvider {
 
         @Override
         public Rectangle getArea() {
-            return new Rectangle(177, 1, 18, 46);
+            return new Rectangle(177, 1, 18, 56);
         }
 
         @Override

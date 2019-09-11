@@ -66,11 +66,9 @@ public class TileModule extends TileFrame {
 
     @Override
     public boolean onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (!super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ)) {
-            openGui(playerIn);
-            return true;
-        }
-        return false;
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ)) return true;
+        openGui(playerIn);
+        return true;
     }
 
     public void changeMode() {

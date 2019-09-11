@@ -25,37 +25,20 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.hrznstudio.titanium.block.tile.fluid.SidedFluidTank;
+import net.minecraft.item.DyeColor;
 
 public class TileEntityFluidModule extends TileModule {
 
     @Save
-    private FluidTank tank;
+    private SidedFluidTank tank;
 
     public TileEntityFluidModule() {
         super(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE);
-        this.tank = new FluidTank(16000);
-    }
-
-    @Nullable
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capability) {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-            return LazyOptional.of(new NonNullSupplier<T>() {
-                @Nonnull
-                @Override
-                public T get() {
-                    return (T) tank;
-                }
-            });
-        return super.getCapability(capability);
+        this.addTank(tank = (SidedFluidTank) new SidedFluidTank("tank", 16000, 76, 20, 0).
+                setColor(DyeColor.CYAN).
+                setTile(this)
+        );
     }
 
 }
