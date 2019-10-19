@@ -23,6 +23,7 @@
  */
 package com.buuz135.portality;
 
+import com.buuz135.portality.network.*;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
@@ -32,6 +33,7 @@ import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.Feature;
 import com.hrznstudio.titanium.module.Module;
 import com.hrznstudio.titanium.module.ModuleController;
+import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
@@ -71,6 +73,14 @@ public class Portality extends ModuleController {
     public static CommonProxy proxy;
 
     public Portality() {
+        NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
+        NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
+        NetworkHandler.registerMessage(PortalRenameMessage.class);
+        NetworkHandler.registerMessage(PortalNetworkMessage.Response.class);
+        NetworkHandler.registerMessage(PortalLinkMessage.class);
+        NetworkHandler.registerMessage(PortalCloseMessage.class);
+        NetworkHandler.registerMessage(PortalTeleportMessage.class);
+        NetworkHandler.registerMessage(PortalDisplayToggleMessage.class);
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
         EventManager.mod(FMLCommonSetupEvent.class).process(this::onCommon).subscribe();
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClient).subscribe();

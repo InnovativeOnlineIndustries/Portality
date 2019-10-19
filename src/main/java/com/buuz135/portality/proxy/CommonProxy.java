@@ -30,11 +30,9 @@ import com.buuz135.portality.block.BlockInterdimensionalModule;
 import com.buuz135.portality.block.module.BlockCapabilityEnergyModule;
 import com.buuz135.portality.block.module.BlockCapabilityFluidModule;
 import com.buuz135.portality.block.module.BlockCapabilityItemModule;
-import com.buuz135.portality.network.*;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import com.hrznstudio.titanium.event.handler.EventManager;
-import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -54,14 +52,6 @@ public class CommonProxy {
     public static final BlockCapabilityEnergyModule BLOCK_CAPABILITY_ENERGY_MODULE = new BlockCapabilityEnergyModule();
 
     public void onCommon() {
-        NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
-        NetworkHandler.registerMessage(PortalPrivacyToggleMessage.class);
-        NetworkHandler.registerMessage(PortalRenameMessage.class);
-        NetworkHandler.registerMessage(PortalNetworkMessage.Response.class);
-        NetworkHandler.registerMessage(PortalLinkMessage.class);
-        NetworkHandler.registerMessage(PortalCloseMessage.class);
-        NetworkHandler.registerMessage(PortalTeleportMessage.class);
-        NetworkHandler.registerMessage(PortalDisplayToggleMessage.class);
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
     }
 
