@@ -105,7 +105,7 @@ public class TileController extends TilePowered {
             public int getState() {
                 return 0;
             }
-        });
+        }.setId(1));
 
         this.addButton(new PortalSettingButton(-22, 12 + 22, () -> () -> {
         }, new StateButtonInfo(0, PortalSettingButton.PUBLIC, "portality.display.make_private"), new StateButtonInfo(1, PortalSettingButton.PRIVATE, "portality.display.make_public")) {
@@ -115,7 +115,7 @@ public class TileController extends TilePowered {
             }
         }.setPredicate((playerEntity, compoundNBT) -> {
             if (information.getOwner().equals(playerEntity.getUniqueID())) togglePrivacy();
-        }));
+        }).setId(2));
 
         this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, () -> () -> {
         }, new StateButtonInfo(0, PortalSettingButton.NAME_SHOWN, "portality.display.hide_name"), new StateButtonInfo(1, PortalSettingButton.NAME_HIDDEN, "portality.display.show_name")) {
@@ -126,14 +126,15 @@ public class TileController extends TilePowered {
         }.setPredicate((playerEntity, compoundNBT) -> {
             if (information.getOwner().equals(playerEntity.getUniqueID()))
                 setDisplayNameEnabled(!isDisplayNameEnabled());
-        }));
+        }).setId(3));
         this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
                 .setClientConsumer(() -> screen -> {
                     OpenGui.open(2, TileController.this);
                 })
+                .setId(4)
                 .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength())))
         );
-        this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()));
+        this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()).setId(5));
     }
 
     @Override

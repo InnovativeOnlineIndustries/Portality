@@ -33,6 +33,7 @@ import com.hrznstudio.titanium.block.BlockRotation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -96,20 +97,26 @@ public class BlockController extends BlockRotation<TileController> {
     @Override
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (worldIn.isRemote()) return true;
         if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
-            if (!controller.isFormed()) {
-                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
-                return true;
-            }
-            if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
-                return true;
-            }
-            if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
-                controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
+            if (!worldIn.isRemote()) {
+                if (!controller.isFormed()) {
+                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
+                    return true;
+                }
+                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
+                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
+                    return true;
+                }
+                if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
+                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
+                    controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
+                    return true;
+                }
+            } else {
+                Minecraft.getInstance().deferTask(() -> {
+                    TileController.OpenGui.open(0, (TileController) tile);
+                });
                 return true;
             }
         }
