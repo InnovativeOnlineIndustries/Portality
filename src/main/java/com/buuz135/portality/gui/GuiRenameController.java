@@ -23,9 +23,9 @@
  */
 package com.buuz135.portality.gui;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.network.PortalRenameMessage;
 import com.buuz135.portality.tile.TileController;
-import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -57,7 +57,7 @@ public class GuiRenameController extends Screen {
         this.setFocused(this.textFieldWidget);
 
         confirm = new Button(width / 2 + textFieldWidth / 2 + 5, height / 2 - 10, 50, 18, "Confirm", button -> {
-            NetworkHandler.NETWORK.sendToServer(new PortalRenameMessage(textFieldWidget.getText(), controller.getPos()));
+            Portality.NETWORK.get().sendToServer(new PortalRenameMessage(textFieldWidget.getText(), controller.getPos()));
             onClose();
         });
         addButton(confirm);

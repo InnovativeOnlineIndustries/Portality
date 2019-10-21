@@ -23,13 +23,13 @@
  */
 package com.buuz135.portality.handler;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.network.PortalTeleportMessage;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.tile.TileController;
-import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.util.TeleportationUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -101,7 +101,7 @@ public class TeleportHandler {
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergyForced(PortalityConfig.TELEPORT_ENERGY_AMOUNT);
                         if (entry.getKey() instanceof ServerPlayerEntity)
-                            NetworkHandler.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((ServerPlayerEntity) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                            Portality.NETWORK.get().sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((ServerPlayerEntity) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
                         if (controller.teleportedEntity()) {
                             return;
                         }

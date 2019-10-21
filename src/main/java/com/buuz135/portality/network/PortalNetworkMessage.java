@@ -23,13 +23,13 @@
  */
 package com.buuz135.portality.network;
 
+import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.GuiPortals;
 import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.network.Message;
-import com.hrznstudio.titanium.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -60,7 +60,7 @@ public class PortalNetworkMessage {
             TileEntity entity = world.getTileEntity(information.getLocation());
             return entity instanceof TileController && !interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() == information.getDimension() && (information.getLocation().manhattanDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= distance || information.getLocation().manhattanDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ())) >= BlockPosUtils.getMaxDistance(((TileController) entity).getLength()));
         });
-        NetworkHandler.NETWORK.sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static class Response extends Message {

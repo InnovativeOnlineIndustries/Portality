@@ -31,7 +31,6 @@ import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
 import com.hrznstudio.titanium.client.gui.addon.interfaces.IClickable;
 import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
-import com.hrznstudio.titanium.network.NetworkHandler;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -91,7 +90,7 @@ public class PortalCallButton extends BasicGuiAddon implements IClickable {
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
         Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
         if (guiPortals.getSelectedPortal() != null) {
-            NetworkHandler.NETWORK.sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().getDimension().getType().getId(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
+            Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().getDimension().getType().getId(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
             Minecraft.getInstance().displayGuiScreen(null);
         }
     }
