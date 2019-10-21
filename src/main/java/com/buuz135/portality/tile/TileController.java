@@ -251,8 +251,8 @@ public class TileController extends TilePowered {
         if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
         Direction facing = world.getBlockState(this.pos).get(BlockController.FACING);
-        BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth() - 1).offset(Direction.UP);
-        BlockPos corner2 = this.pos.offset(facing.rotateY(), -structureHandler.getWidth()).offset(Direction.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
+        BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth()).offset(Direction.UP);
+        BlockPos corner2 = this.pos.offset(facing.rotateYCCW(), structureHandler.getWidth()).offset(Direction.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
         return new AxisAlignedBB(corner1, corner2);
     }
 
