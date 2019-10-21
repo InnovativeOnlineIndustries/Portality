@@ -23,6 +23,7 @@
  */
 package com.buuz135.portality.proxy.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.LocatableSound;
 import net.minecraft.util.SoundCategory;
@@ -48,6 +49,7 @@ public class TickeableSound extends LocatableSound implements ITickableSound {
         this.done = false;
         this.volume = 0.35f;
         this.pitch = 0f;
+        this.global = false;
     }
 
     @Override
@@ -75,6 +77,13 @@ public class TickeableSound extends LocatableSound implements ITickableSound {
     public void tick() {
         if (world.getTileEntity(new BlockPos(x, y, z)) == null) {
             setDone();
+        }
+        double distance = Minecraft.getInstance().player.getPosition().manhattanDistance(new BlockPos(this.x, this.y, this.z));
+        if (distance > 16) {
+            this.volume = 0;
+        } else {
+            if (distance == 0) distance = 1;
+            this.volume = (float) (0.35 * (1F / distance));
         }
     }
 }
