@@ -113,7 +113,8 @@ public class BlockController extends BlockRotation<TileController> {
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                     return true;
                 }
-            } else {
+            } else if (controller.isFormed()) {
+                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) return true;
                 Minecraft.getInstance().deferTask(() -> {
                     TileController.OpenGui.open(0, (TileController) tile);
                 });
