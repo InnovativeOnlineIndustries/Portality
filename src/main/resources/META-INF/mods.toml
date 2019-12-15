@@ -27,7 +27,7 @@ Thinkig through portals
 '''
 [[dependencies.portality]] #optional
     modId="titanium" #mandatory
-    mandatory=false #mandatory
-    versionRange="[1.0.0,)" #mandatory
+    mandatory=true #mandatory
+    versionRange="[2.2.9,)" #mandatory
     ordering="NONE"
 side="BOTH"
