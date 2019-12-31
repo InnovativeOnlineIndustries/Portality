@@ -25,8 +25,9 @@ package com.buuz135.portality.proxy.client;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
-import com.buuz135.portality.tile.TileController;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
@@ -34,6 +35,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void onClient(Minecraft instance) {
         super.onClient(instance);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileController.class, new TESRPortal());
+        ClientRegistry.bindTileEntityRenderer(CommonProxy.BLOCK_CONTROLLER.getTileEntityType(), new TESRPortal());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CONTROLLER, RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_FRAME, RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.func_228643_e_());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.func_228643_e_());
     }
 }

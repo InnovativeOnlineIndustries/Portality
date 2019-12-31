@@ -40,7 +40,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -95,33 +95,34 @@ public class BlockController extends BlockRotation<TileController> {
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
+    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof TileController) {
             TileController controller = (TileController) tile;
             if (!worldIn.isRemote()) {
                 if (!controller.isFormed()) {
                     playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
-                    return true;
+                    return ActionResultType.SUCCESS;
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
                     playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
-                    return true;
+                    return ActionResultType.SUCCESS;
                 }
-                if (playerIn.isSneaking() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
+                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
                     playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
-                    return true;
+                    return ActionResultType.SUCCESS;
                 }
             } else if (controller.isFormed()) {
-                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) return true;
+                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID()))
+                    return ActionResultType.SUCCESS;
                 Minecraft.getInstance().deferTask(() -> {
                     TileController.OpenGui.open(0, (TileController) tile);
                 });
-                return true;
+                return ActionResultType.SUCCESS;
             }
         }
-        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, ray);
+        return super.func_225533_a_(state, worldIn, pos, playerIn, hand, ray);
     }
 
     @Override
@@ -144,8 +145,4 @@ public class BlockController extends BlockRotation<TileController> {
         return new TileController();
     }
 
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
-    }
 }

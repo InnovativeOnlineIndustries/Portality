@@ -35,7 +35,7 @@ public class TileEntityItemModule extends TileModule {
     public PosInvHandler handler;
 
     public TileEntityItemModule() {
-        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE_INPUT);
+        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE);
         this.addInventory(this.handler = new SidedInvHandler("inventory", 52, 20, 3 * 4, 0)
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)

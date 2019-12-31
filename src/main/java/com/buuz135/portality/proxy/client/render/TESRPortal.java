@@ -26,104 +26,56 @@ package com.buuz135.portality.proxy.client.render;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.BlockController;
 import com.buuz135.portality.tile.TileController;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Random;
 
 public class TESRPortal extends TileEntityRenderer<TileController> {
 
-    @Override
-    public void render(TileController te, double x, double y, double z, float partialTicks, int destroyStage) {
-        //super.render(te, x, y, z, partialTicks, destroyStage);
-        if (!te.isFormed()) return;
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        int j = 240;
-        int k = 224;
-        RenderHelper.disableStandardItemLighting();
-        if (Minecraft.isAmbientOcclusionEnabled()) {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-        }
-        bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"));
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-        GlStateManager.translated(x, y, z);
-        //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACING
-        Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
-        if (facing == Direction.SOUTH) {
-            GlStateManager.translated(1, 0, 1);
-            GlStateManager.rotatef(-180, 0, 1, 0);
-        }
-        if (facing == Direction.EAST) {
-            GlStateManager.translated(1, 0, 0);
-            GlStateManager.rotatef(-90, 0, 1, 0);
-        }
-        if (facing == Direction.WEST) {
-            GlStateManager.translated(0, 0, 1);
-            GlStateManager.rotatef(90, 0, 1, 0);
-        }
-        double frame = (te.getWorld().getGameTime() % 60) / 60D;
-        //frame = 0.4;
-        //TOP
-        GlStateManager.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
-        renderTop(tessellator, buffer, te, frame, j, k, 0.4, te.getWidth() * 2);
-        GlStateManager.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
-        //RIGHT
-        GlStateManager.translated(3 - te.getWidth() + 2, 2.1, 0);
-        GlStateManager.rotatef(90, 0, 0, 1);
-        renderTop(tessellator, buffer, te, frame, j, k, 0.2, te.getHeight() - 1);
-        GlStateManager.rotatef(-90, 0, 0, 1);
-        GlStateManager.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
-        //LEFT
-        GlStateManager.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
-        GlStateManager.rotatef(-90, 0, 0, 1);
-        renderTop(tessellator, buffer, te, frame, j, k, 0, te.getHeight() - 1);
-        GlStateManager.rotatef(90, 0, 0, 1);
-        GlStateManager.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
-        //BOTTOM
-        GlStateManager.translated(0.9 + te.getWidth() - 2, 5, 0);
-        GlStateManager.rotatef(-180, 0, 0, 1);
-        renderTop(tessellator, buffer, te, frame, j, k, 0.6, te.getWidth() * 2);
-        GlStateManager.rotatef(190, 0, 0, 1);
-        GlStateManager.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
+    private static final Random RANDOM = new Random(31100L);
+    public static RenderType TYPE = createRenderType();
 
-        buffer.setTranslation(0, 0, 0);
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
-        if (te.isActive() && te.getLinkData() != null && te.isDisplayNameEnabled()) {
-            this.setLightmapDisabled(true);
-            drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
-            this.setLightmapDisabled(false);
-        }
+    public TESRPortal() {
+        super(TileEntityRendererDispatcher.instance);
     }
 
-    public void renderTop(Tessellator tessellator, BufferBuilder buffer, TileController te, double frame, int j, int k, double offset, int width) {
+    public static RenderType createRenderType() {
+        RenderType.State state = RenderType.State.func_228694_a_().func_228724_a_(new RenderState.TextureState(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).func_228726_a_(new RenderState.TransparencyState("translucent_transparency", () -> {
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
+            RenderSystem.enableAlphaTest();
+        }, () -> {
+            RenderSystem.disableBlend();
+            RenderSystem.disableAlphaTest();
+        })).func_228728_a_(true);
+        return RenderType.func_228633_a_("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
+    }
+
+    public void renderTop(MatrixStack stack, IVertexBuilder buffer, TileController te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, Color color) {
         double scale = 0.9335;
-        float y = 3.99f;
+        float y = 3.999f;
         float off = /*0.0278*/ 4 - y;
-        //GlStateManager.scale(scale, 1, 1);
-        GlStateManager.enableAlphaTest();
-        for (double posX = 0; posX < width; ++posX) {
+        //RenderSystem.scale(scale, 1, 1);
+        RenderSystem.enableAlphaTest();
+        for (int posX = 0; posX < width; ++posX) {
             for (int posZ = 0; posZ < te.getLength(); ++posZ) {
-                GlStateManager.translated(posX - 2.1 + frame + off, 0, posZ);
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-                double pX1 = 1;
-                double u = 1;
-                double pX2 = 0;
-                double u2 = 0;
+                //RenderSystem.translated(posX - 2.1 + frame + off, 0, posZ);
+                //buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+                float pX1 = 1;
+                float u = 1;
+                float pX2 = 0;
+                float u2 = 0;
                 if (posX == 0) {
                     pX2 = 1 - frame;
                     u2 = 1 - frame;
@@ -136,17 +88,175 @@ public class TESRPortal extends TileEntityRenderer<TileController> {
                     pX1 = Math.max(1 - frame, 0);
                     u = 1 - 1 * frame;
                 }
-                int alpha = 100;
-                buffer.pos(pX2, y, 0).tex(u2, 0).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
-                buffer.pos(pX1, y, 0).tex(u, 0).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
-                buffer.pos(pX1, y, 1).tex(u, 1).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
-                buffer.pos(pX2, y, 1).tex(u2, 1).lightmap(j, k).color(Color.CYAN.getRed(), Color.CYAN.getGreen(), Color.CYAN.getBlue(), alpha).endVertex();
-                tessellator.draw();
-
-                GlStateManager.translated(-(posX - 2.1 + frame + off), 0, -posZ);
+                int alpha = 150;
+                float xOffset = posX - 2f + frame + off + xTrans;
+                float yOffset = yTrans - off;
+                float zOffset = posZ + zTrans;
+                Matrix4f matrix = stack.func_227866_c_().func_227870_a_();
+                buffer.func_227888_a_(matrix, pX2 + xOffset, yOffset, 0 + zOffset).func_225583_a_(u2, 0).func_225586_a_(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.func_227888_a_(matrix, pX1 + xOffset, yOffset, 0 + zOffset).func_225583_a_(u, 0).func_225586_a_(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.func_227888_a_(matrix, pX1 + xOffset, yOffset, 1 + zOffset).func_225583_a_(u, 1).func_225586_a_(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.func_227888_a_(matrix, pX2 + xOffset, yOffset, 1 + zOffset).func_225583_a_(u2, 1).func_225586_a_(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                //tessellator.draw();
+                //RenderSystem.translated(-(posX - 2.1 + frame + off), 0, -posZ);
 
             }
         }
-        //GlStateManager.scale(1 / scale, 1, 1);
+        //RenderSystem.scale(1 / scale, 1, 1);
+    }
+
+    //@Override
+    //public void func_225616_a_(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
+    //    //super.render(te, x, y, z, partialTicks, destroyStage);
+    //    if (!te.isFormed()) return;
+    //    RenderSystem.pushMatrix();
+    //    //matrixStack.func_227860_a_();
+    //    //RenderSystem.enableBlend();
+    //    //BufferBuilder buffer = tessellator.getBuffer();
+    //    ResourceLocation texture = new ResourceLocation("textures/entity/beacon_beam.png");
+    //    IVertexBuilder buffer = typeBuffer.getBuffer(TYPE);
+    //    int j = 240;
+    //    int k = 224;
+    //    int x = te.getPos().getX();
+    //    int y = te.getPos().getY();
+    //    int z = te.getPos().getZ();
+    //    RenderHelper.disableStandardItemLighting();
+    //    if (Minecraft.isAmbientOcclusionEnabled()) {
+    //        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+    //    } else {
+    //        RenderSystem.shadeModel(GL11.GL_FLAT);
+    //    }
+    //    //Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "blocks/portal_render.png"));
+    //    //Minecraft.getInstance().getTextureManager().bindTexture(;
+    //    //RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
+    //    //matrixStack.func_227861_a_(x, y, z);
+    //    //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACINGB
+    //    Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
+    //    if (facing == Direction.SOUTH) {
+    //        RenderSystem.translated(1, 0, 1);
+    //        RenderSystem.rotatef(-180, 0, 1, 0);
+    //    }
+    //    if (facing == Direction.EAST) {
+    //        RenderSystem.translated(1, 0, 0);
+    //        RenderSystem.rotatef(-90, 0, 1, 0);
+    //    }
+    //    if (facing == Direction.WEST) {
+    //        RenderSystem.translated(0, 0, 1);
+    //        RenderSystem.rotatef(90, 0, 1, 0);
+    //    }
+    //    float frame = (te.getWorld().getGameTime() % 60) / 60f;
+    //    //frame = 0.4;
+    //    //TOP
+    //    RenderSystem.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
+    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.4, te.getWidth() * 2);
+    //    RenderSystem.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
+    //    //RIGHT
+    //    RenderSystem.translated(3 - te.getWidth() + 2, 2.1, 0);
+    //    RenderSystem.rotatef(90, 0, 0, 1);
+    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.2, te.getHeight() - 1);
+    //    RenderSystem.rotatef(-90, 0, 0, 1);
+    //    RenderSystem.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
+    //    //LEFT
+    //    RenderSystem.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
+    //    RenderSystem.rotatef(-90, 0, 0, 1);
+    //    renderTop(matrixStack, buffer, te, frame, j, k, 0, te.getHeight() - 1);
+    //    RenderSystem.rotatef(90, 0, 0, 1);
+    //    RenderSystem.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
+    //    //BOTTOM
+    //    RenderSystem.translated(0.9 + te.getWidth() - 2, 5, 0);
+    //    RenderSystem.rotatef(-180, 0, 0, 1);
+    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.6, te.getWidth() * 2);
+    //    RenderSystem.rotatef(190, 0, 0, 1);
+    //    RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
+//
+    //    matrixStack.func_227861_a_(0,0,0);
+    //    //buffer.setTranslation(0, 0, 0);
+    //    RenderSystem.setupGui3DDiffuseLighting();
+    //    RenderSystem.disableBlend();
+    //    RenderSystem.popMatrix();
+    //    if (te.isActive() && te.getLinkData() != null && te.isDisplayNameEnabled()) {
+    //        //this.setLightmapDisabled(true);
+    //        //drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
+    //        //this.setLightmapDisabled(false);
+    //    }
+    //}
+
+    public void func_225616_a_(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
+        if (!te.isFormed()) return;
+        RenderSystem.pushMatrix();
+        float frame = (te.getWorld().getGameTime() % 60) / 60f;
+        //Color color = Color.getHSBColor((te.getWorld().getGameTime() % 360)/ 360f , 01f ,1f);
+        Color color = Color.CYAN;
+        //renderTop(stack, p_225616_4_.getBuffer(TYPE), te, frame,0,0, -0.6, te.getWidth() * 2);
+        //this.func_228883_a_(te, lvt_10_1_, 0.15F, lvt_11_1_, p_225616_4_.getBuffer((RenderType)field_228881_e_.get(0)));
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        //RenderSystem.translated(x,y,z);
+        if (te.isDisplayNameEnabled() && te.isActive()) {
+            matrixStack.func_227860_a_();
+            String name = te.getLinkData().getName();
+            matrixStack.func_227861_a_(0.5, (double) 1.5f, 0.5D);
+            matrixStack.func_227863_a_(Minecraft.getInstance().getRenderManager().func_229098_b_());
+            matrixStack.func_227862_a_(-0.025F, -0.025F, 0.025F);
+            float f1 = Minecraft.getInstance().gameSettings.func_216840_a(0.25F);
+            int j = (int) (f1 * 255.0F) << 24;
+
+            Minecraft.getInstance().fontRenderer.func_228079_a_(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.func_227866_c_().func_227870_a_(), typeBuffer, false, j, 15728880);
+            matrixStack.func_227865_b_();
+        }
+        Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
+        if (facing == Direction.SOUTH) {
+            //RenderSystem.translated(1, 0, 1);
+            //RenderSystem.rotatef(-180, 0, 1, 0);
+            z = -1;
+            x = -1;
+            matrixStack.func_227863_a_(Vector3f.field_229181_d_.func_229187_a_(-180f));
+        }
+        if (facing == Direction.EAST) {
+            //RenderSystem.translated(1, 0, 0);
+            //RenderSystem.rotatef(-90, 0, 1, 0);
+            z = -1;
+            matrixStack.func_227863_a_(Vector3f.field_229181_d_.func_229187_a_(-90f));
+        }
+        if (facing == Direction.WEST) {
+            //RenderSystem.translated(0, 0, 1);
+            x = -1;
+            matrixStack.func_227863_a_(Vector3f.field_229181_d_.func_229187_a_(90f));
+            //RenderSystem.rotatef(90, 0, 1, 0);
+        }
+        if (facing == Direction.NORTH) {
+            //x = 1;
+        }
+        //TOP
+        //RenderSystem.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
+        IVertexBuilder buffer = typeBuffer.getBuffer(TYPE);
+        renderTop(matrixStack, buffer, te, frame, -te.getWidth() + 2f + x, te.getHeight() + y - 1f, z, 0.4, te.getWidth() * 2, color);
+        //RenderSystem.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
+        //RIGHT
+        //RenderSystem.translated(3 - te.getWidth() + 2, 2.1, 0);
+        //RenderSystem.rotatef(90, 0, 0, 1);
+        matrixStack.func_227863_a_(Vector3f.field_229183_f_.func_229187_a_(90f));
+        renderTop(matrixStack, buffer, te, frame, 2 + y, te.getWidth() - 1 - x, z, 0.2, te.getHeight() - 1, color);
+        matrixStack.func_227863_a_(Vector3f.field_229182_e_.func_229187_a_(90f));
+        //RenderSystem.rotatef(-90, 0, 0, 1);
+        //RenderSystem.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
+        //LEFT
+        //RenderSystem.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
+        //RenderSystem.rotatef(-90, 0, 0, 1);
+        matrixStack.func_227863_a_(Vector3f.field_229182_e_.func_229187_a_(90f));
+        renderTop(matrixStack, buffer, te, frame, 2 - te.getHeight() + y, te.getWidth() + x, z, 0, te.getHeight() - 1, color);
+        //RenderSystem.rotatef(90, 0, 0, 1);
+        matrixStack.func_227863_a_(Vector3f.field_229183_f_.func_229187_a_(90f));
+        //RenderSystem.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
+        //BOTTOM
+        //RenderSystem.translated(0.9 + te.getWidth() - 2, 5, 0);
+        //RenderSystem.rotatef(-180, 0, 0, 1);
+        matrixStack.func_227863_a_(Vector3f.field_229182_e_.func_229187_a_(180f));
+        renderTop(matrixStack, buffer, te, frame, -te.getWidth() - x + 1, -1 - y, z, 0.6, te.getWidth() * 2, color);
+        //RenderSystem.rotatef(190, 0, 0, 1);180f));
+        //RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
+        RenderSystem.popMatrix();
+
     }
 }

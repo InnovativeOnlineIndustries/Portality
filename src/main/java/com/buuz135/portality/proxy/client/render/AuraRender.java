@@ -2,11 +2,13 @@ package com.buuz135.portality.proxy.client.render;
 
 import com.buuz135.portality.Portality;
 import com.hrznstudio.titanium.reward.storage.ClientRewardStorage;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -28,54 +30,42 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
     }
 
     @Override
-    public void render(AbstractClientPlayerEntity entityIn, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_, float p_212842_8_) {
+    public void func_225628_a_(MatrixStack p_225628_1_, IRenderTypeBuffer p_225628_2_, int p_225628_3_, AbstractClientPlayerEntity entityIn, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_) {
         if (!ClientRewardStorage.REWARD_STORAGE.getRewards().containsKey(entityIn.getUniqueID())) return;
         if (!ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUniqueID()).getEnabled().containsKey(new ResourceLocation(Portality.MOD_ID, "aura")))
             return;
         Portality.AuraType type = Portality.AuraType.valueOf(ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUniqueID()).getEnabled().get(new ResourceLocation(Portality.MOD_ID, "aura")));
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         boolean flag = entityIn.isInvisible();
-        GlStateManager.depthMask(!flag);
-        this.bindTexture(type.getResourceLocation());
-        GlStateManager.matrixMode(5890);
-        GlStateManager.loadIdentity();
+        RenderSystem.depthMask(!flag);
+        Minecraft.getInstance().getTextureManager().bindTexture(type.getResourceLocation());
+        RenderSystem.matrixMode(5890);
+        RenderSystem.loadIdentity();
         float f = (float) entityIn.ticksExisted + p_212842_4_;
-        GlStateManager.translatef(0, f * 0.01F, 0.0F);
-        GlStateManager.matrixMode(5888);
-        GlStateManager.enableBlend();
+        RenderSystem.translatef(0, f * 0.01F, 0.0F);
+        RenderSystem.matrixMode(5888);
+        RenderSystem.enableBlend();
         float f1 = 0.5F;
-        GlStateManager.color4f(0.5F, 0.5F, 0.5F, 1.0F);
-        GlStateManager.disableLighting();
+        RenderSystem.color4f(0.5F, 0.5F, 0.5F, 1.0F);
+        RenderSystem.disableLighting();
         if (type.isEnableBlend())
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         this.getEntityModel().setModelAttributes(model);
         GameRenderer gamerenderer = Minecraft.getInstance().gameRenderer;
-        gamerenderer.setupFogColor(true);
-        RenderHelper.enableGUIStandardItemLighting();
+        RenderSystem.setupGui3DDiffuseLighting();
         modifyModelForPlayer(entityIn);
-        model.render(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_, p_212842_8_);
-        gamerenderer.setupFogColor(false);
-        GlStateManager.matrixMode(5890);
-        GlStateManager.loadIdentity();
-        GlStateManager.matrixMode(5888);
-        GlStateManager.enableLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        GlStateManager.popMatrix();
-    }
-
-    @Override
-    public boolean shouldCombineTextures() {
-        return false;
-    }
-
-    @Override
-    public void bindTexture(ResourceLocation texture) {
-        super.bindTexture(texture);
+        model.func_225597_a_(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_);
+        RenderSystem.matrixMode(5890);
+        RenderSystem.loadIdentity();
+        RenderSystem.matrixMode(5888);
+        RenderSystem.enableLighting();
+        RenderSystem.disableBlend();
+        RenderSystem.depthMask(true);
+        RenderSystem.popMatrix();
     }
 
     private void modifyModelForPlayer(AbstractClientPlayerEntity entityIn) {
-        model.isSneak = entityIn.shouldRenderSneaking();
+        model.field_228270_o_ = entityIn.isCrouching();
         ItemStack itemstack = entityIn.getHeldItemMainhand();
         ItemStack itemstack1 = entityIn.getHeldItemOffhand();
         BipedModel.ArmPose bipedmodel$armpose = this.getArmPose(entityIn, itemstack, itemstack1, Hand.MAIN_HAND);

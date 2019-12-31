@@ -31,7 +31,7 @@ import com.buuz135.portality.tile.TileController;
 import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
 import com.hrznstudio.titanium.client.gui.addon.interfaces.IClickable;
 import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
@@ -83,7 +83,7 @@ public class PortalCallButton extends BasicGuiAddon implements IClickable {
     @Override
     public void drawGuiContainerForegroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
         screen.drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
-        GlStateManager.color4f(1, 1, 1, 1);
+        RenderSystem.color4f(1, 1, 1, 1);
     }
 
     @Override

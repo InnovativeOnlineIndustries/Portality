@@ -1,16 +1,10 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "portality:block/module_energy_input"
-  },
   "variants": {
-    "input": {
-      "true": {
-        "model": "portality:block/module_energy_input"
-      },
-      "false": {
-        "model": "portality:block/module_energy_output"
-      }
+    "input=true": {
+      "model": "portality:block/module_energy_input"
+    },
+    "input=false": {
+      "model": "portality:block/module_energy_output"
     }
   }
 }

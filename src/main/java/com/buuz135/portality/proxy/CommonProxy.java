@@ -47,7 +47,7 @@ public class CommonProxy {
     public static final BlockGenerator BLOCK_GENERATOR = new BlockGenerator();
 
     public static final BlockInterdimensionalModule BLOCK_INTERDIMENSIONAL_MODULE = new BlockInterdimensionalModule();
-    public static final BlockCapabilityItemModule BLOCK_CAPABILITY_ITEM_MODULE_INPUT = new BlockCapabilityItemModule();
+    public static final BlockCapabilityItemModule BLOCK_CAPABILITY_ITEM_MODULE = new BlockCapabilityItemModule();
     public static final BlockCapabilityFluidModule BLOCK_CAPABILITY_FLUID_MODULE = new BlockCapabilityFluidModule();
     public static final BlockCapabilityEnergyModule BLOCK_CAPABILITY_ENERGY_MODULE = new BlockCapabilityEnergyModule();
 
@@ -61,7 +61,7 @@ public class CommonProxy {
     }
 
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getEntityPlayer().isSneaking() && event.getEntityPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
+        if (event.getPlayer().isCrouching() && event.getPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
             TileController controller = (TileController) event.getWorld().getTileEntity(event.getPos());
             if (!controller.getDisplay().isItemEqual(event.getItemStack())) {
                 event.setUseBlock(Event.Result.ALLOW);

@@ -1,16 +1,10 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "portality:block/module_fluids_input"
-  },
   "variants": {
-    "input": {
-      "true": {
+      "input=true": {
         "model": "portality:block/module_fluids_input"
       },
-      "false": {
-        "model": "portality:block/module_fluids_output"
-      }
+    "input=false": {
+      "model": "portality:block/module_fluids_output"
     }
-  }
+    }
 }

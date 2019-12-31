@@ -29,6 +29,7 @@ import com.buuz135.portality.tile.TileController;
 import com.buuz135.portality.tile.TileFrame;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -52,8 +53,8 @@ public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implement
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
-        return false;
+    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
+        return ActionResultType.FAIL;
     }
 
 }

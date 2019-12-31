@@ -103,7 +103,7 @@ public class Portality extends ModuleController {
                         .content(Block.class, CommonProxy.BLOCK_FRAME)
                         .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE)
                         .content(Block.class, CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE)
-                        .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE_INPUT)
+                        .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE)
                         .content(Block.class, CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE)
                         .content(Block.class, CommonProxy.BLOCK_GENERATOR)
                         .content(SoundEvent.class, PortalitySoundHandler.PORTAL)

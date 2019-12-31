@@ -34,7 +34,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -82,11 +81,6 @@ public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
         return new TileFrame(CommonProxy.BLOCK_FRAME);
-    }
-
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT;
     }
 
     @Override
