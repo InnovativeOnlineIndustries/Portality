@@ -34,7 +34,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -44,6 +43,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
@@ -101,15 +101,15 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
             ControllerTile controller = (ControllerTile) tile;
             if (!worldIn.isRemote()) {
                 if (!controller.isFormed()) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").setStyle(new Style().setColor(TextFormatting.RED)), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.privacy")), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").setStyle(new Style().setColor(TextFormatting.RED)), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.GREEN + I18n.format("portility.controller.info.icon_changed")), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").setStyle(new Style().setColor(TextFormatting.RED)), true);
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                     return ActionResultType.SUCCESS;
                 }
