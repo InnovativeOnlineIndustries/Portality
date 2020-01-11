@@ -23,11 +23,11 @@
  */
 package com.buuz135.portality.handler;
 
-import com.buuz135.portality.block.BlockController;
+import com.buuz135.portality.block.ControllerBlock;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.proxy.PortalityConfig;
-import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileFrame;
+import com.buuz135.portality.tile.ControllerTile;
+import com.buuz135.portality.tile.FrameTile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -40,23 +40,23 @@ public class StructureHandler {
     private int length;
     private int width;
     private int height;
-    private TileController controller;
+    private ControllerTile controller;
     private List<BlockPos> modules;
     private List<BlockPos> frameBlocks;
     private boolean shouldCheckForStructure;
 
-    public StructureHandler(TileController tileController) {
+    public StructureHandler(ControllerTile controllerTile) {
         this.modules = new ArrayList<>();
         this.frameBlocks = new ArrayList<>();
         this.length = width = height = 0;
-        this.controller = tileController;
+        this.controller = controllerTile;
         this.shouldCheckForStructure = true;
     }
 
     public boolean checkArea() {
         checkPortalSize();
         if (length < 3) return false;
-        Direction facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
+        Direction facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
         modules.clear();
         if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), false)) { //BOTTOM
             return false;
@@ -87,8 +87,8 @@ public class StructureHandler {
                     modules.add(blockPos.toImmutable());
                 }
                 TileEntity entity = this.controller.getWorld().getTileEntity(blockPos);
-                if (entity instanceof TileFrame) {
-                    ((TileFrame) entity).setControllerPos(this.controller.getPos());
+                if (entity instanceof FrameTile) {
+                    ((FrameTile) entity).setControllerPos(this.controller.getPos());
                     entity.markDirty();
                 }
             }
@@ -97,7 +97,7 @@ public class StructureHandler {
     }
 
     private void checkPortalSize() {
-        Direction controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(BlockController.FACING);
+        Direction controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
         if (controllerFacing.getAxis().isVertical()) return;
         //Checking width
         Direction widthFacing = controllerFacing.rotateY();
@@ -121,15 +121,15 @@ public class StructureHandler {
     }
 
     private boolean isValidFrame(BlockPos pos) {
-        return this.controller.getWorld().getTileEntity(pos) instanceof TileFrame && (((TileFrame) this.controller.getWorld().getTileEntity(pos)).getControllerPos() == null
-                || ((TileFrame) this.controller.getWorld().getTileEntity(pos)).getControllerPos().equals(this.controller.getPos()));
+        return this.controller.getWorld().getTileEntity(pos) instanceof FrameTile && (((FrameTile) this.controller.getWorld().getTileEntity(pos)).getControllerPos() == null
+                || ((FrameTile) this.controller.getWorld().getTileEntity(pos)).getControllerPos().equals(this.controller.getPos()));
     }
 
     public void cancelFrameBlocks() {
         for (BlockPos frameBlock : frameBlocks) {
             TileEntity entity = this.controller.getWorld().getTileEntity(frameBlock);
-            if (entity instanceof TileFrame) {
-                ((TileFrame) entity).setControllerPos(null);
+            if (entity instanceof FrameTile) {
+                ((FrameTile) entity).setControllerPos(null);
                 entity.markDirty();
             }
         }

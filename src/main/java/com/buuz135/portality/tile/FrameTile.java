@@ -23,24 +23,43 @@
  */
 package com.buuz135.portality.tile;
 
-import com.buuz135.portality.proxy.CommonProxy;
-import com.hrznstudio.titanium.annotation.Save;
-import com.hrznstudio.titanium.block.tile.inventory.PosInvHandler;
-import com.hrznstudio.titanium.block.tile.inventory.SidedInvHandler;
-import net.minecraft.item.DyeColor;
+import com.hrznstudio.titanium.block.BasicTileBlock;
+import com.hrznstudio.titanium.block.tile.ActiveTile;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.BlockPos;
 
-public class TileEntityItemModule extends TileModule {
+public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
 
-    @Save
-    public PosInvHandler handler;
+    private BlockPos controllerPos;
 
-    public TileEntityItemModule() {
-        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE);
-        this.addInventory(this.handler = new SidedInvHandler("inventory", 52, 20, 3 * 4, 0)
-                .setColor(DyeColor.YELLOW)
-                .setColorGuiEnabled(false)
-                .setTile(this)
-                .setRange(4, 3));
+    public FrameTile(BasicTileBlock<T> base) {
+        super(base);
     }
 
+    @Override
+    public CompoundNBT write(CompoundNBT compound) {
+        compound = super.write(compound);
+        if (controllerPos != null) {
+            compound.putInt("X", controllerPos.getX());
+            compound.putInt("Y", controllerPos.getY());
+            compound.putInt("Z", controllerPos.getZ());
+        }
+        return compound;
+    }
+
+    @Override
+    public void read(CompoundNBT compound) {
+        super.read(compound);
+        if (compound.contains("X")) {
+            controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
+        }
+    }
+
+    public BlockPos getControllerPos() {
+        return controllerPos;
+    }
+
+    public void setControllerPos(BlockPos controllerPos) {
+        this.controllerPos = controllerPos;
+    }
 }

@@ -24,9 +24,9 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.Portality;
-import com.buuz135.portality.block.BlockFrame;
-import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileFrame;
+import com.buuz135.portality.block.FrameBlock;
+import com.buuz135.portality.tile.ControllerTile;
+import com.buuz135.portality.tile.FrameTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -45,25 +45,25 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class BlockCapabilityModule<T, S extends TileFrame> extends BlockFrame<S> implements IPortalModule {
+public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends FrameBlock<S> implements IPortalModule {
 
     public static BooleanProperty INPUT = BooleanProperty.create("input");
 
-    public BlockCapabilityModule(String name, Class<S> tileClass) {
+    public CapabilityModuleBlock(String name, Class<S> tileClass) {
         super(name, tileClass);
         this.setDefaultState(this.getDefaultState().with(INPUT, true));
         setItemGroup(Portality.TAB);
     }
 
     @Override
-    public void work(TileController controller, BlockPos blockPos) {
+    public void work(ControllerTile controller, BlockPos blockPos) {
         if (controller.getLinkData() == null) return;
         TileEntity other = controller.getWorld().getServer().getWorld(DimensionType.getById(controller.getLinkData().getDimension())).getTileEntity(controller.getLinkData().getPos());
-        if (other instanceof TileController && this.isInput(controller.getWorld().getBlockState(blockPos))) {
-            TileController otherController = (TileController) other;
-            internalWork(controller.getWorld(), blockPos, other.getWorld(), otherController.getModules().stream().filter(pos -> otherController.getWorld().getBlockState(pos).getBlock() instanceof BlockCapabilityModule
-                    && !((BlockCapabilityModule) otherController.getWorld().getBlockState(pos).getBlock()).isInput(otherController.getWorld().getBlockState(pos))
-                    && ((BlockCapabilityModule) otherController.getWorld().getBlockState(pos).getBlock()).getCapability().equals(this.getCapability())).collect(Collectors.toList()));
+        if (other instanceof ControllerTile && this.isInput(controller.getWorld().getBlockState(blockPos))) {
+            ControllerTile otherController = (ControllerTile) other;
+            internalWork(controller.getWorld(), blockPos, other.getWorld(), otherController.getModules().stream().filter(pos -> otherController.getWorld().getBlockState(pos).getBlock() instanceof CapabilityModuleBlock
+                    && !((CapabilityModuleBlock) otherController.getWorld().getBlockState(pos).getBlock()).isInput(otherController.getWorld().getBlockState(pos))
+                    && ((CapabilityModuleBlock) otherController.getWorld().getBlockState(pos).getBlock()).getCapability().equals(this.getCapability())).collect(Collectors.toList()));
         }
     }
 

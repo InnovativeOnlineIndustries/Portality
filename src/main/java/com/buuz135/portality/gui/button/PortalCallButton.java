@@ -25,12 +25,12 @@ package com.buuz135.portality.gui.button;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalLinkData;
-import com.buuz135.portality.gui.GuiPortals;
+import com.buuz135.portality.gui.PortalsScreen;
 import com.buuz135.portality.network.PortalLinkMessage;
-import com.buuz135.portality.tile.TileController;
-import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
-import com.hrznstudio.titanium.client.gui.addon.interfaces.IClickable;
-import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
+import com.buuz135.portality.tile.ControllerTile;
+import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
+import com.hrznstudio.titanium.client.screen.addon.interfaces.IClickable;
+import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -40,15 +40,15 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class PortalCallButton extends BasicGuiAddon implements IClickable {
+public class PortalCallButton extends BasicScreenAddon implements IClickable {
 
     private final CallAction action;
-    private final TileController controller;
-    private final GuiPortals guiPortals;
+    private final ControllerTile controller;
+    private final PortalsScreen guiPortals;
     private int guiX;
     private int guiY;
 
-    public PortalCallButton(int x, int y, TileController tile, CallAction action, GuiPortals guiPortals) {
+    public PortalCallButton(int x, int y, ControllerTile tile, CallAction action, PortalsScreen guiPortals) {
         super(x, y);
         this.action = action;
         this.controller = tile;
@@ -58,7 +58,7 @@ public class PortalCallButton extends BasicGuiAddon implements IClickable {
     }
 
     @Override
-    public void drawGuiContainerBackgroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackgroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         screen.blit(this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
         this.guiX = guiX;
@@ -81,7 +81,7 @@ public class PortalCallButton extends BasicGuiAddon implements IClickable {
     }
 
     @Override
-    public void drawGuiContainerForegroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
+    public void drawForegroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
         screen.drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
     }

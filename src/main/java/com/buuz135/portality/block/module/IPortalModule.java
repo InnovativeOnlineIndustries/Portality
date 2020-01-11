@@ -23,12 +23,12 @@
  */
 package com.buuz135.portality.block.module;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import net.minecraft.util.math.BlockPos;
 
 public interface IPortalModule {
 
-    void work(TileController controller, BlockPos pos);
+    void work(ControllerTile controller, BlockPos pos);
 
     boolean allowsInterdimensionalTravel();
 }

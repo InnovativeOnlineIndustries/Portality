@@ -25,20 +25,20 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.network.PortalRenameMessage;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class GuiRenameController extends Screen {
+public class RenameControllerScreen extends Screen {
 
-    private final TileController controller;
+    private final ControllerTile controller;
     private TextFieldWidget textFieldWidget;
     private Button confirm;
 
-    public GuiRenameController(TileController controller) {
+    public RenameControllerScreen(ControllerTile controller) {
         super(new TranslationTextComponent("portality.gui.controller.rename"));
         this.controller = controller;
     }
@@ -86,6 +86,6 @@ public class GuiRenameController extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        Minecraft.getInstance().displayGuiScreen(new GuiController(controller));
+        Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
     }
 }

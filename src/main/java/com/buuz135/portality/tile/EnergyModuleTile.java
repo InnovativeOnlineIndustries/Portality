@@ -26,7 +26,7 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
-import com.hrznstudio.titanium.client.gui.addon.EnergyBarGuiAddon;
+import com.hrznstudio.titanium.client.screen.addon.EnergyBarScreenAddon;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -40,22 +40,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class TileEntityEnergyModule extends TileModule {
+public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
 
     @Save
     private NBTEnergyHandler energyHandler;
     private LazyOptional<IEnergyStorage> energyCap;
 
-    public TileEntityEnergyModule() {
+    public EnergyModuleTile() {
         super(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE);
         this.energyHandler = new NBTEnergyHandler(this, 10000);
         this.energyCap = LazyOptional.of(() -> this.energyHandler);
-        this.addGuiAddonFactory(() -> new EnergyBarGuiAddon(10, 20, energyHandler));
+        this.addGuiAddonFactory(() -> new EnergyBarScreenAddon(10, 20, energyHandler));
     }
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public LazyOptional getCapability(@Nonnull Capability cap, @Nullable Direction side) {
         if (cap == CapabilityEnergy.ENERGY) return energyCap.cast();
         return super.getCapability(cap, side);
     }
@@ -77,5 +77,11 @@ public class TileEntityEnergyModule extends TileModule {
                 }
             }
         }
+    }
+
+    @Nonnull
+    @Override
+    public EnergyModuleTile getSelf() {
+        return this;
     }
 }

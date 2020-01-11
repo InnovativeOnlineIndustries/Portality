@@ -23,15 +23,15 @@
  */
 package com.buuz135.portality.proxy;
 
-import com.buuz135.portality.block.BlockController;
-import com.buuz135.portality.block.BlockFrame;
-import com.buuz135.portality.block.BlockGenerator;
-import com.buuz135.portality.block.BlockInterdimensionalModule;
-import com.buuz135.portality.block.module.BlockCapabilityEnergyModule;
-import com.buuz135.portality.block.module.BlockCapabilityFluidModule;
-import com.buuz135.portality.block.module.BlockCapabilityItemModule;
-import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileFrame;
+import com.buuz135.portality.block.ControllerBlock;
+import com.buuz135.portality.block.FrameBlock;
+import com.buuz135.portality.block.GeneratorBlock;
+import com.buuz135.portality.block.InterdimensionalModuleBlock;
+import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
+import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
+import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
+import com.buuz135.portality.tile.BasicFrameTile;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,14 +42,14 @@ import net.minecraftforge.eventbus.api.Event;
 
 public class CommonProxy {
 
-    public static final BlockController BLOCK_CONTROLLER = new BlockController();
-    public static final BlockFrame BLOCK_FRAME = new BlockFrame("frame", TileFrame.class);
-    public static final BlockGenerator BLOCK_GENERATOR = new BlockGenerator();
+    public static final ControllerBlock BLOCK_CONTROLLER = new ControllerBlock();
+    public static final FrameBlock<BasicFrameTile> BLOCK_FRAME = new FrameBlock<BasicFrameTile>("frame", BasicFrameTile.class);
+    public static final GeneratorBlock BLOCK_GENERATOR = new GeneratorBlock();
 
-    public static final BlockInterdimensionalModule BLOCK_INTERDIMENSIONAL_MODULE = new BlockInterdimensionalModule();
-    public static final BlockCapabilityItemModule BLOCK_CAPABILITY_ITEM_MODULE = new BlockCapabilityItemModule();
-    public static final BlockCapabilityFluidModule BLOCK_CAPABILITY_FLUID_MODULE = new BlockCapabilityFluidModule();
-    public static final BlockCapabilityEnergyModule BLOCK_CAPABILITY_ENERGY_MODULE = new BlockCapabilityEnergyModule();
+    public static final InterdimensionalModuleBlock BLOCK_INTERDIMENSIONAL_MODULE = new InterdimensionalModuleBlock();
+    public static final CapabilityItemModuleBlock BLOCK_CAPABILITY_ITEM_MODULE = new CapabilityItemModuleBlock();
+    public static final CapabilityFluidModuleBlock BLOCK_CAPABILITY_FLUID_MODULE = new CapabilityFluidModuleBlock();
+    public static final CapabilityEnergyModuleBlock BLOCK_CAPABILITY_ENERGY_MODULE = new CapabilityEnergyModuleBlock();
 
     public void onCommon() {
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
@@ -62,7 +62,7 @@ public class CommonProxy {
 
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
         if (event.getPlayer().isCrouching() && event.getPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
-            TileController controller = (TileController) event.getWorld().getTileEntity(event.getPos());
+            ControllerTile controller = (ControllerTile) event.getWorld().getTileEntity(event.getPos());
             if (!controller.getDisplay().isItemEqual(event.getItemStack())) {
                 event.setUseBlock(Event.Result.ALLOW);
             }

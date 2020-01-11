@@ -25,11 +25,11 @@ package com.buuz135.portality.gui.button;
 
 import com.hrznstudio.titanium.Titanium;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
-import com.hrznstudio.titanium.block.tile.button.PosButton;
-import com.hrznstudio.titanium.client.gui.ITileContainer;
-import com.hrznstudio.titanium.client.gui.addon.BasicButtonAddon;
-import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
+import com.hrznstudio.titanium.client.screen.ITileContainer;
+import com.hrznstudio.titanium.client.screen.addon.BasicButtonAddon;
+import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
+import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import net.minecraft.client.Minecraft;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class TextPortalButton extends PosButton {
+public class TextPortalButton extends ButtonComponent {
 
     private final String display;
     private Supplier<Consumer<Screen>> screenConsumer;
@@ -68,7 +68,7 @@ public class TextPortalButton extends PosButton {
     }
 
     @Override
-    public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
+    public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Collections.singletonList(() -> new TextButtonAddon(this, display, screenConsumer.get()));
     }
 
@@ -77,15 +77,15 @@ public class TextPortalButton extends PosButton {
         private String text;
         private Consumer<Screen> supplier;
 
-        public TextButtonAddon(PosButton posButton, String text, Consumer<Screen> supplier) {
+        public TextButtonAddon(ButtonComponent posButton, String text, Consumer<Screen> supplier) {
             super(posButton);
             this.text = text;
             this.supplier = supplier;
         }
 
         @Override
-        public void drawGuiContainerBackgroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
-            super.drawGuiContainerBackgroundLayer(screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
+        public void drawBackgroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+            super.drawBackgroundLayer(screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
             String string = new TranslationTextComponent(text).getUnformattedComponentText();
             TextFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? TextFormatting.YELLOW : TextFormatting.WHITE;
             Minecraft.getInstance().fontRenderer.drawString(color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);

@@ -23,7 +23,7 @@
  */
 package com.buuz135.portality.block.module;
 
-import com.buuz135.portality.tile.TileEntityFluidModule;
+import com.buuz135.portality.tile.FluidModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -36,10 +36,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockCapabilityFluidModule extends BlockCapabilityModule<IFluidHandler, TileEntityFluidModule> {
+public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHandler, FluidModuleTile> {
 
-    public BlockCapabilityFluidModule() {
-        super("module_fluids", TileEntityFluidModule.class);
+    public CapabilityFluidModuleBlock() {
+        super("module_fluids", FluidModuleTile.class);
     }
 
     @Override
@@ -66,13 +66,13 @@ public class BlockCapabilityFluidModule extends BlockCapabilityModule<IFluidHand
     }
 
     @Override
-    public IFactory<TileEntityFluidModule> getTileEntityFactory() {
-        return TileEntityFluidModule::new;
+    public IFactory<FluidModuleTile> getTileEntityFactory() {
+        return FluidModuleTile::new;
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new TileEntityFluidModule();
+        return new FluidModuleTile();
     }
 }

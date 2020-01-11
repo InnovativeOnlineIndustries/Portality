@@ -23,7 +23,7 @@
  */
 package com.buuz135.portality.network;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -49,8 +49,8 @@ public class PortalRenameMessage extends Message {
         ServerPlayerEntity serverPlayer = context.getSender();
         context.enqueueWork(() -> {
             World world = serverPlayer.world;
-            if (world.getTileEntity(tileLocation) != null && world.getTileEntity(tileLocation) instanceof TileController) {
-                TileController controller = (TileController) world.getTileEntity(tileLocation);
+            if (world.getTileEntity(tileLocation) != null && world.getTileEntity(tileLocation) instanceof ControllerTile) {
+                ControllerTile controller = (ControllerTile) world.getTileEntity(tileLocation);
                 if (controller.getOwner().equals(serverPlayer.getUniqueID())) controller.setDisplayName(name);
             }
         });

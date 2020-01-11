@@ -21,45 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.buuz135.portality.tile;
+package com.buuz135.portality.block;
 
-import com.hrznstudio.titanium.block.BlockTileBase;
-import com.hrznstudio.titanium.block.tile.TileActive;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import com.buuz135.portality.Portality;
+import com.buuz135.portality.tile.LowEfficiencyGeneratorTile;
+import com.hrznstudio.titanium.api.IFactory;
+import com.hrznstudio.titanium.block.RotatableBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItemUseContext;
 
-public class TileFrame extends TileActive {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-    private BlockPos controllerPos;
+public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
-    public TileFrame(BlockTileBase base) {
-        super(base);
+    public GeneratorBlock() {
+        super("generator", Block.Properties.create(Material.ROCK), LowEfficiencyGeneratorTile.class);
+        setItemGroup(Portality.TAB);
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        compound = super.write(compound);
-        if (controllerPos != null) {
-            compound.putInt("X", controllerPos.getX());
-            compound.putInt("Y", controllerPos.getY());
-            compound.putInt("Z", controllerPos.getZ());
-        }
-        return compound;
+    public IFactory<LowEfficiencyGeneratorTile> getTileEntityFactory() {
+        return LowEfficiencyGeneratorTile::new;
     }
 
+    @Nonnull
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
-        if (compound.contains("X")) {
-            controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
-        }
+    public RotationType getRotationType() {
+        return RotationType.FOUR_WAY;
     }
 
-    public BlockPos getControllerPos() {
-        return controllerPos;
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
+        return this.getDefaultState().with(FACING_HORIZONTAL, context.getPlacementHorizontalFacing().getOpposite());
     }
 
-    public void setControllerPos(BlockPos controllerPos) {
-        this.controllerPos = controllerPos;
-    }
 }

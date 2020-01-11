@@ -27,10 +27,10 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.button.GuiButtonImagePortal;
 import com.buuz135.portality.gui.button.PortalCallButton;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
-import com.hrznstudio.titanium.client.gui.GuiAddonScreen;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
+import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.ResourceLocation;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GuiPortals extends GuiAddonScreen {
+public class PortalsScreen extends ScreenAddonScreen {
 
     private final int guiHeight;
     private final int guiWidth;
@@ -50,16 +50,18 @@ public class GuiPortals extends GuiAddonScreen {
     private boolean isDragging;
     private int visiblePortalInformations;
     private List<GuiButtonImagePortal> portalButtons;
+    private List<PortalInformation> currentlyShowing;
     private PortalInformation selectedPortal;
-    private TileController controller;
+    private ControllerTile controller;
 
-    public GuiPortals(TileController controller) {
+    public PortalsScreen(ControllerTile controller) {
         super(PortalityAssetProvider.PROVIDER, false);
         this.guiWidth = 200;
         this.guiHeight = 186;
         this.scrolling = 0;
         this.lastScrolling = 0;
         this.portalButtons = new ArrayList<>();
+        this.currentlyShowing = new ArrayList<>();
         this.controller = controller;
     }
 
@@ -81,23 +83,25 @@ public class GuiPortals extends GuiAddonScreen {
 
     private void addPortalButtons() {
         if (this.informationList == null) return;
-        List<PortalInformation> informationList = new ArrayList<>(this.informationList);
-        informationList.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUniqueID()));
-        informationList.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
+        List<PortalInformation> tempInformations = new ArrayList<>(this.informationList);
+        tempInformations.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUniqueID()));
+        tempInformations.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
         if (!textField.getText().isEmpty())
-            informationList.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText()));
+            tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText().toLowerCase()));
         this.buttons.removeIf(guiButton -> portalButtons.contains(guiButton));
         this.portalButtons.clear();
-        this.visiblePortalInformations = informationList.size();
-        int pointer = (int) ((informationList.size() / 7D) * scrolling);
+        this.visiblePortalInformations = tempInformations.size();
+        //int pointer = (int) ((tempInformations.size() / 7D) * scrolling);
+        currentlyShowing = tempInformations;
+        int pointer = 0;
         for (int i = pointer; i < pointer + 7; i++) {
-            if (informationList.size() > i) {
+            if (tempInformations.size() > i) {
                 int finalI = i;
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, informationList.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, tempInformations.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
                         if (isMouseOver(mouseX, mouseY)) {
-                            selectedPortal = informationList.get(finalI);
+                            selectedPortal = currentlyShowing.get(finalI);
                         }
                         super.onClick(mouseX, mouseY);
                     }
@@ -135,7 +139,7 @@ public class GuiPortals extends GuiAddonScreen {
     }
 
     @Override
-    public List<IFactory<IGuiAddon>> guiAddons() {
+    public List<IFactory<IScreenAddon>> guiAddons() {
         return Collections.emptyList();
     }
 

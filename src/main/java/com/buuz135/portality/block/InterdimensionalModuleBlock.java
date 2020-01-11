@@ -24,29 +24,37 @@
 package com.buuz135.portality.block;
 
 import com.buuz135.portality.Portality;
-import com.buuz135.portality.tile.TileLowEfficiencyGenerator;
-import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.block.BlockRotation;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import com.buuz135.portality.block.module.IPortalModule;
+import com.buuz135.portality.tile.BasicFrameTile;
+import com.buuz135.portality.tile.ControllerTile;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.World;
 
-import javax.annotation.Nonnull;
+public class InterdimensionalModuleBlock extends FrameBlock<BasicFrameTile> implements IPortalModule {
 
-public class BlockGenerator extends BlockRotation<TileLowEfficiencyGenerator> {
-
-    public BlockGenerator() {
-        super("generator", Block.Properties.create(Material.ROCK), TileLowEfficiencyGenerator.class);
+    public InterdimensionalModuleBlock() {
+        super("module_interdimensional", BasicFrameTile.class);
         setItemGroup(Portality.TAB);
     }
 
     @Override
-    public IFactory<TileLowEfficiencyGenerator> getTileEntityFactory() {
-        return TileLowEfficiencyGenerator::new;
+    public void work(ControllerTile controller, BlockPos pos) {
+
     }
 
-    @Nonnull
     @Override
-    public RotationType getRotationType() {
-        return RotationType.FOUR_WAY;
+    public boolean allowsInterdimensionalTravel() {
+        return true;
     }
+
+    @Override
+    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
+        return ActionResultType.FAIL;
+    }
+
 }

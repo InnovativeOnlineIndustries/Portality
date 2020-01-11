@@ -23,16 +23,16 @@
  */
 package com.buuz135.portality.tile;
 
-import com.buuz135.portality.block.module.BlockCapabilityModule;
+import com.buuz135.portality.block.module.CapabilityModuleBlock;
 import com.buuz135.portality.gui.TileAssetProvider;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
-import com.hrznstudio.titanium.block.BlockTileBase;
-import com.hrznstudio.titanium.block.tile.button.PosButton;
-import com.hrznstudio.titanium.client.gui.addon.StateButtonAddon;
-import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
-import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
+import com.hrznstudio.titanium.block.BasicTileBlock;
+import com.hrznstudio.titanium.client.screen.addon.StateButtonAddon;
+import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
+import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
+import com.hrznstudio.titanium.component.button.ButtonComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -41,18 +41,18 @@ import net.minecraft.util.Hand;
 import java.util.Collections;
 import java.util.List;
 
-public class TileModule extends TileFrame {
+public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
 
     @Save
     private boolean input;
-    private PosButton button;
+    private ButtonComponent button;
 
-    public TileModule(BlockTileBase base) {
+    public ModuleTile(BasicTileBlock<T> base) {
         super(base);
         this.input = true;
-        this.addButton(button = new PosButton(153, 84, 18, 18) {
+        this.addButton(button = new ButtonComponent(153, 84, 18, 18) {
             @Override
-            public List<IFactory<? extends IGuiAddon>> getGuiAddons() {
+            public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(button,
                         new StateButtonInfo(0, TileAssetProvider.AA_BUTTON_IO_INPUT, "module.type.input"),
                         new StateButtonInfo(1, TileAssetProvider.AA_BUTTON_IO_OUTPUT, "module.type.output")) {
@@ -75,7 +75,7 @@ public class TileModule extends TileFrame {
 
     public void changeMode() {
         input = !input;
-        this.world.setBlockState(this.pos, this.getBlockState().with(BlockCapabilityModule.INPUT, input));
+        this.world.setBlockState(this.pos, this.getBlockState().with(CapabilityModuleBlock.INPUT, input));
         markForUpdate();
     }
 
