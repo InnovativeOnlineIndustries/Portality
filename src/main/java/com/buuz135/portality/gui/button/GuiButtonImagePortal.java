@@ -58,7 +58,7 @@ public class GuiButtonImagePortal extends ImageButton {
         TextFormatting color = TextFormatting.RESET;
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 28)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
+        fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 25)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
         if (information.isPrivate()) {

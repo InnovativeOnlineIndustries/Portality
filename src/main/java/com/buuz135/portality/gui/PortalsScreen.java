@@ -50,6 +50,7 @@ public class PortalsScreen extends ScreenAddonScreen {
     private boolean isDragging;
     private int visiblePortalInformations;
     private List<GuiButtonImagePortal> portalButtons;
+    private List<PortalInformation> currentlyShowing;
     private PortalInformation selectedPortal;
     private ControllerTile controller;
 
@@ -60,6 +61,7 @@ public class PortalsScreen extends ScreenAddonScreen {
         this.scrolling = 0;
         this.lastScrolling = 0;
         this.portalButtons = new ArrayList<>();
+        this.currentlyShowing = new ArrayList<>();
         this.controller = controller;
     }
 
@@ -81,23 +83,26 @@ public class PortalsScreen extends ScreenAddonScreen {
 
     private void addPortalButtons() {
         if (this.informationList == null) return;
-        List<PortalInformation> informationList = new ArrayList<>(this.informationList);
-        informationList.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUniqueID()));
-        informationList.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
+        List<PortalInformation> tempInformations = new ArrayList<>(this.informationList);
+        tempInformations.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUniqueID()));
+        tempInformations.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
         if (!textField.getText().isEmpty())
-            informationList.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText()));
+            tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText().toLowerCase()));
         this.buttons.removeIf(guiButton -> portalButtons.contains(guiButton));
         this.portalButtons.clear();
-        this.visiblePortalInformations = informationList.size();
-        int pointer = (int) ((informationList.size() / 7D) * scrolling);
+        this.visiblePortalInformations = tempInformations.size();
+        //int pointer = (int) ((tempInformations.size() / 7D) * scrolling);
+        currentlyShowing = tempInformations;
+        int pointer = 0;
         for (int i = pointer; i < pointer + 7; i++) {
-            if (informationList.size() > i) {
+            if (tempInformations.size() > i) {
                 int finalI = i;
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, informationList.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, tempInformations.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
                         if (isMouseOver(mouseX, mouseY)) {
-                            selectedPortal = informationList.get(finalI);
+                            System.out.println(finalI);
+                            selectedPortal = currentlyShowing.get(finalI);
                         }
                         super.onClick(mouseX, mouseY);
                     }
