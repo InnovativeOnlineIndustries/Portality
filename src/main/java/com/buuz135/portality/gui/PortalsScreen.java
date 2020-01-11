@@ -101,7 +101,6 @@ public class PortalsScreen extends ScreenAddonScreen {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
                         if (isMouseOver(mouseX, mouseY)) {
-                            System.out.println(finalI);
                             selectedPortal = currentlyShowing.get(finalI);
                         }
                         super.onClick(mouseX, mouseY);
