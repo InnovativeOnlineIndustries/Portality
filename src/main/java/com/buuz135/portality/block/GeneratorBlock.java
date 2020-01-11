@@ -28,9 +28,12 @@ import com.buuz135.portality.tile.LowEfficiencyGeneratorTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItemUseContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
@@ -49,4 +52,11 @@ public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
     public RotationType getRotationType() {
         return RotationType.FOUR_WAY;
     }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
+        return this.getDefaultState().with(FACING_HORIZONTAL, context.getPlacementHorizontalFacing().getOpposite());
+    }
+
 }
