@@ -27,9 +27,9 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.proxy.CommonProxy;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.block.BlockRotation;
+import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -56,10 +56,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class BlockController extends BlockRotation<TileController> {
+public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
-    public BlockController() {
-        super("controller", Block.Properties.create(Material.ROCK), TileController.class);
+    public ControllerBlock() {
+        super("controller", Block.Properties.create(Material.ROCK), ControllerTile.class);
         setItemGroup(Portality.TAB);
     }
 
@@ -85,7 +85,7 @@ public class BlockController extends BlockRotation<TileController> {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
+        return this.getDefaultState().with(FACING_HORIZONTAL, context.getPlacementHorizontalFacing().getOpposite());
     }
 
     @Nonnull
@@ -97,8 +97,8 @@ public class BlockController extends BlockRotation<TileController> {
     @Override
     public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof TileController) {
-            TileController controller = (TileController) tile;
+        if (tile instanceof ControllerTile) {
+            ControllerTile controller = (ControllerTile) tile;
             if (!worldIn.isRemote()) {
                 if (!controller.isFormed()) {
                     playerIn.sendStatusMessage(new TranslationTextComponent(TextFormatting.RED + I18n.format("portality.controller.error.size")), true);
@@ -117,7 +117,7 @@ public class BlockController extends BlockRotation<TileController> {
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID()))
                     return ActionResultType.SUCCESS;
                 Minecraft.getInstance().deferTask(() -> {
-                    TileController.OpenGui.open(0, (TileController) tile);
+                    ControllerTile.OpenGui.open(0, (ControllerTile) tile);
                 });
                 return ActionResultType.SUCCESS;
             }
@@ -128,21 +128,21 @@ public class BlockController extends BlockRotation<TileController> {
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         TileEntity entity = worldIn.getTileEntity(pos);
-        if (entity instanceof TileController) {
-            ((TileController) entity).breakController();
+        if (entity instanceof ControllerTile) {
+            ((ControllerTile) entity).breakController();
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
-    public IFactory<TileController> getTileEntityFactory() {
-        return TileController::new;
+    public IFactory<ControllerTile> getTileEntityFactory() {
+        return ControllerTile::new;
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new TileController();
+        return new ControllerTile();
     }
 
 }

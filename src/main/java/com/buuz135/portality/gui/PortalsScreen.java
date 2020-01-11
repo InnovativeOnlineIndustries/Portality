@@ -27,10 +27,10 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.button.GuiButtonImagePortal;
 import com.buuz135.portality.gui.button.PortalCallButton;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
-import com.hrznstudio.titanium.client.gui.GuiAddonScreen;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
+import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.ResourceLocation;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GuiPortals extends GuiAddonScreen {
+public class PortalsScreen extends ScreenAddonScreen {
 
     private final int guiHeight;
     private final int guiWidth;
@@ -51,9 +51,9 @@ public class GuiPortals extends GuiAddonScreen {
     private int visiblePortalInformations;
     private List<GuiButtonImagePortal> portalButtons;
     private PortalInformation selectedPortal;
-    private TileController controller;
+    private ControllerTile controller;
 
-    public GuiPortals(TileController controller) {
+    public PortalsScreen(ControllerTile controller) {
         super(PortalityAssetProvider.PROVIDER, false);
         this.guiWidth = 200;
         this.guiHeight = 186;
@@ -135,7 +135,7 @@ public class GuiPortals extends GuiAddonScreen {
     }
 
     @Override
-    public List<IFactory<IGuiAddon>> guiAddons() {
+    public List<IFactory<IScreenAddon>> guiAddons() {
         return Collections.emptyList();
     }
 

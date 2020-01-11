@@ -24,7 +24,7 @@
 package com.buuz135.portality.network;
 
 import com.buuz135.portality.data.PortalLinkData;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
@@ -56,8 +56,8 @@ public class PortalLinkMessage extends Message {
     protected void handleMessage(NetworkEvent.Context context) {
         World world = context.getSender().world.getServer().getWorld(DimensionType.getById(linkSender.getDimension()));
         TileEntity tileEntity = world.getTileEntity(linkSender.getPos());
-        if (tileEntity instanceof TileController) {
-            ((TileController) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[type]);
+        if (tileEntity instanceof ControllerTile) {
+            ((ControllerTile) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[type]);
         }
     }
 

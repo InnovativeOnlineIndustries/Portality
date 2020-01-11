@@ -24,12 +24,12 @@
 package com.buuz135.portality.handler;
 
 import com.buuz135.portality.Portality;
-import com.buuz135.portality.block.BlockController;
+import com.buuz135.portality.block.ControllerBlock;
 import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.network.PortalTeleportMessage;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.util.TeleportationUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -55,9 +55,9 @@ public class TeleportHandler {
 
     private HashMap<Entity, TeleportData> entityTimeToTeleport;
     private HashMap<Entity, TeleportedEntityData> entitesTeleported;
-    private TileController controller;
+    private ControllerTile controller;
 
-    public TeleportHandler(TileController controller) {
+    public TeleportHandler(ControllerTile controller) {
         entityTimeToTeleport = new HashMap<>();
         entitesTeleported = new HashMap<>();
         this.controller = controller;
@@ -68,11 +68,11 @@ public class TeleportHandler {
     }
 
     public void tick() {
-        if (!(controller.getWorld().getBlockState(controller.getPos()).getBlock() instanceof BlockController)) {
+        if (!(controller.getWorld().getBlockState(controller.getPos()).getBlock() instanceof ControllerBlock)) {
             controller.closeLink();
             return;
         }
-        Direction facing = controller.getWorld().getBlockState(controller.getPos()).get(BlockController.FACING).getOpposite();
+        Direction facing = controller.getWorld().getBlockState(controller.getPos()).get(ControllerBlock.FACING_HORIZONTAL).getOpposite();
         Random random = controller.getWorld().rand;
         BlockPos offset = controller.getPos().offset(facing);
         double mult = controller.getLength() / 20D;
@@ -95,7 +95,7 @@ public class TeleportHandler {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.getById(entry.getValue().data.getDimension()));
-                        Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
+                        Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
@@ -127,8 +127,8 @@ public class TeleportHandler {
                     entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ(), entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vec3d(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
-                if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof BlockController) {
-                    Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(BlockController.FACING);
+                if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock) {
+                    Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
                     Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                     entry.getKey().setMotion(vec3d.x, vec3d.y, vec3d.z);
                     entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());

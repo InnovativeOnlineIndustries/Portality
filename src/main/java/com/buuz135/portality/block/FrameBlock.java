@@ -24,11 +24,11 @@
 package com.buuz135.portality.block;
 
 import com.buuz135.portality.Portality;
-import com.buuz135.portality.proxy.CommonProxy;
-import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileFrame;
+import com.buuz135.portality.tile.BasicFrameTile;
+import com.buuz135.portality.tile.ControllerTile;
+import com.buuz135.portality.tile.FrameTile;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.block.BlockRotation;
+import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -41,9 +41,9 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
+public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
-    public BlockFrame(String name, Class<T> tileClass) {
+    public FrameBlock(String name, Class<T> tileClass) {
         super(name, Block.Properties.create(Material.ROCK), tileClass);
         setItemGroup(Portality.TAB);
     }
@@ -51,10 +51,10 @@ public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof TileFrame && ((TileFrame) tileEntity).getControllerPos() != null) {
-            TileEntity controller = worldIn.getTileEntity(((TileFrame) tileEntity).getControllerPos());
-            if (controller instanceof TileController) {
-                ((TileController) controller).setShouldCheckForStructure(true);
+        if (tileEntity instanceof FrameTile && ((FrameTile) tileEntity).getControllerPos() != null) {
+            TileEntity controller = worldIn.getTileEntity(((FrameTile) tileEntity).getControllerPos());
+            if (controller instanceof ControllerTile) {
+                ((ControllerTile) controller).setShouldCheckForStructure(true);
             }
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
@@ -72,7 +72,7 @@ public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
             @Nonnull
             @Override
             public T create() {
-                return (T) new TileFrame(CommonProxy.BLOCK_FRAME);
+                return (T) new BasicFrameTile();
             }
         };
     }
@@ -80,7 +80,7 @@ public class BlockFrame<T extends TileFrame> extends BlockRotation<T> {
     @Nullable
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new TileFrame(CommonProxy.BLOCK_FRAME);
+        return new BasicFrameTile();
     }
 
     @Override

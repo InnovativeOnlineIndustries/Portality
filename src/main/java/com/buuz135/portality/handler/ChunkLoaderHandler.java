@@ -23,14 +23,14 @@
  */
 package com.buuz135.portality.handler;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 public class ChunkLoaderHandler {
 
-    public static void removePortalAsChunkloader(TileController controller) {
+    public static void removePortalAsChunkloader(ControllerTile controller) {
         World world = controller.getWorld();
         if (world instanceof ServerWorld) {
             ChunkPos chunkPos = world.getChunkAt(controller.getPos()).getPos();
@@ -38,7 +38,7 @@ public class ChunkLoaderHandler {
         }
     }
 
-    public static void addPortalAsChunkloader(TileController controller) {
+    public static void addPortalAsChunkloader(ControllerTile controller) {
         World world = controller.getWorld();
         if (world instanceof ServerWorld) {
             ChunkPos chunkPos = world.getChunkAt(controller.getPos()).getPos();

@@ -23,14 +23,14 @@
  */
 package com.buuz135.portality.tile;
 
-import com.buuz135.portality.block.BlockController;
+import com.buuz135.portality.block.ControllerBlock;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
-import com.buuz135.portality.gui.GuiController;
-import com.buuz135.portality.gui.GuiPortals;
-import com.buuz135.portality.gui.GuiRenameController;
+import com.buuz135.portality.gui.ControllerScreen;
+import com.buuz135.portality.gui.PortalsScreen;
+import com.buuz135.portality.gui.RenameControllerScreen;
 import com.buuz135.portality.gui.button.PortalSettingButton;
 import com.buuz135.portality.gui.button.TextPortalButton;
 import com.buuz135.portality.handler.ChunkLoaderHandler;
@@ -43,8 +43,8 @@ import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.api.IFactory;
-import com.hrznstudio.titanium.block.tile.TilePowered;
-import com.hrznstudio.titanium.client.gui.addon.StateButtonInfo;
+import com.hrznstudio.titanium.block.tile.PoweredTile;
+import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -65,10 +65,11 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
 
-public class TileController extends TilePowered {
+public class ControllerTile extends PoweredTile<ControllerTile> {
 
     private static String NBT_FORMED = "Formed";
     private static String NBT_LENGTH = "Length";
@@ -91,7 +92,7 @@ public class TileController extends TilePowered {
     private TeleportHandler teleportHandler;
     private StructureHandler structureHandler;
 
-    public TileController() {
+    public ControllerTile() {
         super(CommonProxy.BLOCK_CONTROLLER);
         this.isFormed = false;
         this.onceCall = false;
@@ -100,7 +101,7 @@ public class TileController extends TilePowered {
         this.structureHandler = new StructureHandler(this);
 
         this.addButton(new PortalSettingButton(-22, 12, () -> () -> {
-            OpenGui.open(1, TileController.this);
+            OpenGui.open(1, ControllerTile.this);
         }, new StateButtonInfo(0, PortalSettingButton.RENAME, "portality.display.change_name")) {
             @Override
             public int getState() {
@@ -130,7 +131,7 @@ public class TileController extends TilePowered {
         }).setId(3));
         this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
                 .setClientConsumer(() -> screen -> {
-                    OpenGui.open(2, TileController.this);
+                    OpenGui.open(2, ControllerTile.this);
                 })
                 .setId(4)
                 .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength())))
@@ -175,13 +176,20 @@ public class TileController extends TilePowered {
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
                     TileEntity tileEntity = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension())).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof TileController) || ((TileController) tileEntity).getLinkData() == null || ((TileController) tileEntity).getLinkData().getDimension() != this.world.getDimension().getType().getId() || !((TileController) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || ((ControllerTile) tileEntity).getLinkData().getDimension() != this.world.getDimension().getType().getId() || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
                         this.closeLink();
                     }
                 }
             }
             markForUpdate();
         }
+    }
+
+    @Nonnull
+    @Override
+    public ControllerTile getSelf() {
+        return this;
+
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -249,9 +257,9 @@ public class TileController extends TilePowered {
     }
 
     public AxisAlignedBB getPortalArea() {
-        if (!(world.getBlockState(this.pos).getBlock() instanceof BlockController))
+        if (!(world.getBlockState(this.pos).getBlock() instanceof ControllerBlock))
             return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        Direction facing = world.getBlockState(this.pos).get(BlockController.FACING);
+        Direction facing = world.getBlockState(this.pos).get(ControllerBlock.FACING_HORIZONTAL);
         BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth()).offset(Direction.UP);
         BlockPos corner2 = this.pos.offset(facing.rotateYCCW(), structureHandler.getWidth()).offset(Direction.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
         return new AxisAlignedBB(corner1, corner2);
@@ -318,9 +326,9 @@ public class TileController extends TilePowered {
         if (data.isCaller()) {
             World world = this.world.getServer().getWorld(DimensionType.getById(data.getDimension()));
             TileEntity entity = world.getTileEntity(data.getPos());
-            if (entity instanceof TileController) {
-                data.setName(((TileController) entity).getPortalDisplayName());
-                ((TileController) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getId(), this.pos, false, this.getPortalDisplayName()), type);
+            if (entity instanceof ControllerTile) {
+                data.setName(((ControllerTile) entity).getPortalDisplayName());
+                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getId(), this.pos, false, this.getPortalDisplayName()), type);
                 int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.distanceSq(new Vec3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
@@ -338,8 +346,8 @@ public class TileController extends TilePowered {
             World world = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension()));
             TileEntity entity = world.getTileEntity(linkData.getPos());
             linkData = null;
-            if (entity instanceof TileController) {
-                ((TileController) entity).closeLink();
+            if (entity instanceof ControllerTile) {
+                ((ControllerTile) entity).closeLink();
             }
         }
         ChunkLoaderHandler.removePortalAsChunkloader(this);
@@ -427,16 +435,16 @@ public class TileController extends TilePowered {
 
     @OnlyIn(Dist.CLIENT)
     public static class OpenGui {
-        public static void open(int id, TileController controller) {
+        public static void open(int id, ControllerTile controller) {
             switch (id) {
                 case 0:
-                    Minecraft.getInstance().displayGuiScreen(new GuiController(controller));
+                    Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
                     return;
                 case 1:
-                    Minecraft.getInstance().displayGuiScreen(new GuiRenameController(controller));
+                    Minecraft.getInstance().displayGuiScreen(new RenameControllerScreen(controller));
                     return;
                 case 2:
-                    Minecraft.getInstance().displayGuiScreen(new GuiPortals(controller));
+                    Minecraft.getInstance().displayGuiScreen(new PortalsScreen(controller));
                     return;
             }
         }

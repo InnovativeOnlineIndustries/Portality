@@ -25,20 +25,27 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
-import com.hrznstudio.titanium.block.tile.fluid.SidedFluidTank;
+import com.hrznstudio.titanium.component.fluid.SidedFluidTankComponent;
 import net.minecraft.item.DyeColor;
 
-public class TileEntityFluidModule extends TileModule {
+import javax.annotation.Nonnull;
+
+public class FluidModuleTile extends ModuleTile<FluidModuleTile> {
 
     @Save
-    private SidedFluidTank tank;
+    private SidedFluidTankComponent<FluidModuleTile> tank;
 
-    public TileEntityFluidModule() {
+    public FluidModuleTile() {
         super(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE);
-        this.addTank(tank = (SidedFluidTank) new SidedFluidTank("tank", 16000, 76, 20, 0).
+        this.addTank(tank = (SidedFluidTankComponent<FluidModuleTile>) new SidedFluidTankComponent<FluidModuleTile>("tank", 16000, 76, 20, 0).
                 setColor(DyeColor.CYAN).
-                setTile(this)
+                setComponentHarness(this)
         );
     }
 
+    @Nonnull
+    @Override
+    public FluidModuleTile getSelf() {
+        return this;
+    }
 }

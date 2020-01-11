@@ -21,40 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.buuz135.portality.block;
+package com.buuz135.portality.tile;
 
-import com.buuz135.portality.Portality;
-import com.buuz135.portality.block.module.IPortalModule;
-import com.buuz135.portality.tile.TileController;
-import com.buuz135.portality.tile.TileFrame;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
+import com.buuz135.portality.proxy.CommonProxy;
+import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.minecraft.item.DyeColor;
 
-public class BlockInterdimensionalModule extends BlockFrame<TileFrame> implements IPortalModule {
+import javax.annotation.Nonnull;
 
-    public BlockInterdimensionalModule() {
-        super("module_interdimensional", TileFrame.class);
-        setItemGroup(Portality.TAB);
+public class ItemModuleTile extends ModuleTile<ItemModuleTile> {
+
+    @Save
+    public SidedInventoryComponent<ItemModuleTile> handler;
+
+    public ItemModuleTile() {
+        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE);
+        this.addInventory(this.handler = (SidedInventoryComponent<ItemModuleTile>) new SidedInventoryComponent<ItemModuleTile>("inventory", 52, 20, 3 * 4, 0)
+                .setColor(DyeColor.YELLOW)
+                .setColorGuiEnabled(false)
+                .setComponentHarness(this)
+                .setRange(4, 3));
     }
 
+    @Nonnull
     @Override
-    public void work(TileController controller, BlockPos pos) {
-
+    public ItemModuleTile getSelf() {
+        return this;
     }
-
-    @Override
-    public boolean allowsInterdimensionalTravel() {
-        return true;
-    }
-
-    @Override
-    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
-        return ActionResultType.FAIL;
-    }
-
 }

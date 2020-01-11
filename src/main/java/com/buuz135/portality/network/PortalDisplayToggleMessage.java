@@ -23,7 +23,7 @@
  */
 package com.buuz135.portality.network;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -46,8 +46,8 @@ public class PortalDisplayToggleMessage extends Message {
         context.enqueueWork(() -> {
             World world = context.getSender().world;
             BlockPos pos = BlockPos.fromLong(tileLocation);
-            if (world.getTileEntity(pos) instanceof TileController) {
-                TileController controller = (TileController) world.getTileEntity(pos);
+            if (world.getTileEntity(pos) instanceof ControllerTile) {
+                ControllerTile controller = (ControllerTile) world.getTileEntity(pos);
                 if (controller.getOwner().equals(context.getSender().getUniqueID()))
                     controller.setDisplayNameEnabled(!controller.isDisplayNameEnabled());
             }

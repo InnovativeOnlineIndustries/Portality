@@ -24,16 +24,16 @@
 package com.buuz135.portality.gui;
 
 import com.buuz135.portality.proxy.CommonProxy;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
-import com.hrznstudio.titanium.api.client.IGuiAddon;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.api.client.assets.types.IBackgroundAsset;
-import com.hrznstudio.titanium.client.gui.GuiAddonScreen;
-import com.hrznstudio.titanium.client.gui.ITileContainer;
-import com.hrznstudio.titanium.client.gui.addon.BasicGuiAddon;
-import com.hrznstudio.titanium.client.gui.asset.IAssetProvider;
+import com.hrznstudio.titanium.client.screen.ITileContainer;
+import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
+import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
+import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -45,11 +45,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiController extends GuiAddonScreen implements ITileContainer<TileController> {
+public class ControllerScreen extends ScreenAddonScreen implements ITileContainer<ControllerTile> {
 
-    private TileController controller;
+    private ControllerTile controller;
 
-    public GuiController(TileController controller) {
+    public ControllerScreen(ControllerTile controller) {
         super(PortalityAssetProvider.PROVIDER, true);
         this.controller = controller;
     }
@@ -81,9 +81,9 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
     }
 
     @Override
-    public List<IFactory<IGuiAddon>> guiAddons() {
-        List<IFactory<IGuiAddon>> addons = new ArrayList<>();
-        addons.add(() -> new BasicGuiAddon(x - 25, y + 9) {
+    public List<IFactory<IScreenAddon>> guiAddons() {
+        List<IFactory<IScreenAddon>> addons = new ArrayList<>();
+        addons.add(() -> new BasicScreenAddon(x - 25, y + 9) {
             @Override
             public int getXSize() {
                 return 0;
@@ -95,18 +95,18 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
             }
 
             @Override
-            public void drawGuiContainerBackgroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
+            public void drawBackgroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
                 IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
                 Minecraft.getInstance().getTextureManager().bindTexture(background.getResourceLocation());
                 guiScreen.blit(x - 25, y + 9, 0, 110, 25, 97);
             }
 
             @Override
-            public void drawGuiContainerForegroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3) {
+            public void drawForegroundLayer(Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3) {
 
             }
         });
-        controller.getGuiAddons().forEach(iFactory -> addons.add((IFactory<IGuiAddon>) iFactory));
+        controller.getScreenAddons().forEach(iFactory -> addons.add((IFactory<IScreenAddon>) iFactory));
         return addons;
     }
 
@@ -116,7 +116,7 @@ public class GuiController extends GuiAddonScreen implements ITileContainer<Tile
     }
 
     @Override
-    public TileController getTile() {
+    public ControllerTile getTile() {
         return controller;
     }
 }

@@ -23,16 +23,16 @@
  */
 package com.buuz135.portality.tile;
 
-import com.hrznstudio.titanium.block.BlockTileBase;
-import com.hrznstudio.titanium.block.tile.TileActive;
+import com.hrznstudio.titanium.block.BasicTileBlock;
+import com.hrznstudio.titanium.block.tile.ActiveTile;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
-public class TileFrame extends TileActive {
+public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
 
     private BlockPos controllerPos;
 
-    public TileFrame(BlockTileBase base) {
+    public FrameTile(BasicTileBlock<T> base) {
         super(base);
     }
 

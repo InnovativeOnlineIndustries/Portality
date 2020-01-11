@@ -24,8 +24,8 @@
 package com.buuz135.portality.proxy.client.render;
 
 import com.buuz135.portality.Portality;
-import com.buuz135.portality.block.BlockController;
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.block.ControllerBlock;
+import com.buuz135.portality.tile.ControllerTile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -41,7 +41,7 @@ import net.minecraft.util.ResourceLocation;
 import java.awt.*;
 import java.util.Random;
 
-public class TESRPortal extends TileEntityRenderer<TileController> {
+public class TESRPortal extends TileEntityRenderer<ControllerTile> {
 
     private static final Random RANDOM = new Random(31100L);
     public static RenderType TYPE = createRenderType();
@@ -62,7 +62,7 @@ public class TESRPortal extends TileEntityRenderer<TileController> {
         return RenderType.func_228633_a_("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
     }
 
-    public void renderTop(MatrixStack stack, IVertexBuilder buffer, TileController te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, Color color) {
+    public void renderTop(MatrixStack stack, IVertexBuilder buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, Color color) {
         double scale = 0.9335;
         float y = 3.999f;
         float off = /*0.0278*/ 4 - y;
@@ -181,7 +181,7 @@ public class TESRPortal extends TileEntityRenderer<TileController> {
     //    }
     //}
 
-    public void func_225616_a_(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
+    public void func_225616_a_(ControllerTile te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
         if (!te.isFormed()) return;
         RenderSystem.pushMatrix();
         float frame = (te.getWorld().getGameTime() % 60) / 60f;
@@ -205,7 +205,7 @@ public class TESRPortal extends TileEntityRenderer<TileController> {
             Minecraft.getInstance().fontRenderer.func_228079_a_(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.func_227866_c_().func_227870_a_(), typeBuffer, false, j, 15728880);
             matrixStack.func_227865_b_();
         }
-        Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
+        Direction facing = te.getWorld().getBlockState(te.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
         if (facing == Direction.SOUTH) {
             //RenderSystem.translated(1, 0, 1);
             //RenderSystem.rotatef(-180, 0, 1, 0);

@@ -23,7 +23,7 @@
  */
 package com.buuz135.portality.network;
 
-import com.buuz135.portality.tile.TileController;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -49,8 +49,8 @@ public class PortalCloseMessage extends Message {
     protected void handleMessage(NetworkEvent.Context context) {
         World world = context.getSender().world.getServer().getWorld(DimensionType.byName(dimension));
         TileEntity tileEntity = world.getTileEntity(pos);
-        if (tileEntity instanceof TileController) {
-            ((TileController) tileEntity).closeLink();
+        if (tileEntity instanceof ControllerTile) {
+            ((ControllerTile) tileEntity).closeLink();
         }
     }
 

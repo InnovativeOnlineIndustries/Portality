@@ -23,54 +23,62 @@
  */
 package com.buuz135.portality.block.module;
 
-import com.buuz135.portality.tile.TileEntityEnergyModule;
+import com.buuz135.portality.tile.ItemModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockCapabilityEnergyModule extends BlockCapabilityModule<IEnergyStorage, TileEntityEnergyModule> {
+public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandler, ItemModuleTile> {
 
-    public BlockCapabilityEnergyModule() {
-        super("module_energy", TileEntityEnergyModule.class);
+    public CapabilityItemModuleBlock() {
+        super("module_items", ItemModuleTile.class);
     }
 
     @Override
-    public Capability<IEnergyStorage> getCapability() {
-        return CapabilityEnergy.ENERGY;
+    public Capability<IItemHandler> getCapability() {
+        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
     }
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getTileEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
-                for (BlockPos pos : compatibleBlockPos) {
-                    TileEntity entity = otherWorld.getTileEntity(pos);
-                    if (entity != null) {
-                        entity.getCapability(getCapability()).ifPresent(otherStorage -> {
-                            int energy = otherStorage.receiveEnergy(Math.min(storage.getEnergyStored(), 5000), false);
-                            storage.extractEnergy(energy, false);
-                            if (energy > 0) return;
-                        });
-                    }
+        current.getTileEntity(myself).getCapability(this.getCapability(), null).ifPresent(handlerSelf -> {
+            for (BlockPos otherPos : compatibleBlockPos) {
+                TileEntity otherTile = otherWorld.getTileEntity(otherPos);
+                if (otherTile != null) {
+                    otherTile.getCapability(this.getCapability(), null).ifPresent(handlerOther -> {
+                        for (int i = 0; i < handlerSelf.getSlots(); i++) {
+                            ItemStack stack = handlerSelf.getStackInSlot(i);
+                            if (stack.isEmpty()) continue;
+                            if (ItemHandlerHelper.insertItem(handlerOther, stack, true).isEmpty()) {
+                                ItemHandlerHelper.insertItem(handlerOther, stack.copy(), false);
+                                handlerSelf.getStackInSlot(i).setCount(0);
+                                return;
+                            }
+                        }
+                    });
                 }
-            });
+            }
+        });
     }
 
     @Override
-    public IFactory<TileEntityEnergyModule> getTileEntityFactory() {
-        return TileEntityEnergyModule::new;
+    public IFactory<ItemModuleTile> getTileEntityFactory() {
+        return ItemModuleTile::new;
     }
 
     @Nullable
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new TileEntityEnergyModule();
+        return new ItemModuleTile();
     }
 }

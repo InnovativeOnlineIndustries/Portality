@@ -21,26 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.buuz135.portality.tile;
+package com.buuz135.portality.block;
 
-import com.buuz135.portality.proxy.CommonProxy;
-import com.hrznstudio.titanium.annotation.Save;
-import com.hrznstudio.titanium.block.tile.inventory.PosInvHandler;
-import com.hrznstudio.titanium.block.tile.inventory.SidedInvHandler;
-import net.minecraft.item.DyeColor;
+import com.buuz135.portality.Portality;
+import com.buuz135.portality.tile.LowEfficiencyGeneratorTile;
+import com.hrznstudio.titanium.api.IFactory;
+import com.hrznstudio.titanium.block.RotatableBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 
-public class TileEntityItemModule extends TileModule {
+import javax.annotation.Nonnull;
 
-    @Save
-    public PosInvHandler handler;
+public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
-    public TileEntityItemModule() {
-        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE);
-        this.addInventory(this.handler = new SidedInvHandler("inventory", 52, 20, 3 * 4, 0)
-                .setColor(DyeColor.YELLOW)
-                .setColorGuiEnabled(false)
-                .setTile(this)
-                .setRange(4, 3));
+    public GeneratorBlock() {
+        super("generator", Block.Properties.create(Material.ROCK), LowEfficiencyGeneratorTile.class);
+        setItemGroup(Portality.TAB);
     }
 
+    @Override
+    public IFactory<LowEfficiencyGeneratorTile> getTileEntityFactory() {
+        return LowEfficiencyGeneratorTile::new;
+    }
+
+    @Nonnull
+    @Override
+    public RotationType getRotationType() {
+        return RotationType.FOUR_WAY;
+    }
 }
