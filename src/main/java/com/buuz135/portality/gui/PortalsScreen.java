@@ -34,6 +34,8 @@ import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,9 +93,8 @@ public class PortalsScreen extends ScreenAddonScreen {
         this.buttons.removeIf(guiButton -> portalButtons.contains(guiButton));
         this.portalButtons.clear();
         this.visiblePortalInformations = tempInformations.size();
-        //int pointer = (int) ((tempInformations.size() / 7D) * scrolling);
+        int pointer = (int) (((tempInformations.size() - 7) * scrolling));
         currentlyShowing = tempInformations;
-        int pointer = 0;
         for (int i = pointer; i < pointer + 7; i++) {
             if (tempInformations.size() > i) {
                 int finalI = i;
@@ -101,7 +102,7 @@ public class PortalsScreen extends ScreenAddonScreen {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
                         if (isMouseOver(mouseX, mouseY)) {
-                            selectedPortal = currentlyShowing.get(finalI);
+                            selectedPortal = currentlyShowing.get(finalI + (int) (((currentlyShowing.size() - 7) * scrolling)));
                         }
                         super.onClick(mouseX, mouseY);
                     }
@@ -130,6 +131,7 @@ public class PortalsScreen extends ScreenAddonScreen {
 
     @Override
     public void renderBackground(int mouseX, int mouseY, float partialTicks) {
+        checkForScrolling(mouseX, mouseY);
         renderBackground();
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         blit(x, y, 0, 0, guiWidth, guiHeight);
@@ -158,4 +160,26 @@ public class PortalsScreen extends ScreenAddonScreen {
         return false;
     }
 
+    private void checkForScrolling(int mouseX, int mouseY) {
+        if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
+            if (!isDragging && mouseX > this.x + guiWidth - 22 && mouseX < this.x + guiWidth - 22 + 18 && mouseY > this.y + 10 && mouseY < this.y + 10 + 151) {
+                isDragging = true;
+            }
+            if (isDragging) {
+                mouseY -= (7 + 18 + this.y);
+                lastScrolling = scrolling;
+                scrolling = MathHelper.clamp(mouseY / 128D, 0, 1);
+                addPortalButtons();
+            }
+        } else {
+            isDragging = false;
+        }
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double z) {
+        scrolling = MathHelper.clamp(scrolling -= z / (currentlyShowing.size() - 7D), 0, 1);
+        addPortalButtons();
+        return true;
+    }
 }
