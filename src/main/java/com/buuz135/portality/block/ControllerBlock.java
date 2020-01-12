@@ -95,7 +95,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     }
 
     @Override
-    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
+    public ActionResultType onUse(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof ControllerTile) {
             ControllerTile controller = (ControllerTile) tile;
@@ -122,7 +122,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
                 return ActionResultType.SUCCESS;
             }
         }
-        return super.func_225533_a_(state, worldIn, pos, playerIn, hand, ray);
+        return super.onUse(state, worldIn, pos, playerIn, hand, ray);
     }
 
     @Override

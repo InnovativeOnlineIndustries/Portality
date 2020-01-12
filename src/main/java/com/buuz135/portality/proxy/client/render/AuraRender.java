@@ -30,7 +30,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
     }
 
     @Override
-    public void func_225628_a_(MatrixStack p_225628_1_, IRenderTypeBuffer p_225628_2_, int p_225628_3_, AbstractClientPlayerEntity entityIn, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_) {
+    public void render(MatrixStack p_225628_1_, IRenderTypeBuffer p_225628_2_, int p_225628_3_, AbstractClientPlayerEntity entityIn, float p_212842_2_, float p_212842_3_, float p_212842_4_, float p_212842_5_, float p_212842_6_, float p_212842_7_) {
         if (!ClientRewardStorage.REWARD_STORAGE.getRewards().containsKey(entityIn.getUniqueID())) return;
         if (!ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUniqueID()).getEnabled().containsKey(new ResourceLocation(Portality.MOD_ID, "aura")))
             return;
@@ -54,7 +54,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
         GameRenderer gamerenderer = Minecraft.getInstance().gameRenderer;
         RenderSystem.setupGui3DDiffuseLighting();
         modifyModelForPlayer(entityIn);
-        model.func_225597_a_(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_);
+        model.setAngles(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_);
         RenderSystem.matrixMode(5890);
         RenderSystem.loadIdentity();
         RenderSystem.matrixMode(5888);
@@ -65,7 +65,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
     }
 
     private void modifyModelForPlayer(AbstractClientPlayerEntity entityIn) {
-        model.field_228270_o_ = entityIn.isCrouching();
+        model.isSneaking = entityIn.isCrouching();
         ItemStack itemstack = entityIn.getHeldItemMainhand();
         ItemStack itemstack1 = entityIn.getHeldItemOffhand();
         BipedModel.ArmPose bipedmodel$armpose = this.getArmPose(entityIn, itemstack, itemstack1, Hand.MAIN_HAND);
