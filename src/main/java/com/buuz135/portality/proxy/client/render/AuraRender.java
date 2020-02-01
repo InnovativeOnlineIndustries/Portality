@@ -54,7 +54,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
         GameRenderer gamerenderer = Minecraft.getInstance().gameRenderer;
         RenderSystem.setupGui3DDiffuseLighting();
         modifyModelForPlayer(entityIn);
-        model.setAngles(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_);
+        //model.setAngles(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_); //TODO ROTATE MODEL
         RenderSystem.matrixMode(5890);
         RenderSystem.loadIdentity();
         RenderSystem.matrixMode(5888);
@@ -65,7 +65,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
     }
 
     private void modifyModelForPlayer(AbstractClientPlayerEntity entityIn) {
-        model.isSneaking = entityIn.isCrouching();
+        model.isSneak = entityIn.isCrouching();
         ItemStack itemstack = entityIn.getHeldItemMainhand();
         ItemStack itemstack1 = entityIn.getHeldItemOffhand();
         BipedModel.ArmPose bipedmodel$armpose = this.getArmPose(entityIn, itemstack, itemstack1, Hand.MAIN_HAND);

@@ -95,7 +95,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     }
 
     @Override
-    public ActionResultType onUse(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof ControllerTile) {
             ControllerTile controller = (ControllerTile) tile;
@@ -122,8 +122,9 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
                 return ActionResultType.SUCCESS;
             }
         }
-        return super.onUse(state, worldIn, pos, playerIn, hand, ray);
+        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, ray);
     }
+
 
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {

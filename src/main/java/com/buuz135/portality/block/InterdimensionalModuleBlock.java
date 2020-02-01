@@ -53,7 +53,7 @@ public class InterdimensionalModuleBlock extends FrameBlock<BasicFrameTile> impl
     }
 
     @Override
-    public ActionResultType onUse(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult ray) {
         return ActionResultType.FAIL;
     }
 

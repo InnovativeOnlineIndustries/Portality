@@ -59,7 +59,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             RenderSystem.disableBlend();
             RenderSystem.disableAlphaTest();
         })).build(true);
-        return RenderType.of("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
+        return RenderType.get("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
     }
 
     public void renderTop(MatrixStack stack, IVertexBuilder buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, Color color) {
@@ -92,11 +92,11 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
                 float xOffset = posX - 2f + frame + off + xTrans;
                 float yOffset = yTrans - off;
                 float zOffset = posZ + zTrans;
-                Matrix4f matrix = stack.peek().getModel();
-                buffer.vertex(matrix, pX2 + xOffset, yOffset, 0 + zOffset).texture(u2, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
-                buffer.vertex(matrix, pX1 + xOffset, yOffset, 0 + zOffset).texture(u, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
-                buffer.vertex(matrix, pX1 + xOffset, yOffset, 1 + zOffset).texture(u, 1).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
-                buffer.vertex(matrix, pX2 + xOffset, yOffset, 1 + zOffset).texture(u2, 1).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                Matrix4f matrix = stack.getLast().getPositionMatrix();
+                buffer.pos(matrix, pX2 + xOffset, yOffset, 0 + zOffset).tex(u2, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.pos(matrix, pX1 + xOffset, yOffset, 0 + zOffset).tex(u, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.pos(matrix, pX1 + xOffset, yOffset, 1 + zOffset).tex(u, 1).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
+                buffer.pos(matrix, pX2 + xOffset, yOffset, 1 + zOffset).tex(u2, 1).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
                 //tessellator.draw();
                 //RenderSystem.translated(-(posX - 2.1 + frame + off), 0, -posZ);
 
@@ -198,12 +198,12 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             matrixStack.push();
             String name = te.getLinkData().getName();
             matrixStack.translate(0.5, (double) 1.5f, 0.5D);
-            matrixStack.multiply(Minecraft.getInstance().getRenderManager().getRotation());
+            matrixStack.rotate(Minecraft.getInstance().getRenderManager().getCameraOrientation());
             matrixStack.scale(-0.025F, -0.025F, 0.025F);
-            float f1 = Minecraft.getInstance().gameSettings.func_216840_a(0.25F);
+            float f1 = Minecraft.getInstance().gameSettings.getTextBackgroundOpacity(0.25F);
             int j = (int) (f1 * 255.0F) << 24;
 
-            Minecraft.getInstance().fontRenderer.draw(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.peek().getModel(), typeBuffer, false, j, 15728880);
+            Minecraft.getInstance().fontRenderer.renderString(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.getLast().getPositionMatrix(), typeBuffer, false, j, 15728880);
             matrixStack.pop();
         }
         Direction facing = te.getWorld().getBlockState(te.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
@@ -212,18 +212,18 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             //RenderSystem.rotatef(-180, 0, 1, 0);
             z = -1;
             x = -1;
-            matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-180f));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(-180f));
         }
         if (facing == Direction.EAST) {
             //RenderSystem.translated(1, 0, 0);
             //RenderSystem.rotatef(-90, 0, 1, 0);
             z = -1;
-            matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-90f));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(-90f));
         }
         if (facing == Direction.WEST) {
             //RenderSystem.translated(0, 0, 1);
             x = -1;
-            matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(90f));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(90f));
             //RenderSystem.rotatef(90, 0, 1, 0);
         }
         if (facing == Direction.NORTH) {
@@ -237,23 +237,23 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         //RIGHT
         //RenderSystem.translated(3 - te.getWidth() + 2, 2.1, 0);
         //RenderSystem.rotatef(90, 0, 0, 1);
-        matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(90f));
+        matrixStack.rotate(Vector3f.ZP.rotationDegrees(90f));
         renderTop(matrixStack, buffer, te, frame, 2 + y, te.getWidth() - 1 - x, z, 0.2, te.getHeight() - 1, color);
-        matrixStack.multiply(Vector3f.NEGATIVE_Z.getDegreesQuaternion(90f));
+        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
         //RenderSystem.rotatef(-90, 0, 0, 1);
         //RenderSystem.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
         //LEFT
         //RenderSystem.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
         //RenderSystem.rotatef(-90, 0, 0, 1);
-        matrixStack.multiply(Vector3f.NEGATIVE_Z.getDegreesQuaternion(90f));
+        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
         renderTop(matrixStack, buffer, te, frame, 2 - te.getHeight() + y, te.getWidth() + x, z, 0, te.getHeight() - 1, color);
         //RenderSystem.rotatef(90, 0, 0, 1);
-        matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(90f));
+        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
         //RenderSystem.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
         //BOTTOM
         //RenderSystem.translated(0.9 + te.getWidth() - 2, 5, 0);
         //RenderSystem.rotatef(-180, 0, 0, 1);
-        matrixStack.multiply(Vector3f.NEGATIVE_Z.getDegreesQuaternion(180f));
+        //matrixStack.rotate(Vector3f.ZN.rotationDegrees(180f));
         renderTop(matrixStack, buffer, te, frame, -te.getWidth() - x + 1, -1 - y, z, 0.6, te.getWidth() * 2, color);
         //RenderSystem.rotatef(190, 0, 0, 1);180f));
         //RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);

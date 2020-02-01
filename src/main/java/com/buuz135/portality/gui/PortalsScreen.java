@@ -161,7 +161,7 @@ public class PortalsScreen extends ScreenAddonScreen {
     }
 
     private void checkForScrolling(int mouseX, int mouseY) {
-        if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
+        if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
             if (!isDragging && mouseX > this.x + guiWidth - 22 && mouseX < this.x + guiWidth - 22 + 18 && mouseY > this.y + 10 && mouseY < this.y + 10 + 151) {
                 isDragging = true;
             }

@@ -36,11 +36,11 @@ public class ClientProxy extends CommonProxy {
     public void onClient(Minecraft instance) {
         super.onClient(instance);
         ClientRegistry.bindTileEntityRenderer(CommonProxy.BLOCK_CONTROLLER.getTileEntityType(), TESRPortal::new);
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CONTROLLER, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_FRAME, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.getCutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CONTROLLER, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_FRAME, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.cutout());
     }
 }
