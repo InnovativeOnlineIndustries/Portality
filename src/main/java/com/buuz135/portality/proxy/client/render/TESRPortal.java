@@ -51,7 +51,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
     }
 
     public static RenderType createRenderType() {
-        RenderType.State state = RenderType.State.builder().texture(new RenderState.TextureState(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
+        RenderType.State state = RenderType.State.getBuilder().texture(new RenderState.TextureState(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
             RenderSystem.enableAlphaTest();
@@ -59,7 +59,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             RenderSystem.disableBlend();
             RenderSystem.disableAlphaTest();
         })).build(true);
-        return RenderType.get("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
+        return RenderType.makeType("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
     }
 
     public void renderTop(MatrixStack stack, IVertexBuilder buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, Color color) {
@@ -92,7 +92,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
                 float xOffset = posX - 2f + frame + off + xTrans;
                 float yOffset = yTrans - off;
                 float zOffset = posZ + zTrans;
-                Matrix4f matrix = stack.getLast().getPositionMatrix();
+                Matrix4f matrix = stack.getLast().getMatrix();
                 buffer.pos(matrix, pX2 + xOffset, yOffset, 0 + zOffset).tex(u2, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
                 buffer.pos(matrix, pX1 + xOffset, yOffset, 0 + zOffset).tex(u, 0).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
                 buffer.pos(matrix, pX1 + xOffset, yOffset, 1 + zOffset).tex(u, 1).color(color.getRed(), color.getGreen(), color.getBlue(), alpha).endVertex();
@@ -203,7 +203,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             float f1 = Minecraft.getInstance().gameSettings.getTextBackgroundOpacity(0.25F);
             int j = (int) (f1 * 255.0F) << 24;
 
-            Minecraft.getInstance().fontRenderer.renderString(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.getLast().getPositionMatrix(), typeBuffer, false, j, 15728880);
+            Minecraft.getInstance().fontRenderer.renderString(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.getLast().getMatrix(), typeBuffer, false, j, 15728880);
             matrixStack.pop();
         }
         Direction facing = te.getWorld().getBlockState(te.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
