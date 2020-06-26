@@ -43,8 +43,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -88,7 +88,7 @@ public class TeleportHandler {
                 continue;
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2D - 0.75, 0).offset(facing, controller.getLength() - 1);
-            Vec3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
+            Vector3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
             double distance = destinationPos.manhattanDistance(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
             destination = destination.subtract(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).scale((entry.getValue().time += 0.05) / distance);
             if (destinationPos.withinDistance(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 1.5)) {
@@ -129,7 +129,7 @@ public class TeleportHandler {
                 World tpWorld = entry.getKey().world;
                 if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock) {
                     Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
-                    Vec3d vec3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
+                    Vector3d Vector3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                     entry.getKey().setMotion(vec3d.x, vec3d.y, vec3d.z);
                     entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
                 }
