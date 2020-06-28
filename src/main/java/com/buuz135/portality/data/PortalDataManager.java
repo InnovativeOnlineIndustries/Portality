@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 
@@ -137,7 +136,7 @@ public class PortalDataManager extends WorldSavedData {
     @Nullable
     public static PortalDataManager getData(World world) {
         if (world instanceof ServerWorld) {
-            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(DimensionType.OVERWORLD);
+            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(World.field_234918_g_);
             PortalDataManager data = serverWorld.getSavedData().getOrCreate(PortalDataManager::new, NAME);
             //if (data == null) {
             //    data = new PortalDataManager();

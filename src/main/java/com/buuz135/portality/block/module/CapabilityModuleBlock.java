@@ -38,7 +38,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
@@ -58,7 +57,7 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
     @Override
     public void work(ControllerTile controller, BlockPos blockPos) {
         if (controller.getLinkData() == null) return;
-        TileEntity other = controller.getWorld().getServer().getWorld(DimensionType.getById(controller.getLinkData().getDimension())).getTileEntity(controller.getLinkData().getPos());
+        TileEntity other = controller.getWorld().getServer().getWorld(controller.getLinkData().getDimension()).getTileEntity(controller.getLinkData().getPos());
         if (other instanceof ControllerTile && this.isInput(controller.getWorld().getBlockState(blockPos))) {
             ControllerTile otherController = (ControllerTile) other;
             internalWork(controller.getWorld(), blockPos, other.getWorld(), otherController.getModules().stream().filter(pos -> otherController.getWorld().getBlockState(pos).getBlock() instanceof CapabilityModuleBlock

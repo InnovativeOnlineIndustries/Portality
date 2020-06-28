@@ -26,10 +26,11 @@ package com.buuz135.portality.network;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PortalCloseMessage extends Message {
@@ -37,8 +38,8 @@ public class PortalCloseMessage extends Message {
     private ResourceLocation dimension;
     private BlockPos pos;
 
-    public PortalCloseMessage(ResourceLocation dimension, BlockPos pos) {
-        this.dimension = dimension;
+    public PortalCloseMessage(RegistryKey<World> worldRegistryKey, BlockPos pos) {
+        this.dimension = worldRegistryKey.func_240901_a_();
         this.pos = pos;
     }
 
@@ -47,7 +48,7 @@ public class PortalCloseMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(DimensionType.byName(dimension));
+        World world = context.getSender().world.getServer().getWorld(RegistryKey.func_240903_a_(Registry.field_239699_ae_, dimension));
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).closeLink();

@@ -52,7 +52,7 @@ public class AuraRender extends LayerRenderer<AbstractClientPlayerEntity, Player
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         this.getEntityModel().setModelAttributes(model);
         GameRenderer gamerenderer = Minecraft.getInstance().gameRenderer;
-        RenderSystem.setupGui3DDiffuseLighting();
+        //RenderSystem.setupGui3DDiffuseLighting();
         modifyModelForPlayer(entityIn);
         //model.setAngles(entityIn, p_212842_2_, p_212842_3_, p_212842_5_, p_212842_6_, p_212842_7_); //TODO ROTATE MODEL
         RenderSystem.matrixMode(5890);

@@ -43,10 +43,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 
 import java.util.*;
@@ -88,16 +87,16 @@ public class TeleportHandler {
                 continue;
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2D - 0.75, 0).offset(facing, controller.getLength() - 1);
-            Vector3d destination = new Vec3d(destinationPos).add(0.5, 0, 0.5);
-            double distance = destinationPos.manhattanDistance(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
-            destination = destination.subtract(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).scale((entry.getValue().time += 0.05) / distance);
-            if (destinationPos.withinDistance(new Vec3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 1.5)) {
+            Vector3d destination = new Vector3d(destinationPos.getX(), destinationPos.getY(), destinationPos.getZ()).add(0.5, 0, 0.5);
+            double distance = destinationPos.manhattanDistance(new Vector3i(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()));
+            destination = destination.subtract(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()).scale((entry.getValue().time += 0.05) / distance);
+            if (destinationPos.withinDistance(new Vector3i(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()), 1.5)) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
-                        World tpWorld = entry.getKey().world.getServer().getWorld(DimensionType.getById(entry.getValue().data.getDimension()));
+                        World tpWorld = entry.getKey().world.getServer().getWorld(entry.getValue().data.getDimension());
                         Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
-                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), DimensionType.getById(entry.getValue().data.getDimension()), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
+                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergyForced(PortalityConfig.TELEPORT_ENERGY_AMOUNT);
                         if (entry.getKey() instanceof ServerPlayerEntity)
@@ -124,12 +123,12 @@ public class TeleportHandler {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
                 if (entry.getKey().world.isRemote)
-                    entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ(), entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vec3d(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 0.5f, 1f)));
+                    entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ(), entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vector3d(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()), 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock) {
                     Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
-                    Vector3d Vector3d = new Vec3d(tpFacing.getDirectionVec()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
+                    Vector3d vec3d = new Vector3d(tpFacing.getDirectionVec().getX(), tpFacing.getDirectionVec().getY(), tpFacing.getDirectionVec().getZ()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                     entry.getKey().setMotion(vec3d.x, vec3d.y, vec3d.z);
                     entry.getKey().setRotationYawHead(tpFacing.getHorizontalAngle());
                 }

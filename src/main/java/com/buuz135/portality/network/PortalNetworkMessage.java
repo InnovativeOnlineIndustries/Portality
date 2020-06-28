@@ -35,9 +35,8 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -48,17 +47,17 @@ public class PortalNetworkMessage {
 
     public static void sendInformationToPlayer(ServerPlayerEntity playerEntity, boolean interdimensional, BlockPos pos, int distance) {
         List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(playerEntity.world).getInformationList());
-        infos.removeIf(information -> information.getDimension() == playerEntity.getServerWorld().getDimension().getType().getId() && information.getLocation().equals(pos));
+        infos.removeIf(information -> information.getDimension().equals(playerEntity.getServerWorld().func_234923_W_()) && information.getLocation().equals(pos));
         infos.removeIf(information -> {
-            World world = playerEntity.getServer().getWorld(DimensionType.getById(information.getDimension()));
+            World world = playerEntity.getServer().getWorld(information.getDimension());
             return world.getTileEntity(information.getLocation()) instanceof ControllerTile && !((ControllerTile) world.getTileEntity(information.getLocation())).isFormed();
         });
-        infos.removeIf(information -> !interdimensional && playerEntity.getServerWorld().getDimension().getType().getId() != information.getDimension());
-        infos.removeIf(information -> interdimensional && playerEntity.getEntityWorld().getDimension().getType().getId() != information.getDimension() && !information.isInterdimensional());
+        infos.removeIf(information -> !interdimensional && !playerEntity.getServerWorld().func_234923_W_().equals(information.getDimension()));
+        infos.removeIf(information -> interdimensional && !playerEntity.getServerWorld().func_234923_W_().equals(information.getDimension()) && !information.isInterdimensional());
         infos.removeIf(information -> {
-            World world = playerEntity.getEntityWorld().getServer().getWorld(DimensionType.getById(information.getDimension()));
+            World world = playerEntity.getEntityWorld().getServer().getWorld(information.getDimension());
             TileEntity entity = world.getTileEntity(information.getLocation());
-            return entity instanceof ControllerTile && !interdimensional && (playerEntity.getEntityWorld().getDimension().getType().getId() != information.getDimension() || (!information.getLocation().withinDistance(new Vec3d(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().withinDistance(new Vec3i(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
+            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getServerWorld().func_234923_W_().equals(information.getDimension()) || (!information.getLocation().withinDistance(new Vector3d(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().withinDistance(new Vector3d(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
         });
         Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }

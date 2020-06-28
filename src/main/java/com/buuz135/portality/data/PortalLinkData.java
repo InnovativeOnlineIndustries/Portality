@@ -24,20 +24,24 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 public class PortalLinkData {
 
-    private int dimension;
+    private RegistryKey<World> dimension;
     private BlockPos pos;
     private boolean caller;
     private String name;
 
-    public PortalLinkData(int dimension, BlockPos pos, boolean caller) {
+    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller) {
         this(dimension, pos, caller, "");
     }
 
-    public PortalLinkData(int dimension, BlockPos pos, boolean caller, String name) {
+    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller, String name) {
         this.dimension = dimension;
         this.pos = pos;
         this.caller = caller;
@@ -45,10 +49,10 @@ public class PortalLinkData {
     }
 
     public static PortalLinkData readFromNBT(CompoundNBT compound) {
-        return new PortalLinkData(compound.getInt("Dimension"), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
+        return new PortalLinkData(RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
     }
 
-    public int getDimension() {
+    public RegistryKey<World> getDimension() {
         return dimension;
     }
 
@@ -70,7 +74,7 @@ public class PortalLinkData {
 
     public CompoundNBT writeToNBT() {
         CompoundNBT tagCompound = new CompoundNBT();
-        tagCompound.putInt("Dimension", dimension);
+        tagCompound.putString("Dimension", dimension.func_240901_a_().toString());
         tagCompound.putLong("Position", pos.toLong());
         tagCompound.putBoolean("Caller", caller);
         tagCompound.putString("Name", name);

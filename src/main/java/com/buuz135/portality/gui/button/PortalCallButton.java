@@ -31,6 +31,7 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
 import com.hrznstudio.titanium.client.screen.addon.interfaces.IClickable;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -58,9 +59,9 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
     }
 
     @Override
-    public void drawBackgroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackgroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        screen.blit(this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
+        screen.func_238474_b_(stack, this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
         this.guiX = guiX;
         this.guiY = guiY;
     }
@@ -81,16 +82,16 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
     }
 
     @Override
-    public void drawForegroundLayer(Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
-        screen.drawCenteredString(Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
+    public void drawForegroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
+        screen.func_238471_a_(stack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
     }
 
     @Override
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-        Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
+        Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.func_233580_cy_()));
         if (guiPortals.getSelectedPortal() != null) {
-            Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().getDimension().getType().getId(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
+            Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().func_234923_W_(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
             Minecraft.getInstance().displayGuiScreen(null);
         }
     }

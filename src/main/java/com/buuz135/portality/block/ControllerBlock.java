@@ -43,14 +43,12 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,7 +63,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.getDimension().getType().getId(), pos, "Dim: " + DimensionType.getKey(worldIn.getDimension().getType()).getPath() + " X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.func_234923_W_(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
         PortalDataManager.addInformation(worldIn, information);
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
@@ -101,15 +99,15 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
             ControllerTile controller = (ControllerTile) tile;
             if (!worldIn.isRemote()) {
                 if (!controller.isFormed()) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").setStyle(new Style().setColor(TextFormatting.RED)), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").func_240699_a_(TextFormatting.RED), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").setStyle(new Style().setColor(TextFormatting.RED)), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").func_240699_a_(TextFormatting.RED), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").setStyle(new Style().setColor(TextFormatting.RED)), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").func_240699_a_(TextFormatting.RED), true);
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                     return ActionResultType.SUCCESS;
                 }

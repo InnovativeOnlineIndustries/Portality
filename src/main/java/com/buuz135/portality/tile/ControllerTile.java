@@ -47,6 +47,7 @@ import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.energy.NBTEnergyHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,9 +60,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -175,8 +175,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
-                    TileEntity tileEntity = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension())).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || ((ControllerTile) tileEntity).getLinkData().getDimension() != this.world.getDimension().getType().getId() || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
+                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.func_234923_W_()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
                         this.closeLink();
                     }
                 }
@@ -225,7 +225,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
     }
 
     @Override
-    public void read(CompoundNBT compound) {
+    public void func_230337_a_(BlockState state, CompoundNBT compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
@@ -236,7 +236,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
-        super.read(compound);
+        super.func_230337_a_(state, compound);
     }
 
     public void breakController() {
@@ -324,14 +324,14 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
         if (linkData != null) return;
         if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
-            World world = this.world.getServer().getWorld(DimensionType.getById(data.getDimension()));
+            World world = this.world.getServer().getWorld(data.getDimension());
             TileEntity entity = world.getTileEntity(data.getPos());
             if (entity instanceof ControllerTile) {
                 data.setName(((ControllerTile) entity).getPortalDisplayName());
-                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimension().getType().getId(), this.pos, false, this.getPortalDisplayName()), type);
+                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.func_234923_W_(), this.pos, false, this.getPortalDisplayName()), type);
                 int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
                 if (entity.getWorld().equals(this.world)) {
-                    power = (int) this.pos.distanceSq(new Vec3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
+                    power = (int) this.pos.distanceSq(new Vector3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
                 }
                 this.getEnergyStorage().extractEnergy(power, false);
             }
@@ -343,7 +343,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
     public void closeLink() {
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.world, this.pos, false);
-            World world = this.world.getServer().getWorld(DimensionType.getById(linkData.getDimension()));
+            World world = this.world.getServer().getWorld(linkData.getDimension());
             TileEntity entity = world.getTileEntity(linkData.getPos());
             linkData = null;
             if (entity instanceof ControllerTile) {

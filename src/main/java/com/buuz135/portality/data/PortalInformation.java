@@ -25,7 +25,11 @@ package com.buuz135.portality.data;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import java.util.UUID;
 
@@ -36,12 +40,12 @@ public class PortalInformation {
     private String name;
     private boolean isActive;
     private boolean isPrivate;
-    private int dimension;
+    private RegistryKey<World> dimension;
     private BlockPos location;
     private ItemStack display;
     private boolean interdimensional;
 
-    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, int dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
+    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, RegistryKey<World> dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
         this.id = id;
         this.owner = owner;
         this.isActive = isActive;
@@ -55,7 +59,7 @@ public class PortalInformation {
 
     public static PortalInformation readFromNBT(CompoundNBT info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                info.getInt("Dimension"), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
+                RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
     }
 
     public UUID getId() {
@@ -82,7 +86,7 @@ public class PortalInformation {
         isPrivate = aPrivate;
     }
 
-    public int getDimension() {
+    public RegistryKey<World> getDimension() {
         return dimension;
     }
 
@@ -120,7 +124,7 @@ public class PortalInformation {
         infoTag.putUniqueId("Owner", getOwner());
         infoTag.putBoolean("Active", isActive());
         infoTag.putBoolean("Private", isPrivate());
-        infoTag.putInt("Dimension", getDimension());
+        infoTag.putString("Dimension", getDimension().func_240901_a_().toString());
         infoTag.putLong("Position", getLocation().toLong());
         infoTag.putString("Name", getName());
         infoTag.put("Display", display.serializeNBT());

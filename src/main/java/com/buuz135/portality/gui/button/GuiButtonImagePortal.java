@@ -27,8 +27,10 @@ package com.buuz135.portality.gui.button;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.PortalsScreen;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.renderer.RenderHelper;
@@ -48,29 +50,29 @@ public class GuiButtonImagePortal extends ImageButton {
     }
 
     @Override
-    public void renderButton(int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
+    public void func_230431_b_(MatrixStack stack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
         RenderSystem.color4f(1, 1, 1, 1);
-        super.renderButton(p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
+        super.func_230431_b_(stack, p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
         RenderSystem.pushMatrix();
-        RenderSystem.setupGui3DDiffuseLighting();
-        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), x + 5, y + 3);
+        //RenderSystem.setupGui3DDiffuseLighting();
+        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), field_230690_l_ + 5, field_230691_m_ + 3);
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         TextFormatting color = TextFormatting.RESET;
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.drawString(color + information.getName().substring(0, Math.min(information.getName().length(), 25)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
+        fontRenderer.func_238405_a_(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), field_230690_l_ + 28, 7 + field_230691_m_, func_231047_b_(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
         if (information.isPrivate()) {
             RenderSystem.disableDepthTest();
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/lock.png"));
-            blit(x + 4, y + 14, 0, 0, 8, 8, 8, 8);
+            AbstractGui.func_238463_a_(stack, field_230690_l_ + 4, field_230691_m_ + 14, 0, 0, 8, 8, 8, 8);
             RenderSystem.enableDepthTest();
         }
         RenderHelper.disableStandardItemLighting();
         if (portals.getSelectedPortal() == information) {
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-            blit(x, y, 0, 210, 157, 22);
+            Minecraft.getInstance().currentScreen.func_238474_b_(stack, field_230690_l_, field_230691_m_, 0, 210, 157, 22);
         }
         RenderSystem.popMatrix();
     }

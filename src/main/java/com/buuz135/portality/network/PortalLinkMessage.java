@@ -29,7 +29,6 @@ import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 
@@ -54,7 +53,7 @@ public class PortalLinkMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(DimensionType.getById(linkSender.getDimension()));
+        World world = context.getSender().world.getServer().getWorld(linkSender.getDimension());
         TileEntity tileEntity = world.getTileEntity(linkSender.getPos());
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[type]);
