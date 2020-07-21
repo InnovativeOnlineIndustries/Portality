@@ -42,10 +42,9 @@ import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
-import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
-import com.hrznstudio.titanium.energy.NBTEnergyHandler;
+import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -429,8 +428,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
     }
 
     @Override
-    protected IFactory<NBTEnergyHandler> getEnergyHandlerFactory() {
-        return () -> new NBTEnergyHandler(this, PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 0);
+    protected EnergyStorageComponent<ControllerTile> createEnergyStorage() {
+        return new EnergyStorageComponent<>(PortalityConfig.MAX_PORTAL_POWER, PortalityConfig.MAX_PORTAL_POWER_IN, 10, 20);
     }
 
     @OnlyIn(Dist.CLIENT)

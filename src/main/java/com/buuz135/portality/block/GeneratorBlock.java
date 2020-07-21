@@ -38,7 +38,8 @@ import javax.annotation.Nullable;
 public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
     public GeneratorBlock() {
-        super("generator", Block.Properties.create(Material.ROCK), LowEfficiencyGeneratorTile.class);
+        super(Block.Properties.create(Material.ROCK), LowEfficiencyGeneratorTile.class);
+        setRegistryName(Portality.MOD_ID, "generator");
         setItemGroup(Portality.TAB);
     }
 

@@ -44,7 +44,8 @@ import javax.annotation.Nullable;
 public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     public FrameBlock(String name, Class<T> tileClass) {
-        super(name, Block.Properties.create(Material.ROCK), tileClass);
+        super(Block.Properties.create(Material.ROCK), tileClass);
+        setRegistryName(Portality.MOD_ID, name);
         setItemGroup(Portality.TAB);
     }
 

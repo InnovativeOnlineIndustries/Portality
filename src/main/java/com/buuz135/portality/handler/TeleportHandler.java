@@ -98,7 +98,7 @@ public class TeleportHandler {
                         BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
                         Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
-                        controller.getEnergyStorage().extractEnergyForced(PortalityConfig.TELEPORT_ENERGY_AMOUNT);
+                        controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
                         if (entry.getKey() instanceof ServerPlayerEntity)
                             Portality.NETWORK.get().sendTo(new PortalTeleportMessage(tpFacing.getIndex(), controller.getLength()), ((ServerPlayerEntity) entry.getKey()).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
                         if (controller.teleportedEntity()) {

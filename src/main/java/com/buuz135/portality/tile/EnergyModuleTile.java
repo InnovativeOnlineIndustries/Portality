@@ -27,7 +27,7 @@ package com.buuz135.portality.tile;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.client.screen.addon.EnergyBarScreenAddon;
-import com.hrznstudio.titanium.energy.NBTEnergyHandler;
+import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -43,20 +43,25 @@ import javax.annotation.Nullable;
 public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
 
     @Save
-    private NBTEnergyHandler energyHandler;
-    private LazyOptional<IEnergyStorage> energyCap;
+    private final EnergyStorageComponent<EnergyModuleTile> energyStorage;
+    private final LazyOptional<IEnergyStorage> lazyEnergyStorage = LazyOptional.of(this::getEnergyStorage);
 
     public EnergyModuleTile() {
         super(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE);
-        this.energyHandler = new NBTEnergyHandler(this, 10000);
-        this.energyCap = LazyOptional.of(() -> this.energyHandler);
-        this.addGuiAddonFactory(() -> new EnergyBarScreenAddon(10, 20, energyHandler));
+        this.energyStorage = new EnergyStorageComponent<>(10000, 10000, 10000, 10, 20);
+        this.energyStorage.setComponentHarness(this.getSelf());
+        this.addGuiAddonFactory(() -> new EnergyBarScreenAddon(10, 20, energyStorage));
+    }
+
+    @Nonnull
+    public EnergyStorageComponent<EnergyModuleTile> getEnergyStorage() {
+        return energyStorage;
     }
 
     @Nonnull
     @Override
     public LazyOptional getCapability(@Nonnull Capability cap, @Nullable Direction side) {
-        if (cap == CapabilityEnergy.ENERGY) return energyCap.cast();
+        if (cap == CapabilityEnergy.ENERGY) return lazyEnergyStorage.cast();
         return super.getCapability(cap, side);
     }
 
@@ -68,9 +73,9 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
                 TileEntity checkingTile = this.world.getTileEntity(checking);
                 if (checkingTile != null) {
                     checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
-                        int energy = storage.receiveEnergy(Math.min(this.energyHandler.getEnergyStored(), 1000), false);
+                        int energy = storage.receiveEnergy(Math.min(this.energyStorage.getEnergyStored(), 1000), false);
                         if (energy > 0) {
-                            this.energyHandler.extractEnergy(energy, false);
+                            this.energyStorage.extractEnergy(energy, false);
                             return;
                         }
                     });

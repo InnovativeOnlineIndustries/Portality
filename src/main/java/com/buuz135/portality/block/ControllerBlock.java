@@ -57,7 +57,8 @@ import java.util.UUID;
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     public ControllerBlock() {
-        super("controller", Block.Properties.create(Material.ROCK), ControllerTile.class);
+        super(Block.Properties.create(Material.ROCK), ControllerTile.class);
+        setRegistryName(Portality.MOD_ID, "controller");
         setItemGroup(Portality.TAB);
     }
 
