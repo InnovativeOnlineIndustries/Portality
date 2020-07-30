@@ -127,7 +127,12 @@ public class Portality extends ModuleController {
         END(new ResourceLocation("textures/environment/end_sky.png"), true),
         CLOUDS(new ResourceLocation("textures/environment/clouds.png"), true),
         RAIN(new ResourceLocation("textures/environment/rain.png"), true),
-        SGA(new ResourceLocation("textures/font/ascii_sga.png"), true);
+        SGA(new ResourceLocation("textures/font/ascii_sga.png"), true),
+        ENCHANTED(new ResourceLocation("textures/misc/enchanted_item_glint.png"), true),
+        BARS(new ResourceLocation("textures/gui/bars.png"), true),
+        RECIPE_BOOK(new ResourceLocation("textures/gui/recipe_book.png"), true),
+        END_PORTAL(new ResourceLocation("textures/entity/end_portal.png"), true),
+        MOON(new ResourceLocation("textures/environment/moon_phases.png"), true);
 
         private final ResourceLocation resourceLocation;
         private final boolean enableBlend;
