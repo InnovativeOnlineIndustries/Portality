@@ -100,15 +100,15 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
             ControllerTile controller = (ControllerTile) tile;
             if (!worldIn.isRemote()) {
                 if (!controller.isFormed()) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").func_240699_a_(TextFormatting.RED), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").mergeStyle(TextFormatting.RED), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").func_240699_a_(TextFormatting.RED), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").mergeStyle(TextFormatting.RED), true);
                     return ActionResultType.SUCCESS;
                 }
                 if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").func_240699_a_(TextFormatting.RED), true);
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").mergeStyle(TextFormatting.RED), true);
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                     return ActionResultType.SUCCESS;
                 }

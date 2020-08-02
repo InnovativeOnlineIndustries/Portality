@@ -55,24 +55,24 @@ public class GuiButtonImagePortal extends ImageButton {
         super.renderButton(stack, p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
         RenderSystem.pushMatrix();
         //RenderSystem.setupGui3DDiffuseLighting();
-        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), field_230690_l_ + 5, field_230691_m_ + 3);
+        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), x + 5, y + 3);
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         TextFormatting color = TextFormatting.RESET;
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.drawStringWithShadow(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), field_230690_l_ + 28, 7 + field_230691_m_, func_231047_b_(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
         if (information.isPrivate()) {
             RenderSystem.disableDepthTest();
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/lock.png"));
-            AbstractGui.func_238463_a_(stack, field_230690_l_ + 4, field_230691_m_ + 14, 0, 0, 8, 8, 8, 8);
+            AbstractGui.blit(stack, x + 4, y + 14, 0, 0, 8, 8, 8, 8);
             RenderSystem.enableDepthTest();
         }
         RenderHelper.disableStandardItemLighting();
         if (portals.getSelectedPortal() == information) {
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-            Minecraft.getInstance().currentScreen.blit(stack, field_230690_l_, field_230691_m_, 0, 210, 157, 22);
+            Minecraft.getInstance().currentScreen.blit(stack, x, y, 0, 210, 157, 22);
         }
         RenderSystem.popMatrix();
     }

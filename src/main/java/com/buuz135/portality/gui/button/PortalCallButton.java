@@ -83,7 +83,7 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
 
     @Override
     public void drawForegroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
-        screen.func_238471_a_(stack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
+        screen.drawCenteredString(stack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action.getName()).getUnformattedComponentText(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
     }
 

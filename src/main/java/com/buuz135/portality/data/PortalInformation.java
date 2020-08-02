@@ -59,7 +59,7 @@ public class PortalInformation {
 
     public static PortalInformation readFromNBT(CompoundNBT info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
+                RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
     }
 
     public UUID getId() {

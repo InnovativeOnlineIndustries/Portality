@@ -48,7 +48,7 @@ public class PortalCloseMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(RegistryKey.func_240903_a_(Registry.field_239699_ae_, dimension));
+        World world = context.getSender().world.getServer().getWorld(RegistryKey.func_240903_a_(Registry.WORLD_KEY, dimension));
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).closeLink();

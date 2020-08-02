@@ -106,7 +106,7 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
     }
 
     @Override
-    public boolean func_231177_au__() {
+    public boolean isPauseScreen() {
         return false;
     }
 

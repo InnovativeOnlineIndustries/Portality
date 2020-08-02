@@ -49,7 +49,7 @@ public class PortalLinkData {
     }
 
     public static PortalLinkData readFromNBT(CompoundNBT compound) {
-        return new PortalLinkData(RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
+        return new PortalLinkData(RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
     }
 
     public RegistryKey<World> getDimension() {
