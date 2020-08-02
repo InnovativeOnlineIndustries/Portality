@@ -60,7 +60,7 @@ public class RenameControllerScreen extends Screen {
 
         confirm = new Button(width / 2 + textFieldWidth / 2 + 5, height / 2 - 10, 50, 18, new StringTextComponent("Confirm"), button -> {
             Portality.NETWORK.get().sendToServer(new PortalRenameMessage(textFieldWidget.getText(), controller.getPos()));
-            closeScreen();
+            Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
         });
         addButton(confirm);
     }
@@ -81,7 +81,6 @@ public class RenameControllerScreen extends Screen {
 
     @Override
     public void onClose() { //onClose
-        super.onClose();
-        Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
+
     }
 }

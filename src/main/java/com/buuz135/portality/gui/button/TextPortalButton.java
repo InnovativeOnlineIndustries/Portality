@@ -87,9 +87,9 @@ public class TextPortalButton extends ButtonComponent {
         @Override
         public void drawBackgroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
             super.drawBackgroundLayer(stack, screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
-            String string = new TranslationTextComponent(text).getUnformattedComponentText();
+            String string = new TranslationTextComponent(text).getString();
             TextFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? TextFormatting.YELLOW : TextFormatting.WHITE;
-            Minecraft.getInstance().fontRenderer.drawStringWithShadow(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
+            Minecraft.getInstance().fontRenderer.drawString(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
         }
 
         @Override

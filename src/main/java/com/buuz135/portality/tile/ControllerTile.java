@@ -98,7 +98,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
         this.display = true;
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
-
+        this.setShowEnergy(false);
         this.addButton(new PortalSettingButton(-22, 12, () -> () -> {
             OpenGui.open(1, ControllerTile.this);
         }, new StateButtonInfo(0, PortalSettingButton.RENAME, "portality.display.change_name")) {
