@@ -88,9 +88,9 @@ public class TeleportHandler {
             }
             BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2D - 0.75, 0).offset(facing, controller.getLength() - 1);
             Vector3d destination = new Vector3d(destinationPos.getX(), destinationPos.getY(), destinationPos.getZ()).add(0.5, 0, 0.5);
-            double distance = destinationPos.manhattanDistance(new Vector3i(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()));
-            destination = destination.subtract(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()).scale((entry.getValue().time += 0.05) / distance);
-            if (destinationPos.withinDistance(new Vector3i(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()), 1.5)) {
+            double distance = destinationPos.manhattanDistance(new Vector3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
+            destination = destination.subtract(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).scale((entry.getValue().time += 0.05) / distance);
+            if (destinationPos.withinDistance(new Vector3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 1.5)) {
                 if (!entry.getKey().world.isRemote) {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getServer().getWorld(entry.getValue().data.getDimension());
@@ -123,7 +123,7 @@ public class TeleportHandler {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
                 if (entry.getKey().world.isRemote)
-                    entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ(), entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vector3d(entry.getKey().func_233580_cy_().getX(), entry.getKey().func_233580_cy_().getY(), entry.getKey().func_233580_cy_().getZ()), 0.5f, 1f)));
+                    entry.getKey().world.getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ(), entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).grow(16)).forEach(entityPlayer -> entityPlayer.connection.sendPacket(new SPlaySoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundCategory.BLOCKS, new Vector3d(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()), 0.5f, 1f)));
                 entry.getValue().moved = true;
                 World tpWorld = entry.getKey().world;
                 if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock) {

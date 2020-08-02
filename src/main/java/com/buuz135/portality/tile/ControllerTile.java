@@ -224,7 +224,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
     }
 
     @Override
-    public void func_230337_a_(BlockState state, CompoundNBT compound) {
+    public void read(BlockState state, CompoundNBT compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
@@ -235,7 +235,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
-        super.func_230337_a_(state, compound);
+        super.read(state, compound);
     }
 
     public void breakController() {

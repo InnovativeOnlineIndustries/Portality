@@ -78,7 +78,7 @@ public class TickeableSound extends LocatableSound implements ITickableSound {
         if (world.getTileEntity(new BlockPos(x, y, z)) == null) {
             setDone();
         }
-        double distance = Minecraft.getInstance().player.func_233580_cy_().manhattanDistance(new BlockPos(this.x, this.y, this.z));
+        double distance = Minecraft.getInstance().player.getPosition().manhattanDistance(new BlockPos(this.x, this.y, this.z));
         if (distance > 16) {
             this.volume = 0;
         } else {

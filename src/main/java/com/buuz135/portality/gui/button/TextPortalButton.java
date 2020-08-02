@@ -89,12 +89,12 @@ public class TextPortalButton extends ButtonComponent {
             super.drawBackgroundLayer(stack, screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
             String string = new TranslationTextComponent(text).getUnformattedComponentText();
             TextFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? TextFormatting.YELLOW : TextFormatting.WHITE;
-            Minecraft.getInstance().fontRenderer.func_238405_a_(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
         }
 
         @Override
         public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-            Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.func_233580_cy_()));
+            Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
             if (tile instanceof ITileContainer) {
                 Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getPos()), getId(), new CompoundNBT()));
             }

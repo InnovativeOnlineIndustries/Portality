@@ -50,9 +50,9 @@ public class GuiButtonImagePortal extends ImageButton {
     }
 
     @Override
-    public void func_230431_b_(MatrixStack stack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
+    public void renderButton(MatrixStack stack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
         RenderSystem.color4f(1, 1, 1, 1);
-        super.func_230431_b_(stack, p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
+        super.renderButton(stack, p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
         RenderSystem.pushMatrix();
         //RenderSystem.setupGui3DDiffuseLighting();
         Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), field_230690_l_ + 5, field_230691_m_ + 3);
@@ -60,7 +60,7 @@ public class GuiButtonImagePortal extends ImageButton {
         TextFormatting color = TextFormatting.RESET;
         if (information.isPrivate()) color = TextFormatting.GOLD;
         if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.func_238405_a_(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), field_230690_l_ + 28, 7 + field_230691_m_, func_231047_b_(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), field_230690_l_ + 28, 7 + field_230691_m_, func_231047_b_(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
         if (information.isPrivate()) {
@@ -72,7 +72,7 @@ public class GuiButtonImagePortal extends ImageButton {
         RenderHelper.disableStandardItemLighting();
         if (portals.getSelectedPortal() == information) {
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-            Minecraft.getInstance().currentScreen.func_238474_b_(stack, field_230690_l_, field_230691_m_, 0, 210, 157, 22);
+            Minecraft.getInstance().currentScreen.blit(stack, field_230690_l_, field_230691_m_, 0, 210, 157, 22);
         }
         RenderSystem.popMatrix();
     }

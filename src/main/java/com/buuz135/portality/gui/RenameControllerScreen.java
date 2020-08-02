@@ -71,7 +71,7 @@ public class RenameControllerScreen extends Screen {
         super.func_230430_a_(matrixStack, p_render_1_, p_render_2_, p_render_3_);
         //textFieldWidget.render(p_render_1_, p_render_2_, p_render_3_);
         String rename = new TranslationTextComponent("portality.gui.controller.rename").getString();
-        Minecraft.getInstance().fontRenderer.func_238405_a_(matrixStack, rename, field_230708_k_ / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(rename) / 2, field_230709_l_ / 2 - 30, 0xFFFFFF);
+        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, rename, field_230708_k_ / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(rename) / 2, field_230709_l_ / 2 - 30, 0xFFFFFF);
     }
 
     //@Override

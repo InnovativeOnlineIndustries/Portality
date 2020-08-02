@@ -61,7 +61,7 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
     @Override
     public void drawBackgroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        screen.func_238474_b_(stack, this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
+        screen.blit(stack, this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
         this.guiX = guiX;
         this.guiY = guiY;
     }
@@ -89,7 +89,7 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
 
     @Override
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-        Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.func_233580_cy_()));
+        Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
         if (guiPortals.getSelectedPortal() != null) {
             Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().func_234923_W_(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
             Minecraft.getInstance().displayGuiScreen(null);

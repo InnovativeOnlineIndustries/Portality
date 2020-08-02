@@ -65,13 +65,13 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
         IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
         String name = new TranslationTextComponent(CommonProxy.BLOCK_CONTROLLER.getTranslationKey()).getString();
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        fontRenderer.func_238405_a_(stack, TextFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.getStringWidth(name) / 2, this.y + 3, 0x000000);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller.private") + " " + controller.isPrivate(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(controller.getLength()), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller.power") + " " + new DecimalFormat().format(controller.getEnergyStorage().getEnergyStored()) + " FE", this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
-        fontRenderer.func_238405_a_(stack, I18n.format("portality.gui.controller.link") + " " + (controller.isActive() ? I18n.format("portality.gui.controller.link_active") : I18n.format("portality.gui.controller.link_missing")), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, TextFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.getStringWidth(name) / 2, this.y + 3, 0x000000);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller.private") + " " + controller.isPrivate(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 1, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(controller.getLength()), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 2, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 3, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller.power") + " " + new DecimalFormat().format(controller.getEnergyStorage().getEnergyStored()) + " FE", this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 4, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(stack, I18n.format("portality.gui.controller.link") + " " + (controller.isActive() ? I18n.format("portality.gui.controller.link_active") : I18n.format("portality.gui.controller.link_missing")), this.x + 10, this.y + 21 + (fontRenderer.FONT_HEIGHT + 1) * 5, 0xFFFFFF);
         super.renderForeground(stack, mouseX, mouseY, partialTicks);
     }
 
@@ -93,7 +93,7 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
             public void drawBackgroundLayer(MatrixStack stack, Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
                 IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
                 Minecraft.getInstance().getTextureManager().bindTexture(background.getResourceLocation());
-                guiScreen.func_238474_b_(stack, x - 25, y + 9, 0, 110, 25, 97);
+                guiScreen.blit(stack, x - 25, y + 9, 0, 110, 25, 97);
             }
 
             @Override

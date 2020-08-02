@@ -133,10 +133,10 @@ public class PortalsScreen extends ScreenAddonScreen {
         checkForScrolling(mouseX, mouseY);
         this.func_238651_a_(stack, 0);
         Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        Minecraft.getInstance().currentScreen.func_238474_b_(stack, x, y, 0, 0, guiWidth, guiHeight);
-        Minecraft.getInstance().currentScreen.func_238474_b_(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
+        Minecraft.getInstance().currentScreen.blit(stack, x, y, 0, 0, guiWidth, guiHeight);
+        Minecraft.getInstance().currentScreen.blit(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
         super.renderBackground(stack, mouseX, mouseY, partialTicks);
-        textField.func_230431_b_(stack, mouseX, mouseY, partialTicks);
+        textField.renderButton(stack, mouseX, mouseY, partialTicks);
     }
 
     @Override
