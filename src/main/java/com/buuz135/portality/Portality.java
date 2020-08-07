@@ -80,6 +80,7 @@ public class Portality extends ModuleController {
         NETWORK.registerMessage(PortalCloseMessage.class);
         NETWORK.registerMessage(PortalTeleportMessage.class);
         NETWORK.registerMessage(PortalDisplayToggleMessage.class);
+        NETWORK.registerMessage(PortalChangeColorMessage.class);
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
         EventManager.mod(FMLCommonSetupEvent.class).process(this::onCommon).subscribe();
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClient).subscribe();

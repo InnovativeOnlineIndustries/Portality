@@ -28,6 +28,7 @@ import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.PortalLinkData;
+import com.buuz135.portality.gui.ChangeColorScreen;
 import com.buuz135.portality.gui.ControllerScreen;
 import com.buuz135.portality.gui.PortalsScreen;
 import com.buuz135.portality.gui.RenameControllerScreen;
@@ -40,6 +41,7 @@ import com.buuz135.portality.network.PortalNetworkMessage;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
+import com.buuz135.portality.proxy.client.IPortalColor;
 import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
@@ -68,7 +70,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
 
-public class ControllerTile extends PoweredTile<ControllerTile> {
+public class ControllerTile extends PoweredTile<ControllerTile> implements IPortalColor {
 
     private static String NBT_FORMED = "Formed";
     private static String NBT_LENGTH = "Length";
@@ -78,12 +80,14 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
     private static String NBT_LINK = "Link";
     private static String NBT_DISPLAY = "Display";
     private static String NBT_ONCE = "Once";
+    private static String NBT_COLOR = "Color";
 
     private boolean isFormed;
     private boolean onceCall;
     private boolean display;
     private PortalInformation information;
     private PortalLinkData linkData;
+    private int color;
 
     @OnlyIn(Dist.CLIENT)
     private TickeableSound sound;
@@ -96,6 +100,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
         this.isFormed = false;
         this.onceCall = false;
         this.display = true;
+        this.color = Integer.parseInt("0094ff", 16); //Default Blue
         this.teleportHandler = new TeleportHandler(this);
         this.structureHandler = new StructureHandler(this);
         this.setShowEnergy(false);
@@ -128,6 +133,14 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
             if (information.getOwner().equals(playerEntity.getUniqueID()))
                 setDisplayNameEnabled(!isDisplayNameEnabled());
         }).setId(3));
+        this.addButton(new PortalSettingButton(-22, 12 + 22 * 3, () -> () -> {
+            OpenGui.open(3, ControllerTile.this);
+        }, new StateButtonInfo(0, PortalSettingButton.CHANGE_COLOR, "portality.display.change_color")) {
+            @Override
+            public int getState() {
+                return 0;
+            }
+        }.setId(5));
         this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
                 .setClientConsumer(() -> screen -> {
                     OpenGui.open(2, ControllerTile.this);
@@ -218,6 +231,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
         compound.putInt(NBT_HEIGHT, structureHandler.getHeight());
         compound.putBoolean(NBT_ONCE, onceCall);
         compound.putBoolean(NBT_DISPLAY, display);
+        compound.putInt(NBT_COLOR, color);
         if (information != null) compound.put(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.put(NBT_LINK, linkData.writeToNBT());
         return compound;
@@ -235,6 +249,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
         display = compound.getBoolean(NBT_DISPLAY);
+        if (compound.contains(NBT_COLOR))
+            color = compound.getInt(NBT_COLOR);
         super.read(state, compound);
     }
 
@@ -413,6 +429,17 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
         return information;
     }
 
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+        structureHandler.getModules().stream().filter(blockPos -> this.world.getTileEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.world.getTileEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
+        structureHandler.getFrameBlocks().stream().filter(blockPos -> !(this.world.getTileEntity(blockPos) instanceof ControllerTile)).filter(blockPos -> this.world.getTileEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.world.getTileEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
+        markForUpdate();
+    }
+
     @OnlyIn(Dist.CLIENT)
     @Override
     public ActionResultType onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
@@ -444,6 +471,9 @@ public class ControllerTile extends PoweredTile<ControllerTile> {
                     return;
                 case 2:
                     Minecraft.getInstance().displayGuiScreen(new PortalsScreen(controller));
+                    return;
+                case 3:
+                    Minecraft.getInstance().displayGuiScreen(new ChangeColorScreen(controller));
                     return;
             }
         }

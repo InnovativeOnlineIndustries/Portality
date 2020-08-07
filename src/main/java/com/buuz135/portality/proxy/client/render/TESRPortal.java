@@ -58,10 +58,8 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         RenderType.State state = RenderType.State.getBuilder().texture(new RenderState.TextureState(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-            RenderSystem.enableAlphaTest();
         }, () -> {
             RenderSystem.disableBlend();
-            RenderSystem.disableAlphaTest();
         })).build(true);
         return RenderType.makeType("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
     }
@@ -71,7 +69,6 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         float y = 3.999f;
         float off = /*0.0278*/ 4 - y;
         //RenderSystem.scale(scale, 1, 1);
-        RenderSystem.enableAlphaTest();
         for (int posX = 0; posX < width; ++posX) {
             for (int posZ = 0; posZ < te.getLength(); ++posZ) {
                 //RenderSystem.translated(posX - 2.1 + frame + off, 0, posZ);
@@ -92,7 +89,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
                     pX1 = Math.max(1 - frame, 0);
                     u = 1 - 1 * frame;
                 }
-                int alpha = 150;
+                int alpha = 1;
                 float xOffset = posX - 2f + frame + off + xTrans;
                 float yOffset = yTrans - off;
                 float zOffset = posZ + zTrans;
@@ -191,7 +188,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         RenderSystem.pushMatrix();
         float frame = (te.getWorld().getGameTime() % 60) / 60f;
         //Color color = Color.getHSBColor((te.getWorld().getGameTime() % 360)/ 360f , 01f ,1f);
-        Color color = Color.CYAN;
+        Color color = new Color(te.getColor());
         //renderTop(stack, p_225616_4_.getBuffer(TYPE), te, frame,0,0, -0.6, te.getWidth() * 2);
         //this.func_228883_a_(te, lvt_10_1_, 0.15F, lvt_11_1_, p_225616_4_.getBuffer((RenderType)field_228881_e_.get(0)));
         int x = 0;

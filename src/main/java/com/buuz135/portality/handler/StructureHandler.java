@@ -89,6 +89,7 @@ public class StructureHandler {
                 TileEntity entity = this.controller.getWorld().getTileEntity(blockPos);
                 if (entity instanceof FrameTile) {
                     ((FrameTile) entity).setControllerPos(this.controller.getPos());
+                    ((FrameTile<?>) entity).setColor(this.controller.getColor());
                     entity.markDirty();
                 }
             }
@@ -170,5 +171,9 @@ public class StructureHandler {
 
     public List<BlockPos> getModules() {
         return modules;
+    }
+
+    public List<BlockPos> getFrameBlocks() {
+        return frameBlocks;
     }
 }

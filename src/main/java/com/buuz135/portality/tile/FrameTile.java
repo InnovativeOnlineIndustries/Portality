@@ -23,18 +23,21 @@
  */
 package com.buuz135.portality.tile;
 
+import com.buuz135.portality.proxy.client.IPortalColor;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
-public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
+public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> implements IPortalColor {
 
     private BlockPos controllerPos;
+    private int color;
 
     public FrameTile(BasicTileBlock<T> base) {
         super(base);
+        this.color = Integer.parseInt("0094ff", 16); //Default Blue
     }
 
     @Override
@@ -45,6 +48,7 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
             compound.putInt("Y", controllerPos.getY());
             compound.putInt("Z", controllerPos.getZ());
         }
+        compound.putInt("Color", color);
         return compound;
     }
 
@@ -54,6 +58,12 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
         if (compound.contains("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }
+        if (compound.contains("Color")) {
+            if (this.color != compound.getInt("Color") && this.world != null) {
+                this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), 1);
+            }
+            this.color = compound.getInt("Color");
+        }
     }
 
     public BlockPos getControllerPos() {
@@ -62,5 +72,14 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> {
 
     public void setControllerPos(BlockPos controllerPos) {
         this.controllerPos = controllerPos;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+        markForUpdate();
     }
 }

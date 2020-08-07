@@ -7,7 +7,7 @@
         "portality:blocks/frame/frame_overlay_ctm"
     ],
     "extra": {
-      "light": 13,
+      "light": 15,
       "connect_inside": true,
       "connect_to": [
          { "block": "portality:controller" },

@@ -22,6 +22,7 @@
   "portality.display.make_private": "Make Portal Private",
   "portality.display.hide_name": "Hide Name Display",
   "portality.display.show_name": "Show Name Display",
+  "portality.display.change_color": "Change Portal Color",
   "portality.gui.controller": "Name:",
   "portality.gui.controller.private": "Private:",
   "portality.gui.controller.max_distance": "Max Distance:",

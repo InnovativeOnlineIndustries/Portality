@@ -29,6 +29,7 @@ import com.hrznstudio.titanium.api.client.AssetTypes;
 import com.hrznstudio.titanium.api.client.IAsset;
 import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.api.client.assets.types.IBackgroundAsset;
+import com.hrznstudio.titanium.client.screen.asset.DefaultAssetProvider;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import net.minecraft.util.ResourceLocation;
 
@@ -151,6 +152,40 @@ public class PortalityAssetProvider implements IAssetProvider {
         }
     };
 
+    private final IAsset CHANGE_COLOR = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(176, 84, 20, 20);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return LOCATION;
+        }
+    };
+    private final IAsset HUE_PICKER = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(235, 21, 9, 14);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+        }
+    };
+    private final IAsset SHADER_PICKER = new IAsset() {
+        @Override
+        public Rectangle getArea() {
+            return new Rectangle(245, 21, 9, 9);
+        }
+
+        @Override
+        public ResourceLocation getResourceLocation() {
+            return new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+        }
+    };
+
     @Nullable
     @Override
     public <T extends IAsset> T getAsset(IAssetType<T> assetType) {
@@ -172,7 +207,12 @@ public class PortalityAssetProvider implements IAssetProvider {
             return assetType.castOrDefault(SEND);
         if (assetType == PortalSettingButton.RECEIVE)
             return assetType.castOrDefault(RECEIVE);
-
-        return null;
+        if (assetType == PortalSettingButton.CHANGE_COLOR)
+            return assetType.castOrDefault(CHANGE_COLOR);
+        if (assetType == AssetTypes.HUE_PICKER)
+            return assetType.castOrDefault(HUE_PICKER);
+        if (assetType == AssetTypes.SHADE_PICKER)
+            return assetType.castOrDefault(SHADER_PICKER);
+        return DefaultAssetProvider.DEFAULT_PROVIDER.getAsset(assetType);
     }
 }

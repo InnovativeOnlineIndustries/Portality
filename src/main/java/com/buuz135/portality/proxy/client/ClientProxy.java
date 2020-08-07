@@ -28,6 +28,7 @@ import com.buuz135.portality.proxy.client.render.TESRPortal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
@@ -42,5 +43,14 @@ public class ClientProxy extends CommonProxy {
         RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.getCutout());
         RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.getCutout());
         RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.getCutout());
+        Minecraft.getInstance().getBlockColors().register((state, world, pos, index) -> {
+            if (index == 0 && world != null) {
+                TileEntity tileEntity = world.getTileEntity(pos);
+                if (tileEntity instanceof IPortalColor) {
+                    return ((IPortalColor) tileEntity).getColor();
+                }
+            }
+            return -16739073;
+        }, CommonProxy.BLOCK_FRAME, CommonProxy.BLOCK_CONTROLLER, CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE);
     }
 }

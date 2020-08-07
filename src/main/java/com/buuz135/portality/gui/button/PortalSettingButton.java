@@ -57,6 +57,7 @@ public abstract class PortalSettingButton extends ButtonComponent {
     public static final IAssetType<IAsset> BOTH_DIRECTION = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
     public static final IAssetType<IAsset> SEND = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
     public static final IAssetType<IAsset> RECEIVE = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
+    public static final IAssetType<IAsset> CHANGE_COLOR = new GenericAssetType<>(IAssetProvider.DEFAULT_PROVIDER::getAsset, IAsset.class);
 
     private StateButtonInfo[] infos;
     private Supplier<Runnable> supplier;
