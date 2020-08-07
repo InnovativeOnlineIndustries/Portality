@@ -98,7 +98,7 @@ public class PortalsScreen extends ScreenAddonScreen {
         int pointer = (int) (((tempInformations.size() - 7) * scrolling));
         currentlyShowing = tempInformations;
         for (int i = pointer; i < pointer + 7; i++) {
-            if (tempInformations.size() > i) {
+            if (tempInformations.size() > i && i >= 0) {
                 int finalI = i;
                 GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, tempInformations.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
                     @Override
