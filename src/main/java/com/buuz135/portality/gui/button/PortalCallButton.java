@@ -91,7 +91,7 @@ public class PortalCallButton extends BasicScreenAddon implements IClickable {
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
         Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
         if (guiPortals.getSelectedPortal() != null) {
-            Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().func_234923_W_(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
+            Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getWorld().getDimensionKey(), controller.getPos(), true), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false)));
             Minecraft.getInstance().displayGuiScreen(null);
         }
     }

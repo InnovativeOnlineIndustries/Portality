@@ -26,6 +26,7 @@ package com.buuz135.portality.data;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
@@ -57,7 +58,7 @@ public class PortalDataManager extends WorldSavedData {
         }
     }
 
-    public static void removeInformation(World world, BlockPos blockPos) {
+    public static void removeInformation(IWorld world, BlockPos blockPos) {
         if (world instanceof ServerWorld) {
             PortalDataManager dataManager = getData(world);
             dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos));
@@ -134,9 +135,9 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     @Nullable
-    public static PortalDataManager getData(World world) {
+    public static PortalDataManager getData(IWorld world) {
         if (world instanceof ServerWorld) {
-            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(World.field_234918_g_);
+            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(World.OVERWORLD);
             PortalDataManager data = serverWorld.getSavedData().getOrCreate(PortalDataManager::new, NAME);
             //if (data == null) {
             //    data = new PortalDataManager();

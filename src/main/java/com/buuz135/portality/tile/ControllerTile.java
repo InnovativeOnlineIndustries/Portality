@@ -188,7 +188,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
                     TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.func_234923_W_()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.getDimensionKey()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
                         this.closeLink();
                     }
                 }
@@ -343,7 +343,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             TileEntity entity = world.getTileEntity(data.getPos());
             if (entity instanceof ControllerTile) {
                 data.setName(((ControllerTile) entity).getPortalDisplayName());
-                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.func_234923_W_(), this.pos, false, this.getPortalDisplayName()), type);
+                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimensionKey(), this.pos, false, this.getPortalDisplayName()), type);
                 int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
                 if (entity.getWorld().equals(this.world)) {
                     power = (int) this.pos.distanceSq(new Vector3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();

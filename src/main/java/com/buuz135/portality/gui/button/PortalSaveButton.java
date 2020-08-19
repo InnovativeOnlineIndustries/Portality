@@ -89,7 +89,7 @@ public class PortalSaveButton extends BasicScreenAddon implements IClickable {
     @Override
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
         Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
-        Portality.NETWORK.get().sendToServer(new PortalChangeColorMessage(controller.getWorld().func_234923_W_(), controller.getPos(), screen.getColor()));
+        Portality.NETWORK.get().sendToServer(new PortalChangeColorMessage(controller.getWorld().getDimensionKey(), controller.getPos(), screen.getColor()));
         Minecraft.getInstance().displayGuiScreen(null);
 
     }

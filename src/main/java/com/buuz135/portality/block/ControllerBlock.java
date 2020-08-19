@@ -64,7 +64,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.func_234923_W_(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.getDimensionKey(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
         PortalDataManager.addInformation(worldIn, information);
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
@@ -72,7 +72,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     @Override
     public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
         super.onPlayerDestroy(worldIn, pos, state);
-        PortalDataManager.removeInformation(worldIn.getWorld(), pos);
+        PortalDataManager.removeInformation(worldIn, pos);
     }
 
     @Override
