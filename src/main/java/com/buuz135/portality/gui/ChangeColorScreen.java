@@ -73,9 +73,9 @@ public class ChangeColorScreen extends ScreenAddonScreen {
         super.renderBackground(stack, mouseX, mouseY, partialTicks);
         textField.renderButton(stack, mouseX, mouseY, partialTicks);
         AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y - 1, -16739073);
-        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y + textField.getHeight(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x - 1, textField.y - 1, textField.y + textField.getHeight(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x + textField.getWidth(), textField.y - 1, textField.y + textField.getHeight(), -16739073);
+        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y + textField.getHeightRealms(), -16739073);
+        AssetUtil.drawVerticalLine(stack, textField.x - 1, textField.y - 1, textField.y + textField.getHeightRealms(), -16739073);
+        AssetUtil.drawVerticalLine(stack, textField.x + textField.getWidth(), textField.y - 1, textField.y + textField.getHeightRealms(), -16739073);
     }
 
     @Override
