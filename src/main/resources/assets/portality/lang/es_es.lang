@@ -1,0 +1,44 @@
+itemGroup.portality=Portality
+
+tile.portality:controller.name=Controlador del portal
+tile.portality:frame.name=Marco del portal
+tile.portality:module_interdimensional.name=Modulos de Interdimensional
+tile.portality:module_items.name=Modulo del Articulo
+tile.portality:module_fluids.name=Modulo del Fluido
+tile.portality:module_energy.name=Modulo del Energia
+
+portality.controller.error.size=ERROR: ¡Estructura del portal no válida!
+portality.controller.error.privacy=ERROR: ¡Este portal es privado!
+portility.controller.info.icon_changed=¡Icono del portal cambiado!
+
+portality.display.private=Privado
+portality.display.public=Publico
+portality.display.dial=Marcar
+portality.display.dial_once=Marcar una vez.
+portality.display.force=Force
+portality.display.call_portal=Portal de llamades
+portality.display.close_portal=Portal de cerrar 
+portality.display.change_name=Cambiar nombre portal.
+portality.display.make_public=Hacer público portal
+portality.display.make_private=Hacer que el portal sea privado
+portality.display.hide_name=Ocultar visualización de nombre
+portality.display.show_name=Mostrar visualización de nombre
+portality.gui.controller.name=Nombre:
+portality.gui.controller.private=Privido:
+portality.gui.controller.max_distance=Distancia maxima:
+portality.gui.controller.interdimensional=Interdimensional:
+portality.gui.controller.power=Poder:
+portality.gui.controller.link=Conectar:
+portality.gui.controller.link_active=Activito
+portality.gui.controller.link_missing=Perdido
+portality.gui.controller.rename=Nuevo nombre
+portality.gui.portals.previous_page=Página anterior
+portality.gui.portals.next_page=Página próxima
+portality.gui.portals.page=PAGE:
+module.type.output=Type: Salida
+module.type.input=Type: Entrar
+portality.display.copy_to_clipboard=Copiar ID del portal al portapapeles
+
+portality.manual=Manual del Portality
+portality.manual.category.basics=Basicos del Portal
+portality.manual.category.modules=Modulos del Portal
