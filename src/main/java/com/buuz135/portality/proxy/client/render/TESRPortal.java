@@ -30,6 +30,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderState;
@@ -210,7 +211,15 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
             Minecraft.getInstance().fontRenderer.renderString(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.getLast().getMatrix(), typeBuffer, false, j, 15728880);
             matrixStack.pop();
         }
-        Direction facing = te.getWorld().getBlockState(te.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
+        BlockState blockState = te.getWorld().getBlockState(te.getPos());
+        // Apparently with Optifine, this code path gets run after the Portal block
+        // has been destroyed, causing the BlockState to be an air block,
+        // which is missing the below property, causing a crash. If this property is missing,
+        // let's just silently fail.
+        if (!blockState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+            return;
+        }
+        Direction facing = blockState.get(ControllerBlock.FACING_HORIZONTAL);
         if (facing == Direction.SOUTH) {
             //RenderSystem.translated(1, 0, 1);
             //RenderSystem.rotatef(-180, 0, 1, 0);
