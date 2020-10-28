@@ -40,7 +40,7 @@ public class PortalChangeColorMessage extends Message {
     private int color;
 
     public PortalChangeColorMessage(RegistryKey<World> worldRegistryKey, BlockPos pos, int color) {
-        this.dimension = worldRegistryKey.func_240901_a_();
+        this.dimension = worldRegistryKey.getLocation();
         this.pos = pos;
         this.color = color;
     }
@@ -50,7 +50,7 @@ public class PortalChangeColorMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(RegistryKey.func_240903_a_(Registry.WORLD_KEY, dimension));
+        World world = context.getSender().world.getServer().getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimension));
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).setColor(color);

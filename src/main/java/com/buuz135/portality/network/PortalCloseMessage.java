@@ -39,7 +39,7 @@ public class PortalCloseMessage extends Message {
     private BlockPos pos;
 
     public PortalCloseMessage(RegistryKey<World> worldRegistryKey, BlockPos pos) {
-        this.dimension = worldRegistryKey.func_240901_a_();
+        this.dimension = worldRegistryKey.getLocation();
         this.pos = pos;
     }
 
@@ -48,7 +48,7 @@ public class PortalCloseMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(RegistryKey.func_240903_a_(Registry.WORLD_KEY, dimension));
+        World world = context.getSender().world.getServer().getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimension));
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).closeLink();
