@@ -187,9 +187,13 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
-                    TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                    if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.getDimensionKey()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                    if (this.world.getServer() == null || this.world.getServer().getWorld(linkData.getDimension()) == null){
                         this.closeLink();
+                    } else {
+                        TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
+                        if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.getDimensionKey()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                            this.closeLink();
+                        }
                     }
                 }
             }
