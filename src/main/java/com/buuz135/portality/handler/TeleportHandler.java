@@ -86,7 +86,7 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            BlockPos destinationPos = controller.getPos().add(0, controller.getHeight() / 2D - 0.75, 0).offset(facing, controller.getLength() - 1);
+            BlockPos destinationPos = controller.getPos().add(0.5, controller.getHeight() / 2D - 0.75, 0.5).offset(facing, controller.getLength() - 1);
             Vector3d destination = new Vector3d(destinationPos.getX(), destinationPos.getY(), destinationPos.getZ()).add(0.5, 0, 0.5);
             double distance = destinationPos.manhattanDistance(new Vector3i(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()));
             destination = destination.subtract(entry.getKey().getPosition().getX(), entry.getKey().getPosition().getY(), entry.getKey().getPosition().getZ()).scale((entry.getValue().time += 0.05) / distance);
@@ -95,7 +95,7 @@ public class TeleportHandler {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         World tpWorld = entry.getKey().world.getServer().getWorld(entry.getValue().data.getDimension());
                         Direction tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
-                        BlockPos pos = entry.getValue().data.getPos().offset(tpFacing);
+                        BlockPos pos = entry.getValue().data.getPos().offset(tpFacing, 2);
                         Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.getHorizontalAngle(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
