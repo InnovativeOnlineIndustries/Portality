@@ -50,7 +50,7 @@ public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHand
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
         current.getTileEntity(myself).getCapability(getCapability(), null).ifPresent(handler -> {
-            if (handler.drain(500, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
+            if (!handler.drain(500, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
                 for (BlockPos pos : compatibleBlockPos) {
                     TileEntity otherTile = otherWorld.getTileEntity(pos);
                     if (otherTile != null) {
