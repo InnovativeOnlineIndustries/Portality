@@ -50,7 +50,7 @@ public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
     public ModuleTile(BasicTileBlock<T> base) {
         super(base);
         this.input = true;
-        this.addButton(button = new ButtonComponent(153, 84, 18, 18) {
+        this.addButton(button = new ButtonComponent(153, 84, 14, 14) {
             @Override
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(button,
