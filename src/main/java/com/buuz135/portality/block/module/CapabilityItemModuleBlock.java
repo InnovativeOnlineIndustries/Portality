@@ -27,6 +27,7 @@ import com.buuz135.portality.tile.ItemModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -51,11 +52,11 @@ public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandle
 
     @Override
     void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getTileEntity(myself).getCapability(this.getCapability(), null).ifPresent(handlerSelf -> {
+        current.getTileEntity(myself).getCapability(this.getCapability(), Direction.UP).ifPresent(handlerSelf -> {
             for (BlockPos otherPos : compatibleBlockPos) {
                 TileEntity otherTile = otherWorld.getTileEntity(otherPos);
                 if (otherTile != null) {
-                    otherTile.getCapability(this.getCapability(), null).ifPresent(handlerOther -> {
+                    otherTile.getCapability(this.getCapability(), Direction.UP).ifPresent(handlerOther -> {
                         for (int i = 0; i < handlerSelf.getSlots(); i++) {
                             ItemStack stack = handlerSelf.getStackInSlot(i);
                             if (stack.isEmpty()) continue;
