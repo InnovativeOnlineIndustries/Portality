@@ -29,6 +29,7 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItemUseContext;
 
@@ -38,7 +39,7 @@ import javax.annotation.Nullable;
 public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
     public GeneratorBlock() {
-        super(Block.Properties.create(Material.ROCK), LowEfficiencyGeneratorTile.class);
+        super(Block.Properties.from(Blocks.IRON_BLOCK), LowEfficiencyGeneratorTile.class);
         setRegistryName(Portality.MOD_ID, "generator");
         setItemGroup(Portality.TAB);
     }

@@ -31,6 +31,7 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
@@ -44,7 +45,7 @@ import javax.annotation.Nullable;
 public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     public FrameBlock(String name, Class<T> tileClass) {
-        super(Block.Properties.create(Material.ROCK), tileClass);
+        super(Block.Properties.from(Blocks.IRON_BLOCK), tileClass);
         setRegistryName(Portality.MOD_ID, name);
         setItemGroup(Portality.TAB);
     }

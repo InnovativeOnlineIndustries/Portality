@@ -32,6 +32,7 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
@@ -57,7 +58,7 @@ import java.util.UUID;
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     public ControllerBlock() {
-        super(Block.Properties.create(Material.ROCK), ControllerTile.class);
+        super(Block.Properties.from(Blocks.IRON_BLOCK), ControllerTile.class);
         setRegistryName(Portality.MOD_ID, "controller");
         setItemGroup(Portality.TAB);
     }
