@@ -26,6 +26,7 @@ package com.buuz135.portality.network;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.data.TokenPortalInformation;
 import com.buuz135.portality.gui.PortalsScreen;
 import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.util.BlockPosUtils;
@@ -34,19 +35,30 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PortalNetworkMessage {
 
-    public static void sendInformationToPlayer(ServerPlayerEntity playerEntity, boolean interdimensional, BlockPos pos, int distance) {
-        List<PortalInformation> infos = new ArrayList<>(PortalDataManager.getData(playerEntity.world).getInformationList());
+    public static void sendInformationToPlayer(ServerPlayerEntity playerEntity, boolean interdimensional, BlockPos pos, int distance, HashMap<String, CompoundNBT> tokens) {
+        List<PortalInformation> infos = new ArrayList<>();
+        tokens.forEach((s, compoundNBT) -> {
+            infos.add(new TokenPortalInformation(playerEntity.getUniqueID(),
+                    RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compoundNBT.getString("Dimension"))),
+                    new BlockPos(compoundNBT.getInt("X"), compoundNBT.getInt("Y"), compoundNBT.getInt("Z")),
+                    s));
+        });
+        infos.addAll(PortalDataManager.getData(playerEntity.world).getInformationList());
         infos.removeIf(information -> information.getDimension().equals(playerEntity.getServerWorld().getDimensionKey()) && information.getLocation().equals(pos));
         infos.removeIf(information -> {
             World world = playerEntity.getServer().getWorld(information.getDimension());

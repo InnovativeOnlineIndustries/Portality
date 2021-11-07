@@ -44,6 +44,7 @@ public class PortalInformation {
     private BlockPos location;
     private ItemStack display;
     private boolean interdimensional;
+    private boolean isToken;
 
     public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, RegistryKey<World> dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
         this.id = id;
@@ -55,11 +56,12 @@ public class PortalInformation {
         this.name = name;
         this.display = display;
         this.interdimensional = interdimensional;
+        this.isToken = false;
     }
 
     public static PortalInformation readFromNBT(CompoundNBT info) {
         return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional"));
+                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional")).setToken(info.getBoolean("Token"));
     }
 
     public UUID getId() {
@@ -118,6 +120,15 @@ public class PortalInformation {
         this.interdimensional = interdimensional;
     }
 
+    public boolean isToken() {
+        return isToken;
+    }
+
+    public PortalInformation setToken(boolean token) {
+        isToken = token;
+        return this;
+    }
+
     public CompoundNBT writetoNBT() {
         CompoundNBT infoTag = new CompoundNBT();
         infoTag.putUniqueId("ID", getId());
@@ -129,6 +140,7 @@ public class PortalInformation {
         infoTag.putString("Name", getName());
         infoTag.put("Display", display.serializeNBT());
         infoTag.putBoolean("Interdimensional", interdimensional);
+        infoTag.putBoolean("Token", isToken());
         return infoTag;
     }
 

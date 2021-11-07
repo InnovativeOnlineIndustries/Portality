@@ -26,6 +26,7 @@ package com.buuz135.portality.block;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalDataManager;
 import com.buuz135.portality.data.PortalInformation;
+import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
@@ -109,7 +110,14 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
                     return ActionResultType.SUCCESS;
                 }
                 if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").mergeStyle(TextFormatting.RED), true);
+                    if (playerIn.getHeldItem(hand).getItem() instanceof TeleportationTokenItem){
+                        if (playerIn.getHeldItem(hand).hasTag()){
+                            controller.addTeleportationToken(playerIn.getHeldItem(hand));
+                            playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.added_token").mergeStyle(TextFormatting.GREEN), true);
+                        }
+                        return ActionResultType.SUCCESS;
+                    }
+                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").mergeStyle(TextFormatting.GREEN), true);
                     controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
                     return ActionResultType.SUCCESS;
                 }

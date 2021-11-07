@@ -40,6 +40,7 @@ import com.hrznstudio.titanium.reward.RewardManager;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -107,6 +108,7 @@ public class Portality extends ModuleController {
                         .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE)
                         .content(Block.class, CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE)
                         .content(Block.class, CommonProxy.BLOCK_GENERATOR)
+                        .content(Item.class, CommonProxy.TELEPORTATION_TOKEN_ITEM)
                         .content(SoundEvent.class, PortalitySoundHandler.PORTAL)
                         .content(SoundEvent.class, PortalitySoundHandler.PORTAL_TP)
                         .force()));

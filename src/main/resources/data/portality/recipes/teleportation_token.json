@@ -1,0 +1,23 @@
+
+{
+  "result": {
+    "item": "portality:teleportation_token"
+  },
+  "pattern": [
+    "fdf",
+    "dqd",
+    "fdf"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "f": {
+      "item": "portality:frame"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    },
+    "q": {
+      "item": "minecraft:ender_pearl"
+    }
+  }
+}

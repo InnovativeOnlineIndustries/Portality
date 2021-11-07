@@ -30,6 +30,7 @@ import com.buuz135.portality.block.InterdimensionalModuleBlock;
 import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
 import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
 import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
+import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.tile.BasicFrameTile;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.event.handler.EventManager;
@@ -50,6 +51,8 @@ public class CommonProxy {
     public static final CapabilityItemModuleBlock BLOCK_CAPABILITY_ITEM_MODULE = new CapabilityItemModuleBlock();
     public static final CapabilityFluidModuleBlock BLOCK_CAPABILITY_FLUID_MODULE = new CapabilityFluidModuleBlock();
     public static final CapabilityEnergyModuleBlock BLOCK_CAPABILITY_ENERGY_MODULE = new CapabilityEnergyModuleBlock();
+
+    public static final TeleportationTokenItem TELEPORTATION_TOKEN_ITEM = new TeleportationTokenItem();
 
     public void onCommon() {
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();

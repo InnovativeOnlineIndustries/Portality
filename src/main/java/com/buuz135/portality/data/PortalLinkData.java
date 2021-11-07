@@ -24,6 +24,7 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -36,20 +37,18 @@ public class PortalLinkData {
     private BlockPos pos;
     private boolean caller;
     private String name;
+    private boolean token;
 
-    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller) {
-        this(dimension, pos, caller, "");
-    }
-
-    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller, String name) {
+    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller, String name, boolean token) {
         this.dimension = dimension;
         this.pos = pos;
         this.caller = caller;
         this.name = name;
+        this.token = token;
     }
 
     public static PortalLinkData readFromNBT(CompoundNBT compound) {
-        return new PortalLinkData(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"));
+        return new PortalLinkData(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"), compound.getBoolean("Token"));
     }
 
     public RegistryKey<World> getDimension() {
@@ -72,12 +71,17 @@ public class PortalLinkData {
         this.name = name;
     }
 
+    public boolean isToken() {
+        return token;
+    }
+
     public CompoundNBT writeToNBT() {
         CompoundNBT tagCompound = new CompoundNBT();
         tagCompound.putString("Dimension", dimension.getLocation().toString());
         tagCompound.putLong("Position", pos.toLong());
         tagCompound.putBoolean("Caller", caller);
         tagCompound.putString("Name", name);
+        tagCompound.putBoolean("Token", token);
         return tagCompound;
     }
 

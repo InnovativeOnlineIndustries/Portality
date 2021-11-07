@@ -56,7 +56,7 @@ public class PortalLinkMessage extends Message {
         World world = context.getSender().world.getServer().getWorld(linkSender.getDimension());
         TileEntity tileEntity = world.getTileEntity(linkSender.getPos());
         if (tileEntity instanceof ControllerTile) {
-            ((ControllerTile) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true), PortalLinkData.PortalCallType.values()[type]);
+            ((ControllerTile) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true, linkSender.getName(), linkReceiver.isToken()), PortalLinkData.PortalCallType.values()[type]);
         }
     }
 

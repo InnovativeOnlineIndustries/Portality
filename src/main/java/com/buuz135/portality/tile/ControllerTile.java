@@ -67,8 +67,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ControllerTile extends PoweredTile<ControllerTile> implements IPortalColor {
 
@@ -81,6 +80,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private static String NBT_DISPLAY = "Display";
     private static String NBT_ONCE = "Once";
     private static String NBT_COLOR = "Color";
+    private static String NBT_TOKENS = "Tokens";
 
     private boolean isFormed;
     private boolean onceCall;
@@ -88,6 +88,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private PortalInformation information;
     private PortalLinkData linkData;
     private int color;
+    private HashMap<String, CompoundNBT> teleportationTokens;
 
     @OnlyIn(Dist.CLIENT)
     private TickeableSound sound;
@@ -97,6 +98,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
 
     public ControllerTile() {
         super(CommonProxy.BLOCK_CONTROLLER);
+        this.teleportationTokens = new LinkedHashMap<>();
         this.isFormed = false;
         this.onceCall = false;
         this.display = true;
@@ -146,7 +148,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     OpenGui.open(2, ControllerTile.this);
                 })
                 .setId(4)
-                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength())))
+                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
         );
         this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()).setId(5));
     }
@@ -189,7 +191,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
                     if (this.world.getServer() == null || this.world.getServer().getWorld(linkData.getDimension()) == null){
                         this.closeLink();
-                    } else {
+                    } else if (!linkData.isToken()){
                         TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
                         if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.getDimensionKey()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
                             this.closeLink();
@@ -205,7 +207,6 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     @Override
     public ControllerTile getSelf() {
         return this;
-
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -238,6 +239,11 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         compound.putInt(NBT_COLOR, color);
         if (information != null) compound.put(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.put(NBT_LINK, linkData.writeToNBT());
+        CompoundNBT tokens = new CompoundNBT();
+        for (String s : teleportationTokens.keySet()) {
+            tokens.put(s, teleportationTokens.get(s));
+        }
+        compound.put(NBT_TOKENS, tokens);
         return compound;
     }
 
@@ -255,6 +261,13 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         display = compound.getBoolean(NBT_DISPLAY);
         if (compound.contains(NBT_COLOR))
             color = compound.getInt(NBT_COLOR);
+        this.teleportationTokens = new LinkedHashMap<>();
+        if (compound.contains(NBT_TOKENS)){
+            CompoundNBT tokens = compound.getCompound(NBT_TOKENS);
+            for (String s : tokens.keySet()) {
+                this.teleportationTokens.put(s, tokens.getCompound(s));
+            }
+        }
         super.read(state, compound);
     }
 
@@ -343,17 +356,19 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         if (linkData != null) return;
         if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
-            World world = this.world.getServer().getWorld(data.getDimension());
-            TileEntity entity = world.getTileEntity(data.getPos());
-            if (entity instanceof ControllerTile) {
-                data.setName(((ControllerTile) entity).getPortalDisplayName());
-                ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimensionKey(), this.pos, false, this.getPortalDisplayName()), type);
-                int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
-                if (entity.getWorld().equals(this.world)) {
-                    power = (int) this.pos.distanceSq(new Vector3i(entity.getPos().getX(), entity.getPos().getZ(), entity.getPos().getY())) * structureHandler.getLength();
+            if (!data.isToken()){
+                World world = this.world.getServer().getWorld(data.getDimension());
+                TileEntity entity = world.getTileEntity(data.getPos());
+                if (entity instanceof ControllerTile) {
+                    data.setName(((ControllerTile) entity).getPortalDisplayName());
+                    ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimensionKey(), this.pos, false, this.getPortalDisplayName(), false), type);
                 }
-                this.getEnergyStorage().extractEnergy(power, false);
             }
+            int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
+            if (data.getDimension().getLocation().equals(this.world.getDimensionKey().getLocation())) {
+                power = (int) this.pos.distanceSq(data.getPos()) * structureHandler.getLength();
+            }
+            this.getEnergyStorage().extractEnergy(power, false);
         }
         PortalDataManager.setActiveStatus(this.world, this.pos, true);
         this.linkData = data;
@@ -362,14 +377,16 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     public void closeLink() {
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.world, this.pos, false);
-            World world = this.world.getServer().getWorld(linkData.getDimension());
-            if (world != null){
-                TileEntity entity = world.getTileEntity(linkData.getPos());
-                linkData = null;
-                if (entity instanceof ControllerTile) {
-                    ((ControllerTile) entity).closeLink();
+            if (!linkData.isToken()){
+                World world = this.world.getServer().getWorld(linkData.getDimension());
+                if (world != null){
+                    TileEntity entity = world.getTileEntity(linkData.getPos());
+                    if (entity instanceof ControllerTile) {
+                        ((ControllerTile) entity).closeLink();
+                    }
                 }
             }
+            linkData = null;
         }
         ChunkLoaderHandler.removePortalAsChunkloader(this);
     }
@@ -483,5 +500,15 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     return;
             }
         }
+    }
+
+    public boolean addTeleportationToken(ItemStack stack){
+        this.teleportationTokens.put(stack.getDisplayName().getString(), stack.getTag());
+        markForUpdate();
+        return true;
+    }
+
+    public HashMap<String, CompoundNBT> getTeleportationTokens() {
+        return teleportationTokens;
     }
 }
