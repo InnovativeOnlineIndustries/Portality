@@ -363,10 +363,12 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.world, this.pos, false);
             World world = this.world.getServer().getWorld(linkData.getDimension());
-            TileEntity entity = world.getTileEntity(linkData.getPos());
-            linkData = null;
-            if (entity instanceof ControllerTile) {
-                ((ControllerTile) entity).closeLink();
+            if (world != null){
+                TileEntity entity = world.getTileEntity(linkData.getPos());
+                linkData = null;
+                if (entity instanceof ControllerTile) {
+                    ((ControllerTile) entity).closeLink();
+                }
             }
         }
         ChunkLoaderHandler.removePortalAsChunkloader(this);
