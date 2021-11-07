@@ -113,9 +113,6 @@ afterEvaluate {
         options.compilerArgs << "-Xmaxerrs" << "2000"
     }
 }
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.9'
-}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
