@@ -54,4 +54,9 @@ public class TeleportationTokenItem extends BasicItem {
 
         }
     }
+
+    @Override
+    public boolean hasEffect(ItemStack stack) {
+        return stack.hasTag();
+    }
 }
