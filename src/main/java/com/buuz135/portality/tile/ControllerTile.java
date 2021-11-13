@@ -382,6 +382,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 if (world != null){
                     TileEntity entity = world.getTileEntity(linkData.getPos());
                     if (entity instanceof ControllerTile) {
+                        linkData = null;
                         ((ControllerTile) entity).closeLink();
                     }
                 }
