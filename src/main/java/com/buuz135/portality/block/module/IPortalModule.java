@@ -24,7 +24,7 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.ControllerTile;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface IPortalModule {
 

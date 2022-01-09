@@ -25,12 +25,12 @@ package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.ItemModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -51,10 +51,10 @@ public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandle
     }
 
     @Override
-    void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getTileEntity(myself).getCapability(this.getCapability(), Direction.UP).ifPresent(handlerSelf -> {
+    void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
+        current.getBlockEntity(myself).getCapability(this.getCapability(), Direction.UP).ifPresent(handlerSelf -> {
             for (BlockPos otherPos : compatibleBlockPos) {
-                TileEntity otherTile = otherWorld.getTileEntity(otherPos);
+                BlockEntity otherTile = otherWorld.getBlockEntity(otherPos);
                 if (otherTile != null) {
                     otherTile.getCapability(this.getCapability(), Direction.UP).ifPresent(handlerOther -> {
                         for (int i = 0; i < handlerSelf.getSlots(); i++) {
@@ -79,7 +79,7 @@ public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandle
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public BlockEntity newBlockEntity(BlockGetter worldIn) {
         return new ItemModuleTile();
     }
 }

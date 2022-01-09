@@ -25,12 +25,12 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PortalChangeColorMessage extends Message {
@@ -39,8 +39,8 @@ public class PortalChangeColorMessage extends Message {
     private BlockPos pos;
     private int color;
 
-    public PortalChangeColorMessage(RegistryKey<World> worldRegistryKey, BlockPos pos, int color) {
-        this.dimension = worldRegistryKey.getLocation();
+    public PortalChangeColorMessage(ResourceKey<Level> worldRegistryKey, BlockPos pos, int color) {
+        this.dimension = worldRegistryKey.location();
         this.pos = pos;
         this.color = color;
     }
@@ -50,8 +50,8 @@ public class PortalChangeColorMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, dimension));
-        TileEntity tileEntity = world.getTileEntity(pos);
+        Level world = context.getSender().level.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, dimension));
+        BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).setColor(color);
         }

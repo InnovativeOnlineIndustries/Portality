@@ -27,11 +27,10 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.tile.LowEfficiencyGeneratorTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +38,7 @@ import javax.annotation.Nullable;
 public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
     public GeneratorBlock() {
-        super(Block.Properties.from(Blocks.IRON_BLOCK), LowEfficiencyGeneratorTile.class);
+        super(Block.Properties.copy(Blocks.IRON_BLOCK), LowEfficiencyGeneratorTile.class);
         setRegistryName(Portality.MOD_ID, "generator");
         setItemGroup(Portality.TAB);
     }
@@ -57,8 +56,8 @@ public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING_HORIZONTAL, context.getPlacementHorizontalFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING_HORIZONTAL, context.getHorizontalDirection().getOpposite());
     }
 
 }

@@ -26,9 +26,9 @@ package com.buuz135.portality.tile;
 import com.buuz135.portality.proxy.client.IPortalColor;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> implements IPortalColor {
 
@@ -41,8 +41,8 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        compound = super.write(compound);
+    public CompoundTag save(CompoundTag compound) {
+        compound = super.save(compound);
         if (controllerPos != null) {
             compound.putInt("X", controllerPos.getX());
             compound.putInt("Y", controllerPos.getY());
@@ -53,14 +53,14 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundTag compound) {
+        super.load(state, compound);
         if (compound.contains("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }
         if (compound.contains("Color")) {
-            if (this.color != compound.getInt("Color") && this.world != null) {
-                this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), 1);
+            if (this.color != compound.getInt("Color") && this.level != null) {
+                this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 1);
             }
             this.color = compound.getInt("Color");
         }

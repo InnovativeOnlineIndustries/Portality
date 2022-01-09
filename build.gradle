@@ -23,19 +23,17 @@ plugins {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
+apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 
 def BUILD_NUMBER = System.getenv("COMMIT") ? "${project.api_version}-${System.getenv("COMMIT")}" : "${project.api_version}"
 version = "${minecraftVersion}-$BUILD_NUMBER"
 group = "com.buuz135"
 archivesBaseName = "portality"
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200916-1.16.2'
+    mappings channel: 'official', version: '1.18.1'
     runs {
         client = {
             // recommended logging data for a userdev environment
@@ -92,7 +90,8 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url 'https://cdn.hrzn.studio/maven/'
+        name 'jared maven'
+        url "https://maven.blamejared.com/"
     }
     maven {
         url "https://maven.tterrag.com/"
@@ -100,11 +99,14 @@ repositories {
     maven {
         url 'https://www.dogforce-games.com/maven/'
     }
+    maven {
+        url = "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.8'
-    implementation fg.deobf ('com.hrznstudio:titanium:1.16.5-3.2.8.2')
+    minecraft 'net.minecraftforge:forge:1.18.1-39.0.8'
+    implementation fg.deobf("curse.maven:titanium-287342:3346366")
     //runtimeOnly fg.deobf("team.chisel.ctm:CTM:MC1.16.1-+")
 }
 

@@ -29,15 +29,14 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.tile.FrameTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,21 +44,21 @@ import javax.annotation.Nullable;
 public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     public FrameBlock(String name, Class<T> tileClass) {
-        super(Block.Properties.from(Blocks.IRON_BLOCK), tileClass);
+        super(Block.Properties.copy(Blocks.IRON_BLOCK), tileClass);
         setRegistryName(Portality.MOD_ID, name);
         setItemGroup(Portality.TAB);
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
         if (tileEntity instanceof FrameTile && ((FrameTile) tileEntity).getControllerPos() != null) {
-            TileEntity controller = worldIn.getTileEntity(((FrameTile) tileEntity).getControllerPos());
+            BlockEntity controller = worldIn.getBlockEntity(((FrameTile) tileEntity).getControllerPos());
             if (controller instanceof ControllerTile) {
                 ((ControllerTile) controller).setShouldCheckForStructure(true);
             }
         }
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
     @Nonnull
@@ -81,12 +80,12 @@ public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public BlockEntity newBlockEntity(BlockGetter worldIn) {
         return new BasicFrameTile();
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 }

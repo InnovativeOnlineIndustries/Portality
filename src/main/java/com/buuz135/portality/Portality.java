@@ -37,14 +37,14 @@ import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
@@ -63,9 +63,9 @@ public class Portality extends ModuleController {
 
     public static final String MOD_ID = "portality";
     public static NetworkHandler NETWORK = new NetworkHandler(MOD_ID);
-    public static final ItemGroup TAB = new ItemGroup(MOD_ID) {
+    public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(CommonProxy.BLOCK_CONTROLLER);
         }
     };
@@ -157,7 +157,7 @@ public class Portality extends ModuleController {
     @OnlyIn(Dist.CLIENT)
     private void registerAura() {
         Minecraft instance = Minecraft.getInstance();
-        EntityRendererManager manager = instance.getRenderManager();
+        EntityRenderDispatcher manager = instance.getEntityRenderDispatcher();
         manager.getSkinMap().get("default").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
         manager.getSkinMap().get("slim").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
     }

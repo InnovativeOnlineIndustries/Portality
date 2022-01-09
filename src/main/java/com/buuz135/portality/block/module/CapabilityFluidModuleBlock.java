@@ -25,10 +25,10 @@ package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.FluidModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -48,11 +48,11 @@ public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHand
     }
 
     @Override
-    void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getTileEntity(myself).getCapability(getCapability(), null).ifPresent(handler -> {
+    void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
+        current.getBlockEntity(myself).getCapability(getCapability(), null).ifPresent(handler -> {
             if (!handler.drain(500, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
                 for (BlockPos pos : compatibleBlockPos) {
-                    TileEntity otherTile = otherWorld.getTileEntity(pos);
+                    BlockEntity otherTile = otherWorld.getBlockEntity(pos);
                     if (otherTile != null) {
                         otherTile.getCapability(getCapability(), null).ifPresent(otherHandler -> {
                             int filled = otherHandler.fill(handler.drain(500, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE);
@@ -72,7 +72,7 @@ public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHand
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public BlockEntity newBlockEntity(BlockGetter worldIn) {
         return new FluidModuleTile();
     }
 }

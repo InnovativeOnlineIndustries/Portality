@@ -24,28 +24,28 @@
 package com.buuz135.portality.handler;
 
 import com.buuz135.portality.tile.ControllerTile;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 
 public class ChunkLoaderHandler {
 
     public static void removePortalAsChunkloader(ControllerTile controller) {
-        World world = controller.getWorld();
-        if (world instanceof ServerWorld) {
-            ChunkPos chunkPos = world.getChunkAt(controller.getPos()).getPos();
-            ((ServerWorld) world).forceChunk(chunkPos.x, chunkPos.z, false);
+        Level world = controller.getLevel();
+        if (world instanceof ServerLevel) {
+            ChunkPos chunkPos = world.getChunkAt(controller.getBlockPos()).getPos();
+            ((ServerLevel) world).setChunkForced(chunkPos.x, chunkPos.z, false);
         }
     }
 
     public static void addPortalAsChunkloader(ControllerTile controller) {
-        World world = controller.getWorld();
-        if (world instanceof ServerWorld) {
-            ChunkPos chunkPos = world.getChunkAt(controller.getPos()).getPos();
-            if (!((ServerWorld) world).getForcedChunks().contains(chunkPos.asLong())) {
-                ((ServerWorld) world).forceChunk(chunkPos.x, chunkPos.z, true);
-                if (!world.isAreaLoaded(controller.getPos(), 2)) {
-                    world.getChunkAt(controller.getPos()).setLoaded(true);
+        Level world = controller.getLevel();
+        if (world instanceof ServerLevel) {
+            ChunkPos chunkPos = world.getChunkAt(controller.getBlockPos()).getPos();
+            if (!((ServerLevel) world).getForcedChunks().contains(chunkPos.toLong())) {
+                ((ServerLevel) world).setChunkForced(chunkPos.x, chunkPos.z, true);
+                if (!world.isAreaLoaded(controller.getBlockPos(), 2)) {
+                    world.getChunkAt(controller.getBlockPos()).setLoaded(true);
                 }
             }
         }

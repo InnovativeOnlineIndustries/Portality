@@ -25,9 +25,9 @@ package com.buuz135.portality.network;
 
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PortalPrivacyToggleMessage extends Message {
@@ -44,12 +44,12 @@ public class PortalPrivacyToggleMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        ServerPlayerEntity serverPlayer = context.getSender();
+        ServerPlayer serverPlayer = context.getSender();
         context.enqueueWork(() -> {
-            World world = serverPlayer.world;
-            if (world.getTileEntity(tileLocation) instanceof ControllerTile) {
-                ControllerTile controller = (ControllerTile) world.getTileEntity(tileLocation);
-                if (controller.getOwner().equals(serverPlayer.getUniqueID())) controller.togglePrivacy();
+            Level world = serverPlayer.level;
+            if (world.getBlockEntity(tileLocation) instanceof ControllerTile) {
+                ControllerTile controller = (ControllerTile) world.getBlockEntity(tileLocation);
+                if (controller.getOwner().equals(serverPlayer.getUUID())) controller.togglePrivacy();
             }
         });
     }

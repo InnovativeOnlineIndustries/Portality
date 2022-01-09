@@ -25,10 +25,10 @@ package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.EnergyModuleTile;
 import com.hrznstudio.titanium.api.IFactory;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -48,10 +48,10 @@ public class CapabilityEnergyModuleBlock extends CapabilityModuleBlock<IEnergySt
     }
 
     @Override
-    void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getTileEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
+    void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
+        current.getBlockEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
                 for (BlockPos pos : compatibleBlockPos) {
-                    TileEntity entity = otherWorld.getTileEntity(pos);
+                    BlockEntity entity = otherWorld.getBlockEntity(pos);
                     if (entity != null) {
                         entity.getCapability(getCapability()).ifPresent(otherStorage -> {
                             int energy = otherStorage.receiveEnergy(Math.min(storage.getEnergyStored(), 5000), false);
@@ -70,7 +70,7 @@ public class CapabilityEnergyModuleBlock extends CapabilityModuleBlock<IEnergySt
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public BlockEntity newBlockEntity(BlockGetter worldIn) {
         return new EnergyModuleTile();
     }
 }

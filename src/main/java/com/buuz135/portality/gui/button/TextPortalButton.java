@@ -32,15 +32,15 @@ import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -85,18 +85,18 @@ public class TextPortalButton extends ButtonComponent {
         }
 
         @Override
-        public void drawBackgroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+        public void drawBackgroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
             super.drawBackgroundLayer(stack, screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
-            String string = new TranslationTextComponent(text).getString();
-            TextFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? TextFormatting.YELLOW : TextFormatting.WHITE;
-            Minecraft.getInstance().fontRenderer.drawString(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
+            String string = new TranslatableComponent(text).getString();
+            ChatFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? ChatFormatting.YELLOW : ChatFormatting.WHITE;
+            Minecraft.getInstance().font.draw(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().font.width(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
         }
 
         @Override
         public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-            Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
+            Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 1f, 1f, Minecraft.getInstance().player.blockPosition()));
             if (tile instanceof ITileContainer) {
-                Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getPos()), getId(), new CompoundNBT()));
+                Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getBlockPos()), getId(), new CompoundTag()));
             }
             supplier.accept(tile);
         }

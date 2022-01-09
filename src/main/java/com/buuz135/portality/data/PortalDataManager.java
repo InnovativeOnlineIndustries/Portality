@@ -23,20 +23,20 @@
  */
 package com.buuz135.portality.data;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.saveddata.SavedData;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PortalDataManager extends WorldSavedData {
+public class PortalDataManager extends SavedData {
 
     public static final String NAME = "Portality";
     private List<PortalInformation> informationList;
@@ -50,24 +50,24 @@ public class PortalDataManager extends WorldSavedData {
         this(NAME);
     }
 
-    public static void addInformation(World world, PortalInformation information) {
-        if (world instanceof ServerWorld) {
+    public static void addInformation(Level world, PortalInformation information) {
+        if (world instanceof ServerLevel) {
             PortalDataManager dataManager = getData(world);
             dataManager.getInformationList().add(information);
-            dataManager.markDirty();
+            dataManager.setDirty();
         }
     }
 
-    public static void removeInformation(IWorld world, BlockPos blockPos) {
-        if (world instanceof ServerWorld) {
+    public static void removeInformation(LevelAccessor world, BlockPos blockPos) {
+        if (world instanceof ServerLevel) {
             PortalDataManager dataManager = getData(world);
             dataManager.getInformationList().removeIf(information1 -> information1.getLocation().equals(blockPos));
-            dataManager.markDirty();
+            dataManager.setDirty();
         }
     }
 
     @Nullable
-    public static PortalInformation getInfoFromID(World world, UUID uuid) {
+    public static PortalInformation getInfoFromID(Level world, UUID uuid) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getId().equals(uuid)) return information;
@@ -76,7 +76,7 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     @Nullable
-    public static PortalInformation getInfoFromPos(World world, BlockPos pos) {
+    public static PortalInformation getInfoFromPos(Level world, BlockPos pos) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) return information;
@@ -85,7 +85,7 @@ public class PortalDataManager extends WorldSavedData {
     }
 
     @Nullable
-    public static PortalInformation getInfoFromLink(World world, PortalLinkData data) {
+    public static PortalInformation getInfoFromLink(Level world, PortalLinkData data) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getDimension() == data.getDimension() && information.getLocation().equals(data.getPos()))
@@ -94,51 +94,51 @@ public class PortalDataManager extends WorldSavedData {
         return null;
     }
 
-    public static void setPortalPrivacy(World world, BlockPos pos, boolean privacy) {
+    public static void setPortalPrivacy(Level world, BlockPos pos, boolean privacy) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setPrivate(privacy);
-                dataManager.markDirty();
+                dataManager.setDirty();
             }
         }
     }
 
-    public static void setPortalName(World world, BlockPos pos, String name) {
+    public static void setPortalName(Level world, BlockPos pos, String name) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setName(name);
-                dataManager.markDirty();
+                dataManager.setDirty();
             }
         }
     }
 
-    public static void setPortalInterdimensional(World world, BlockPos pos, boolean interdimensional) {
+    public static void setPortalInterdimensional(Level world, BlockPos pos, boolean interdimensional) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setInterdimensional(interdimensional);
-                dataManager.markDirty();
+                dataManager.setDirty();
             }
         }
     }
 
-    public static void setPortalDisplay(World world, BlockPos pos, ItemStack stack) {
+    public static void setPortalDisplay(Level world, BlockPos pos, ItemStack stack) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setDisplay(stack);
-                dataManager.markDirty();
+                dataManager.setDirty();
             }
         }
     }
 
     @Nullable
-    public static PortalDataManager getData(IWorld world) {
-        if (world instanceof ServerWorld) {
-            ServerWorld serverWorld = ((ServerWorld) world).getServer().getWorld(World.OVERWORLD);
-            PortalDataManager data = serverWorld.getSavedData().getOrCreate(PortalDataManager::new, NAME);
+    public static PortalDataManager getData(LevelAccessor world) {
+        if (world instanceof ServerLevel) {
+            ServerLevel serverWorld = ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD);
+            PortalDataManager data = serverWorld.getDataStorage().computeIfAbsent(PortalDataManager::new, NAME);
             //if (data == null) {
             //    data = new PortalDataManager();
             //    world.getMapStorage().func_212424_a(world.getDimension().getType(), NAME, data);
@@ -148,29 +148,29 @@ public class PortalDataManager extends WorldSavedData {
         return null;
     }
 
-    public static void setActiveStatus(World world, BlockPos pos, boolean active) {
+    public static void setActiveStatus(Level world, BlockPos pos, boolean active) {
         PortalDataManager dataManager = getData(world);
         for (PortalInformation information : dataManager.getInformationList()) {
             if (information.getLocation().equals(pos)) {
                 information.setActive(active);
-                dataManager.markDirty();
+                dataManager.setDirty();
             }
         }
     }
 
     @Override
-    public void read(CompoundNBT nbt) {
+    public void load(CompoundTag nbt) {
         informationList.clear();
-        CompoundNBT root = nbt.getCompound(NAME);
-        for (String key : root.keySet()) {
-            CompoundNBT info = root.getCompound(key);
+        CompoundTag root = nbt.getCompound(NAME);
+        for (String key : root.getAllKeys()) {
+            CompoundTag info = root.getCompound(key);
             informationList.add(PortalInformation.readFromNBT(info));
         }
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag save(CompoundTag compound) {
+        CompoundTag tag = new CompoundTag();
         for (PortalInformation information : informationList) {
             tag.put(information.getId().toString(), information.writetoNBT());
         }

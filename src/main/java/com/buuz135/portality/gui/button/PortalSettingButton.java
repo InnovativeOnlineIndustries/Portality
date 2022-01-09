@@ -37,11 +37,11 @@ import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -78,9 +78,9 @@ public abstract class PortalSettingButton extends ButtonComponent {
 
             @Override
             public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-                Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
+                Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 1f, 1f, Minecraft.getInstance().player.blockPosition()));
                 if (tile instanceof ITileContainer) {
-                    Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getPos()), getId(), new CompoundNBT()));
+                    Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getBlockPos()), getId(), new CompoundTag()));
                 }
                 supplier.get().run();
             }

@@ -26,7 +26,7 @@ package com.buuz135.portality.tile;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
-import net.minecraft.item.DyeColor;
+import net.minecraft.world.item.DyeColor;
 
 import javax.annotation.Nonnull;
 

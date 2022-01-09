@@ -47,27 +47,29 @@ import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class ControllerTile extends PoweredTile<ControllerTile> implements IPortalColor {
 
@@ -88,7 +90,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private PortalInformation information;
     private PortalLinkData linkData;
     private int color;
-    private HashMap<String, CompoundNBT> teleportationTokens;
+    private HashMap<String, CompoundTag> teleportationTokens;
 
     @OnlyIn(Dist.CLIENT)
     private TickeableSound sound;
@@ -122,7 +124,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 return information != null && information.isPrivate() ? 1 : 0;
             }
         }.setPredicate((playerEntity, compoundNBT) -> {
-            if (information.getOwner().equals(playerEntity.getUniqueID())) togglePrivacy();
+            if (information.getOwner().equals(playerEntity.getUUID())) togglePrivacy();
         }).setId(2));
 
         this.addButton(new PortalSettingButton(-22, 12 + 22 * 2, () -> () -> {
@@ -132,7 +134,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 return display ? 0 : 1;
             }
         }.setPredicate((playerEntity, compoundNBT) -> {
-            if (information.getOwner().equals(playerEntity.getUniqueID()))
+            if (information.getOwner().equals(playerEntity.getUUID()))
                 setDisplayNameEnabled(!isDisplayNameEnabled());
         }).setId(3));
         this.addButton(new PortalSettingButton(-22, 12 + 22 * 3, () -> () -> {
@@ -148,7 +150,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     OpenGui.open(2, ControllerTile.this);
                 })
                 .setId(4)
-                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayerEntity) playerEntity, isInterdimensional(), getPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
+                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayer) playerEntity, isInterdimensional(), getBlockPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
         );
         this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()).setId(5));
     }
@@ -158,15 +160,15 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         if (isActive()) {
             teleportHandler.tick();
             if (linkData != null) {
-                for (Entity entity : this.world.getEntitiesWithinAABB(Entity.class, getPortalArea())) {
+                for (Entity entity : this.level.getEntitiesOfClass(Entity.class, getPortalArea())) {
                     teleportHandler.addEntityToTeleport(entity, linkData);
                 }
             }
         }
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             workModules();
         }
-        if (world.isRemote) {
+        if (level.isClientSide) {
             tickSound();
             return;
         }
@@ -176,7 +178,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 closeLink();
             }
         }
-        if (this.world.getGameTime() % 10 == 0) {
+        if (this.level.getGameTime() % 10 == 0) {
             if (structureHandler.shouldCheckForStructure()) {
                 this.isFormed = structureHandler.checkArea();
                 if (this.isFormed) {
@@ -189,11 +191,11 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 getPortalInfo();
                 if (linkData != null) {
                     ChunkLoaderHandler.addPortalAsChunkloader(this);
-                    if (this.world.getServer() == null || this.world.getServer().getWorld(linkData.getDimension()) == null){
+                    if (this.level.getServer() == null || this.level.getServer().getLevel(linkData.getDimension()) == null){
                         this.closeLink();
                     } else if (!linkData.isToken()){
-                        TileEntity tileEntity = this.world.getServer().getWorld(linkData.getDimension()).getTileEntity(linkData.getPos());
-                        if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.world.getDimensionKey()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.pos)) {
+                        BlockEntity tileEntity = this.level.getServer().getLevel(linkData.getDimension()).getBlockEntity(linkData.getPos());
+                        if (!(tileEntity instanceof ControllerTile) || ((ControllerTile) tileEntity).getLinkData() == null || !((ControllerTile) tileEntity).getLinkData().getDimension().equals(this.level.dimension()) || !((ControllerTile) tileEntity).getLinkData().getPos().equals(this.worldPosition)) {
                             this.closeLink();
                         }
                     }
@@ -213,7 +215,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private void tickSound() {
         if (isActive()) {
             if (sound == null) {
-                Minecraft.getInstance().getSoundHandler().play(sound = new TickeableSound(this.world, this.pos, PortalitySoundHandler.PORTAL));
+                Minecraft.getInstance().getSoundManager().play(sound = new TickeableSound(this.level, this.worldPosition, PortalitySoundHandler.PORTAL));
             } else {
                 sound.increase();
             }
@@ -228,8 +230,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        compound = super.write(compound);
+    public CompoundTag save(CompoundTag compound) {
+        compound = super.save(compound);
         compound.putBoolean(NBT_FORMED, isFormed);
         compound.putInt(NBT_LENGTH, structureHandler.getLength());
         compound.putInt(NBT_WIDTH, structureHandler.getWidth());
@@ -239,7 +241,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         compound.putInt(NBT_COLOR, color);
         if (information != null) compound.put(NBT_PORTAL, information.writetoNBT());
         if (linkData != null) compound.put(NBT_LINK, linkData.writeToNBT());
-        CompoundNBT tokens = new CompoundNBT();
+        CompoundTag tokens = new CompoundTag();
         for (String s : teleportationTokens.keySet()) {
             tokens.put(s, teleportationTokens.get(s));
         }
@@ -248,7 +250,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
+    public void load(BlockState state, CompoundTag compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
@@ -263,12 +265,12 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             color = compound.getInt(NBT_COLOR);
         this.teleportationTokens = new LinkedHashMap<>();
         if (compound.contains(NBT_TOKENS)){
-            CompoundNBT tokens = compound.getCompound(NBT_TOKENS);
-            for (String s : tokens.keySet()) {
+            CompoundTag tokens = compound.getCompound(NBT_TOKENS);
+            for (String s : tokens.getAllKeys()) {
                 this.teleportationTokens.put(s, tokens.getCompound(s));
             }
         }
-        super.read(state, compound);
+        super.load(state, compound);
     }
 
     public void breakController() {
@@ -279,36 +281,36 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private void workModules() {
         boolean interdimensional = false;
         for (BlockPos pos : structureHandler.getModules()) {
-            Block block = this.world.getBlockState(pos).getBlock();
+            Block block = this.level.getBlockState(pos).getBlock();
             if (block instanceof IPortalModule) {
                 if (((IPortalModule) block).allowsInterdimensionalTravel()) interdimensional = true;
                 if (isActive()) ((IPortalModule) block).work(this, pos);
             }
         }
-        PortalDataManager.setPortalInterdimensional(this.world, this.pos, interdimensional);
+        PortalDataManager.setPortalInterdimensional(this.level, this.worldPosition, interdimensional);
     }
 
-    public AxisAlignedBB getPortalArea() {
-        if (!(world.getBlockState(this.pos).getBlock() instanceof ControllerBlock))
-            return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        Direction facing = world.getBlockState(this.pos).get(ControllerBlock.FACING_HORIZONTAL);
-        BlockPos corner1 = this.pos.offset(facing.rotateY(), structureHandler.getWidth()).offset(Direction.UP);
-        BlockPos corner2 = this.pos.offset(facing.rotateYCCW(), structureHandler.getWidth()).offset(Direction.UP, structureHandler.getHeight() - 1).offset(facing.getOpposite(), structureHandler.getLength() - 1);
-        return new AxisAlignedBB(corner1, corner2);
+    public AABB getPortalArea() {
+        if (!(level.getBlockState(this.worldPosition).getBlock() instanceof ControllerBlock))
+            return new AABB(0, 0, 0, 0, 0, 0);
+        Direction facing = level.getBlockState(this.worldPosition).getValue(ControllerBlock.FACING_HORIZONTAL);
+        BlockPos corner1 = this.worldPosition.relative(facing.getClockWise(), structureHandler.getWidth()).relative(Direction.UP);
+        BlockPos corner2 = this.worldPosition.relative(facing.getCounterClockWise(), structureHandler.getWidth()).relative(Direction.UP, structureHandler.getHeight() - 1).relative(facing.getOpposite(), structureHandler.getLength() - 1);
+        return new AABB(corner1, corner2);
     }
 
     @Override
-    public AxisAlignedBB getRenderBoundingBox() {
+    public AABB getRenderBoundingBox() {
         return getPortalArea();
     }
 
     private void getPortalInfo() {
-        information = PortalDataManager.getInfoFromPos(this.world, this.pos);
+        information = PortalDataManager.getInfoFromPos(this.level, this.worldPosition);
         markForUpdate();
     }
 
     public void togglePrivacy() {
-        PortalDataManager.setPortalPrivacy(this.world, this.pos, !information.isPrivate());
+        PortalDataManager.setPortalPrivacy(this.level, this.worldPosition, !information.isPrivate());
         getPortalInfo();
         markForUpdate();
     }
@@ -357,30 +359,30 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         if (type == PortalLinkData.PortalCallType.SINGLE) onceCall = true;
         if (data.isCaller()) {
             if (!data.isToken()){
-                World world = this.world.getServer().getWorld(data.getDimension());
-                TileEntity entity = world.getTileEntity(data.getPos());
+                Level world = this.level.getServer().getLevel(data.getDimension());
+                BlockEntity entity = world.getBlockEntity(data.getPos());
                 if (entity instanceof ControllerTile) {
                     data.setName(((ControllerTile) entity).getPortalDisplayName());
-                    ((ControllerTile) entity).linkTo(new PortalLinkData(this.world.getDimensionKey(), this.pos, false, this.getPortalDisplayName(), false), type);
+                    ((ControllerTile) entity).linkTo(new PortalLinkData(this.level.dimension(), this.worldPosition, false, this.getPortalDisplayName(), false), type);
                 }
             }
             int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
-            if (data.getDimension().getLocation().equals(this.world.getDimensionKey().getLocation())) {
-                power = (int) this.pos.distanceSq(data.getPos()) * structureHandler.getLength();
+            if (data.getDimension().location().equals(this.level.dimension().location())) {
+                power = (int) this.worldPosition.distSqr(data.getPos()) * structureHandler.getLength();
             }
             this.getEnergyStorage().extractEnergy(power, false);
         }
-        PortalDataManager.setActiveStatus(this.world, this.pos, true);
+        PortalDataManager.setActiveStatus(this.level, this.worldPosition, true);
         this.linkData = data;
     }
 
     public void closeLink() {
         if (linkData != null) {
-            PortalDataManager.setActiveStatus(this.world, this.pos, false);
+            PortalDataManager.setActiveStatus(this.level, this.worldPosition, false);
             if (!linkData.isToken()){
-                World world = this.world.getServer().getWorld(linkData.getDimension());
+                Level world = this.level.getServer().getLevel(linkData.getDimension());
                 if (world != null){
-                    TileEntity entity = world.getTileEntity(linkData.getPos());
+                    BlockEntity entity = world.getBlockEntity(linkData.getPos());
                     if (entity instanceof ControllerTile) {
                         linkData = null;
                         ((ControllerTile) entity).closeLink();
@@ -405,7 +407,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     public void setDisplayNameEnabled(ItemStack display) {
-        PortalDataManager.setPortalDisplay(this.world, this.pos, display);
+        PortalDataManager.setPortalDisplay(this.level, this.worldPosition, display);
         getPortalInfo();
         markForUpdate();
     }
@@ -459,23 +461,23 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
 
     public void setColor(int color) {
         this.color = color;
-        structureHandler.getModules().stream().filter(blockPos -> this.world.getTileEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.world.getTileEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
-        structureHandler.getFrameBlocks().stream().filter(blockPos -> !(this.world.getTileEntity(blockPos) instanceof ControllerTile)).filter(blockPos -> this.world.getTileEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.world.getTileEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
+        structureHandler.getModules().stream().filter(blockPos -> this.level.getBlockEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.level.getBlockEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
+        structureHandler.getFrameBlocks().stream().filter(blockPos -> !(this.level.getBlockEntity(blockPos) instanceof ControllerTile)).filter(blockPos -> this.level.getBlockEntity(blockPos) instanceof IPortalColor).map(blockPos -> (IPortalColor) this.level.getBlockEntity(blockPos)).forEach(iPortalColor -> iPortalColor.setColor(color));
         markForUpdate();
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public ActionResultType onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ActionResultType.SUCCESS) {
-            if (!world.isRemote()) {
-                Minecraft.getInstance().deferTask(() -> {
+    public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
+            if (!level.isClientSide()) {
+                Minecraft.getInstance().submitAsync(() -> {
                     OpenGui.open(0, this);
                 });
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -488,28 +490,28 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         public static void open(int id, ControllerTile controller) {
             switch (id) {
                 case 0:
-                    Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
+                    Minecraft.getInstance().setScreen(new ControllerScreen(controller));
                     return;
                 case 1:
-                    Minecraft.getInstance().displayGuiScreen(new RenameControllerScreen(controller));
+                    Minecraft.getInstance().setScreen(new RenameControllerScreen(controller));
                     return;
                 case 2:
-                    Minecraft.getInstance().displayGuiScreen(new PortalsScreen(controller));
+                    Minecraft.getInstance().setScreen(new PortalsScreen(controller));
                     return;
                 case 3:
-                    Minecraft.getInstance().displayGuiScreen(new ChangeColorScreen(controller));
+                    Minecraft.getInstance().setScreen(new ChangeColorScreen(controller));
                     return;
             }
         }
     }
 
     public boolean addTeleportationToken(ItemStack stack){
-        this.teleportationTokens.put(stack.getDisplayName().getString(), stack.getTag());
+        this.teleportationTokens.put(stack.getHoverName().getString(), stack.getTag());
         markForUpdate();
         return true;
     }
 
-    public HashMap<String, CompoundNBT> getTeleportationTokens() {
+    public HashMap<String, CompoundTag> getTeleportationTokens() {
         return teleportationTokens;
     }
 }

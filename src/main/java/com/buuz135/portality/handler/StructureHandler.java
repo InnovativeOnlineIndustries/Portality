@@ -28,9 +28,9 @@ import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.tile.FrameTile;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,41 +56,41 @@ public class StructureHandler {
     public boolean checkArea() {
         checkPortalSize();
         if (length < 3) return false;
-        Direction facing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
+        Direction facing = this.controller.getLevel().getBlockState(this.controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
         modules.clear();
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), false)) { //BOTTOM
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1), false)) { //BOTTOM
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(Direction.UP, height - 1), false)) { //TOP
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1).relative(Direction.UP, height - 1), false)) { //TOP
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), false)) { //LEFT
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), false)) { //LEFT
             return false;
         }
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(facing.getOpposite(), length - 1).offset(Direction.UP, height - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateY(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, 1), this.controller.getPos().offset(facing.rotateYCCW(), width).offset(Direction.UP, height - 2).offset(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1).relative(Direction.UP, height - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), true);
         return true;
     }
 
     public boolean checkFramesInTheBox(BlockPos point1, BlockPos point2, boolean save) {
-        for (BlockPos blockPos : BlockPos.getAllInBoxMutable(point1, point2)) {
-            if (!blockPos.equals(this.controller.getPos()) && !isValidFrame(blockPos)) {
+        for (BlockPos blockPos : BlockPos.betweenClosed(point1, point2)) {
+            if (!blockPos.equals(this.controller.getBlockPos()) && !isValidFrame(blockPos)) {
                 return false;
             } else if (save) {
-                frameBlocks.add(blockPos.toImmutable());
-                if (this.controller.getWorld().getBlockState(blockPos).getBlock() instanceof IPortalModule) {
-                    modules.add(blockPos.toImmutable());
+                frameBlocks.add(blockPos.immutable());
+                if (this.controller.getLevel().getBlockState(blockPos).getBlock() instanceof IPortalModule) {
+                    modules.add(blockPos.immutable());
                 }
-                TileEntity entity = this.controller.getWorld().getTileEntity(blockPos);
+                BlockEntity entity = this.controller.getLevel().getBlockEntity(blockPos);
                 if (entity instanceof FrameTile) {
-                    ((FrameTile) entity).setControllerPos(this.controller.getPos());
+                    ((FrameTile) entity).setControllerPos(this.controller.getBlockPos());
                     ((FrameTile<?>) entity).setColor(this.controller.getColor());
-                    entity.markDirty();
+                    entity.setChanged();
                 }
             }
         }
@@ -98,22 +98,22 @@ public class StructureHandler {
     }
 
     private void checkPortalSize() {
-        Direction controllerFacing = this.controller.getWorld().getBlockState(this.controller.getPos()).get(ControllerBlock.FACING_HORIZONTAL);
+        Direction controllerFacing = this.controller.getLevel().getBlockState(this.controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
         if (controllerFacing.getAxis().isVertical()) return;
         //Checking width
-        Direction widthFacing = controllerFacing.rotateY();
+        Direction widthFacing = controllerFacing.getClockWise();
         int width = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width)) && !isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
+        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width)) && !isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(Direction.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getPos().offset(widthFacing, width).offset(Direction.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
+        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(Direction.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
             ++height;
         }
         Direction lengthChecking = controllerFacing.getOpposite();
         int length = 1;
-        while (isValidFrame(this.controller.getPos().offset(lengthChecking, length)) && length <= PortalityConfig.MAX_PORTAL_LENGTH) {
+        while (isValidFrame(this.controller.getBlockPos().relative(lengthChecking, length)) && length <= PortalityConfig.MAX_PORTAL_LENGTH) {
             ++length;
         }
         this.width = width;
@@ -122,16 +122,16 @@ public class StructureHandler {
     }
 
     private boolean isValidFrame(BlockPos pos) {
-        return this.controller.getWorld().getTileEntity(pos) instanceof FrameTile && (((FrameTile) this.controller.getWorld().getTileEntity(pos)).getControllerPos() == null
-                || ((FrameTile) this.controller.getWorld().getTileEntity(pos)).getControllerPos().equals(this.controller.getPos()));
+        return this.controller.getLevel().getBlockEntity(pos) instanceof FrameTile && (((FrameTile) this.controller.getLevel().getBlockEntity(pos)).getControllerPos() == null
+                || ((FrameTile) this.controller.getLevel().getBlockEntity(pos)).getControllerPos().equals(this.controller.getBlockPos()));
     }
 
     public void cancelFrameBlocks() {
         for (BlockPos frameBlock : frameBlocks) {
-            TileEntity entity = this.controller.getWorld().getTileEntity(frameBlock);
+            BlockEntity entity = this.controller.getLevel().getBlockEntity(frameBlock);
             if (entity instanceof FrameTile) {
                 ((FrameTile) entity).setControllerPos(null);
-                entity.markDirty();
+                entity.setChanged();
             }
         }
         frameBlocks.clear();

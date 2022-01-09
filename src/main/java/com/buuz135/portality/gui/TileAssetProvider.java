@@ -31,8 +31,8 @@ import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.api.client.assets.types.IBackgroundAsset;
 import com.hrznstudio.titanium.api.client.assets.types.ITankAsset;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.awt.*;

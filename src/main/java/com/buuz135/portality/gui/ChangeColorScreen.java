@@ -8,12 +8,12 @@ import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.color.ColorPickerAddon;
 import com.hrznstudio.titanium.util.AssetUtil;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ChangeColorScreen extends ScreenAddonScreen {
 
     private ControllerTile controllerTile;
-    private TextFieldWidget textField;
+    private EditBox textField;
     private int color;
     private ColorPickerAddon colorPickerAddon;
     private boolean textChangedManually;
@@ -36,11 +36,11 @@ public class ChangeColorScreen extends ScreenAddonScreen {
     @Override
     public void init() {
         super.init();
-        textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, this.x + 14, this.y + 120, 80, 16, new StringTextComponent(""));
+        textField = new EditBox(Minecraft.getInstance().font, this.x + 14, this.y + 120, 80, 16, new TextComponent(""));
         //textField.setFocused2(true);
         textField.setVisible(true);
-        textField.setEnableBackgroundDrawing(true);
-        textField.setMaxStringLength(6);
+        textField.setBordered(true);
+        textField.setMaxLength(6);
         textField.setResponder(s -> {
             if (textChangedManually) {
                 textChangedManually = false;
@@ -58,24 +58,24 @@ public class ChangeColorScreen extends ScreenAddonScreen {
             }
         });
         updateColor(color);
-        addListener(textField);
+        addWidget(textField);
         this.getAddons().add(new PortalSaveButton(this.x + 110, this.y + 116, controllerTile, "Save", this));
     }
 
     @Override
-    public void renderBackground(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         renderBackground(stack);
-        Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/color_change.png"));
-        Minecraft.getInstance().currentScreen.blit(stack, x, y, 0, 0, 175, 146);
-        AbstractGui.fill(stack, x + 13, y + 9, x + 15 + 100, y + 91, -16739073);
-        AbstractGui.fill(stack, x + 123, y + 9, x + 121 + 40, y + 91, -16739073);
-        AbstractGui.fill(stack, x + 13, y + 99, x + 13 + 148, y + 109, -16739073);
+        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/color_change.png"));
+        Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, 175, 146);
+        GuiComponent.fill(stack, x + 13, y + 9, x + 15 + 100, y + 91, -16739073);
+        GuiComponent.fill(stack, x + 123, y + 9, x + 121 + 40, y + 91, -16739073);
+        GuiComponent.fill(stack, x + 13, y + 99, x + 13 + 148, y + 109, -16739073);
         super.renderBackground(stack, mouseX, mouseY, partialTicks);
         textField.renderButton(stack, mouseX, mouseY, partialTicks);
         AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y - 1, -16739073);
-        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y + textField.getHeightRealms(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x - 1, textField.y - 1, textField.y + textField.getHeightRealms(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x + textField.getWidth(), textField.y - 1, textField.y + textField.getHeightRealms(), -16739073);
+        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y + textField.getHeight(), -16739073);
+        AssetUtil.drawVerticalLine(stack, textField.x - 1, textField.y - 1, textField.y + textField.getHeight(), -16739073);
+        AssetUtil.drawVerticalLine(stack, textField.x + textField.getWidth(), textField.y - 1, textField.y + textField.getHeight(), -16739073);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ChangeColorScreen extends ScreenAddonScreen {
         this.color = color;
         if (textField != null) {
             this.textChangedManually = true;
-            textField.setText(Integer.toHexString(color).substring(2));
+            textField.setValue(Integer.toHexString(color).substring(2));
         }
     }
 

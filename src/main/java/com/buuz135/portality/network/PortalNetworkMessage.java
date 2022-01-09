@@ -32,15 +32,15 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -50,50 +50,50 @@ import java.util.List;
 
 public class PortalNetworkMessage {
 
-    public static void sendInformationToPlayer(ServerPlayerEntity playerEntity, boolean interdimensional, BlockPos pos, int distance, HashMap<String, CompoundNBT> tokens) {
+    public static void sendInformationToPlayer(ServerPlayer playerEntity, boolean interdimensional, BlockPos pos, int distance, HashMap<String, CompoundTag> tokens) {
         List<PortalInformation> infos = new ArrayList<>();
         tokens.forEach((s, compoundNBT) -> {
-            infos.add(new TokenPortalInformation(playerEntity.getUniqueID(),
-                    RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compoundNBT.getString("Dimension"))),
+            infos.add(new TokenPortalInformation(playerEntity.getUUID(),
+                    ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compoundNBT.getString("Dimension"))),
                     new BlockPos(compoundNBT.getInt("X"), compoundNBT.getInt("Y"), compoundNBT.getInt("Z")),
                     s));
         });
-        infos.addAll(PortalDataManager.getData(playerEntity.world).getInformationList());
-        infos.removeIf(information -> information.getDimension().equals(playerEntity.getServerWorld().getDimensionKey()) && information.getLocation().equals(pos));
+        infos.addAll(PortalDataManager.getData(playerEntity.level).getInformationList());
+        infos.removeIf(information -> information.getDimension().equals(playerEntity.getLevel().dimension()) && information.getLocation().equals(pos));
         infos.removeIf(information -> {
-            World world = playerEntity.getServer().getWorld(information.getDimension());
-            return world.getTileEntity(information.getLocation()) instanceof ControllerTile && !((ControllerTile) world.getTileEntity(information.getLocation())).isFormed();
+            Level world = playerEntity.getServer().getLevel(information.getDimension());
+            return world.getBlockEntity(information.getLocation()) instanceof ControllerTile && !((ControllerTile) world.getBlockEntity(information.getLocation())).isFormed();
         });
-        infos.removeIf(information -> !interdimensional && !playerEntity.getServerWorld().getDimensionKey().equals(information.getDimension()));
-        infos.removeIf(information -> interdimensional && !playerEntity.getServerWorld().getDimensionKey().equals(information.getDimension()) && !information.isInterdimensional());
+        infos.removeIf(information -> !interdimensional && !playerEntity.getLevel().dimension().equals(information.getDimension()));
+        infos.removeIf(information -> interdimensional && !playerEntity.getLevel().dimension().equals(information.getDimension()) && !information.isInterdimensional());
         infos.removeIf(information -> {
-            World world = playerEntity.getEntityWorld().getServer().getWorld(information.getDimension());
-            TileEntity entity = world.getTileEntity(information.getLocation());
-            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getServerWorld().getDimensionKey().equals(information.getDimension()) || (!information.getLocation().withinDistance(new Vector3d(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().withinDistance(new Vector3d(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
+            Level world = playerEntity.getCommandSenderWorld().getServer().getLevel(information.getDimension());
+            BlockEntity entity = world.getBlockEntity(information.getLocation());
+            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getLevel().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
         });
-        Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static class Response extends Message {
 
-        private CompoundNBT compoundNBT;
+        private CompoundTag compoundNBT;
 
         public Response() {
-            compoundNBT = new CompoundNBT();
+            compoundNBT = new CompoundTag();
         }
 
         public Response(List<PortalInformation> information) {
-            compoundNBT = new CompoundNBT();
+            compoundNBT = new CompoundTag();
             information.forEach(portalInformation -> compoundNBT.put(portalInformation.getId().toString(), portalInformation.writetoNBT()));
         }
 
         @Override
         protected void handleMessage(NetworkEvent.Context context) {
-            Minecraft.getInstance().enqueue(() -> {
-                if (Minecraft.getInstance().currentScreen instanceof PortalsScreen) {
+            Minecraft.getInstance().tell(() -> {
+                if (Minecraft.getInstance().screen instanceof PortalsScreen) {
                     List<PortalInformation> information = new ArrayList<>();
-                    compoundNBT.keySet().forEach(s -> information.add(PortalInformation.readFromNBT(compoundNBT.getCompound(s))));
-                    ((PortalsScreen) Minecraft.getInstance().currentScreen).refresh(information);
+                    compoundNBT.getAllKeys().forEach(s -> information.add(PortalInformation.readFromNBT(compoundNBT.getCompound(s))));
+                    ((PortalsScreen) Minecraft.getInstance().screen).refresh(information);
                 }
             });
         }

@@ -26,46 +26,46 @@ package com.buuz135.portality.proxy.client.render;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.ControllerBlock;
 import com.buuz135.portality.tile.ControllerTile;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ColorHelper;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
-public class TESRPortal extends TileEntityRenderer<ControllerTile> {
+public class TESRPortal extends BlockEntityRenderer<ControllerTile> {
 
     private static final Random RANDOM = new Random(31100L);
     public static RenderType TYPE = createRenderType();
 
-    public TESRPortal(TileEntityRendererDispatcher dispatcher) {
+    public TESRPortal(BlockEntityRenderDispatcher dispatcher) {
         super(dispatcher);
     }
 
     public static RenderType createRenderType() {
-        RenderType.State state = RenderType.State.getBuilder().texture(new RenderState.TextureState(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
+        RenderType.CompositeState state = RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).setTransparencyState(new RenderStateShard.TransparencyStateShard("translucent_transparency", () -> {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         }, () -> {
             RenderSystem.disableBlend();
-        })).build(true);
-        return RenderType.makeType("portal_render", DefaultVertexFormats.POSITION_TEX_COLOR, 7, 256, false, true, state);
+        })).createCompositeState(true);
+        return RenderType.create("portal_render", DefaultVertexFormat.POSITION_TEX_COLOR, 7, 256, false, true, state);
     }
 
-    public void renderTop(MatrixStack stack, IVertexBuilder buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, int color) {
+    public void renderTop(PoseStack stack, VertexConsumer buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, int color) {
         double scale = 0.9335;
         float y = 3.999f;
         float off = /*0.0278*/ 4 - y;
@@ -94,15 +94,15 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
                 float xOffset = posX - 2f + frame + off + xTrans;
                 float yOffset = yTrans - off;
                 float zOffset = posZ + zTrans;
-                Matrix4f matrix = stack.getLast().getMatrix();
+                Matrix4f matrix = stack.last().pose();
     
-                int red = ColorHelper.PackedColor.getRed(color);
-                int green = ColorHelper.PackedColor.getGreen(color);
-                int blue = ColorHelper.PackedColor.getBlue(color);
-                buffer.pos(matrix, pX2 + xOffset, yOffset, 0 + zOffset).tex(u2, 0).color(red, green, blue, alpha).endVertex();
-                buffer.pos(matrix, pX1 + xOffset, yOffset, 0 + zOffset).tex(u, 0).color(red, green, blue, alpha).endVertex();
-                buffer.pos(matrix, pX1 + xOffset, yOffset, 1 + zOffset).tex(u, 1).color(red, green, blue, alpha).endVertex();
-                buffer.pos(matrix, pX2 + xOffset, yOffset, 1 + zOffset).tex(u2, 1).color(red, green, blue, alpha).endVertex();
+                int red = FastColor.ARGB32.red(color);
+                int green = FastColor.ARGB32.green(color);
+                int blue = FastColor.ARGB32.blue(color);
+                buffer.vertex(matrix, pX2 + xOffset, yOffset, 0 + zOffset).uv(u2, 0).color(red, green, blue, alpha).endVertex();
+                buffer.vertex(matrix, pX1 + xOffset, yOffset, 0 + zOffset).uv(u, 0).color(red, green, blue, alpha).endVertex();
+                buffer.vertex(matrix, pX1 + xOffset, yOffset, 1 + zOffset).uv(u, 1).color(red, green, blue, alpha).endVertex();
+                buffer.vertex(matrix, pX2 + xOffset, yOffset, 1 + zOffset).uv(u2, 1).color(red, green, blue, alpha).endVertex();
                 //tessellator.draw();
                 //RenderSystem.translated(-(posX - 2.1 + frame + off), 0, -posZ);
 
@@ -112,11 +112,11 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
     }
 
     //@Override
-    //public void func_225616_a_(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
+    //public void render(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
     //    //super.render(te, x, y, z, partialTicks, destroyStage);
     //    if (!te.isFormed()) return;
     //    RenderSystem.pushMatrix();
-    //    //matrixStack.func_227860_a_();
+    //    //matrixStack.pushPose();
     //    //RenderSystem.enableBlend();
     //    //BufferBuilder buffer = tessellator.getBuffer();
     //    ResourceLocation texture = new ResourceLocation("textures/entity/beacon_beam.png");
@@ -135,7 +135,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
     //    //Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "blocks/portal_render.png"));
     //    //Minecraft.getInstance().getTextureManager().bindTexture(;
     //    //RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-    //    //matrixStack.func_227861_a_(x, y, z);
+    //    //matrixStack.translate(x, y, z);
     //    //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACINGB
     //    Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
     //    if (facing == Direction.SOUTH) {
@@ -175,7 +175,7 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
     //    RenderSystem.rotatef(190, 0, 0, 1);
     //    RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
 //
-    //    matrixStack.func_227861_a_(0,0,0);
+    //    matrixStack.translate(0,0,0);
     //    //buffer.setTranslation(0, 0, 0);
     //    RenderSystem.setupGui3DDiffuseLighting();
     //    RenderSystem.disableBlend();
@@ -188,30 +188,30 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
     //}
 
     @Override
-    public void render(ControllerTile te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
+    public void render(ControllerTile te, float p_225616_2_, PoseStack matrixStack, MultiBufferSource typeBuffer, int p_225616_5_, int p_225616_6_) {
         if (!te.isFormed()) return;
         RenderSystem.pushMatrix();
-        float frame = (te.getWorld().getGameTime() % 60) / 60f;
+        float frame = (te.getLevel().getGameTime() % 60) / 60f;
         //Color color = Color.getHSBColor((te.getWorld().getGameTime() % 360)/ 360f , 01f ,1f);
         //renderTop(stack, p_225616_4_.getBuffer(TYPE), te, frame,0,0, -0.6, te.getWidth() * 2);
-        //this.func_228883_a_(te, lvt_10_1_, 0.15F, lvt_11_1_, p_225616_4_.getBuffer((RenderType)field_228881_e_.get(0)));
+        //this.renderCube(te, lvt_10_1_, 0.15F, lvt_11_1_, p_225616_4_.getBuffer((RenderType)RENDER_TYPES.get(0)));
         int x = 0;
         int y = 0;
         int z = 0;
         //RenderSystem.translated(x,y,z);
         if (te.isDisplayNameEnabled() && te.isActive()) {
-            matrixStack.push();
+            matrixStack.pushPose();
             String name = te.getLinkData().getName();
             matrixStack.translate(0.5, (double) 1.5f, 0.5D);
-            matrixStack.rotate(Minecraft.getInstance().getRenderManager().getCameraOrientation());
+            matrixStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
             matrixStack.scale(-0.025F, -0.025F, 0.025F);
-            float f1 = Minecraft.getInstance().gameSettings.getTextBackgroundOpacity(0.25F);
+            float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
             int j = (int) (f1 * 255.0F) << 24;
 
-            Minecraft.getInstance().fontRenderer.renderString(name, -Minecraft.getInstance().fontRenderer.getStringWidth(name) / 2f, 0, -1, false, matrixStack.getLast().getMatrix(), typeBuffer, false, j, 15728880);
-            matrixStack.pop();
+            Minecraft.getInstance().font.drawInBatch(name, -Minecraft.getInstance().font.width(name) / 2f, 0, -1, false, matrixStack.last().pose(), typeBuffer, false, j, 15728880);
+            matrixStack.popPose();
         }
-        BlockState blockState = te.getWorld().getBlockState(te.getPos());
+        BlockState blockState = te.getLevel().getBlockState(te.getBlockPos());
         // Apparently with Optifine, this code path gets run after the Portal block
         // has been destroyed, causing the BlockState to be an air block,
         // which is missing the below property, causing a crash. If this property is missing,
@@ -219,24 +219,24 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         if (!blockState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
             return;
         }
-        Direction facing = blockState.get(ControllerBlock.FACING_HORIZONTAL);
+        Direction facing = blockState.getValue(ControllerBlock.FACING_HORIZONTAL);
         if (facing == Direction.SOUTH) {
             //RenderSystem.translated(1, 0, 1);
             //RenderSystem.rotatef(-180, 0, 1, 0);
             z = -1;
             x = -1;
-            matrixStack.rotate(Vector3f.YP.rotationDegrees(-180f));
+            matrixStack.mulPose(Vector3f.YP.rotationDegrees(-180f));
         }
         if (facing == Direction.EAST) {
             //RenderSystem.translated(1, 0, 0);
             //RenderSystem.rotatef(-90, 0, 1, 0);
             z = -1;
-            matrixStack.rotate(Vector3f.YP.rotationDegrees(-90f));
+            matrixStack.mulPose(Vector3f.YP.rotationDegrees(-90f));
         }
         if (facing == Direction.WEST) {
             //RenderSystem.translated(0, 0, 1);
             x = -1;
-            matrixStack.rotate(Vector3f.YP.rotationDegrees(90f));
+            matrixStack.mulPose(Vector3f.YP.rotationDegrees(90f));
             //RenderSystem.rotatef(90, 0, 1, 0);
         }
         if (facing == Direction.NORTH) {
@@ -244,24 +244,24 @@ public class TESRPortal extends TileEntityRenderer<ControllerTile> {
         }
         //TOP
         //RenderSystem.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
-        IVertexBuilder buffer = typeBuffer.getBuffer(TYPE);
+        VertexConsumer buffer = typeBuffer.getBuffer(TYPE);
         renderTop(matrixStack, buffer, te, frame, -te.getWidth() + 2f + x, te.getHeight() + y - 1f, z, 0.4, te.getWidth() * 2, te.getColor());
         //RenderSystem.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
         //RIGHT
         //RenderSystem.translated(3 - te.getWidth() + 2, 2.1, 0);
         //RenderSystem.rotatef(90, 0, 0, 1);
-        matrixStack.rotate(Vector3f.ZP.rotationDegrees(90f));
+        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(90f));
         renderTop(matrixStack, buffer, te, frame, 2 + y, te.getWidth() - 1 - x, z, 0.2, te.getHeight() - 1, te.getColor());
-        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
+        matrixStack.mulPose(Vector3f.ZN.rotationDegrees(90f));
         //RenderSystem.rotatef(-90, 0, 0, 1);
         //RenderSystem.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
         //LEFT
         //RenderSystem.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
         //RenderSystem.rotatef(-90, 0, 0, 1);
-        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
+        matrixStack.mulPose(Vector3f.ZN.rotationDegrees(90f));
         renderTop(matrixStack, buffer, te, frame, 2 - te.getHeight() + y, te.getWidth() + x, z, 0, te.getHeight() - 1, te.getColor());
         //RenderSystem.rotatef(90, 0, 0, 1);
-        matrixStack.rotate(Vector3f.ZN.rotationDegrees(90f));
+        matrixStack.mulPose(Vector3f.ZN.rotationDegrees(90f));
         //RenderSystem.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
         //BOTTOM
         //RenderSystem.translated(0.9 + te.getWidth() - 2, 5, 0);

@@ -30,15 +30,15 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
 import com.hrznstudio.titanium.client.screen.addon.interfaces.IClickable;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 public class PortalSaveButton extends BasicScreenAddon implements IClickable {
 
@@ -58,8 +58,8 @@ public class PortalSaveButton extends BasicScreenAddon implements IClickable {
     }
 
     @Override
-    public void drawBackgroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
-        Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+    public void drawBackgroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         screen.blit(stack, this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
         this.guiX = guiX;
         this.guiY = guiY;
@@ -81,16 +81,16 @@ public class PortalSaveButton extends BasicScreenAddon implements IClickable {
     }
 
     @Override
-    public void drawForegroundLayer(MatrixStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
-        screen.drawCenteredString(stack, Minecraft.getInstance().fontRenderer, new TranslationTextComponent(action).getString(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
+    public void drawForegroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY) {
+        screen.drawCenteredString(stack, Minecraft.getInstance().font, new TranslatableComponent(action).getString(), this.getPosX() + 25, this.getPosY() + 7, isInside(screen, mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
     }
 
     @Override
     public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-        Minecraft.getInstance().getSoundHandler().play(new SimpleSound(SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1f, 1f, Minecraft.getInstance().player.getPosition()));
-        Portality.NETWORK.get().sendToServer(new PortalChangeColorMessage(controller.getWorld().getDimensionKey(), controller.getPos(), screen.getColor()));
-        Minecraft.getInstance().displayGuiScreen(null);
+        Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 1f, 1f, Minecraft.getInstance().player.blockPosition()));
+        Portality.NETWORK.get().sendToServer(new PortalChangeColorMessage(controller.getLevel().dimension(), controller.getBlockPos(), screen.getColor()));
+        Minecraft.getInstance().setScreen(null);
 
     }
 

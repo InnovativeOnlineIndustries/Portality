@@ -28,9 +28,9 @@ import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.client.screen.addon.EnergyBarScreenAddon;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -69,8 +69,8 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
     public void tick() {
         if (!isInput()) {
             for (Direction facing : Direction.values()) {
-                BlockPos checking = this.pos.offset(facing);
-                TileEntity checkingTile = this.world.getTileEntity(checking);
+                BlockPos checking = this.worldPosition.relative(facing);
+                BlockEntity checkingTile = this.level.getBlockEntity(checking);
                 if (checkingTile != null) {
                     checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
                         int energy = storage.receiveEnergy(Math.min(this.energyStorage.getEnergyStored(), 1000), false);

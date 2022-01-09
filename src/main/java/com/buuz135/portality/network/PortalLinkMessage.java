@@ -27,15 +27,15 @@ import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
 import com.hrznstudio.titanium.network.Message;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 
 public class PortalLinkMessage extends Message {
 
     static {
-        CompoundSerializableDataHandler.map(PortalLinkData.class, buf -> PortalLinkData.readFromNBT(buf.readCompoundTag()), (buf, portalLinkData) -> buf.writeCompoundTag(portalLinkData.writeToNBT()));
+        CompoundSerializableDataHandler.map(PortalLinkData.class, buf -> PortalLinkData.readFromNBT(buf.readNbt()), (buf, portalLinkData) -> buf.writeNbt(portalLinkData.writeToNBT()));
     }
 
     private int type;
@@ -53,8 +53,8 @@ public class PortalLinkMessage extends Message {
 
     @Override
     protected void handleMessage(NetworkEvent.Context context) {
-        World world = context.getSender().world.getServer().getWorld(linkSender.getDimension());
-        TileEntity tileEntity = world.getTileEntity(linkSender.getPos());
+        Level world = context.getSender().level.getServer().getLevel(linkSender.getDimension());
+        BlockEntity tileEntity = world.getBlockEntity(linkSender.getPos());
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).linkTo(new PortalLinkData(linkReceiver.getDimension(), linkReceiver.getPos(), true, linkSender.getName(), linkReceiver.isToken()), PortalLinkData.PortalCallType.values()[type]);
         }

@@ -23,23 +23,22 @@
  */
 package com.buuz135.portality.data;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class PortalLinkData {
 
-    private RegistryKey<World> dimension;
+    private ResourceKey<Level> dimension;
     private BlockPos pos;
     private boolean caller;
     private String name;
     private boolean token;
 
-    public PortalLinkData(RegistryKey<World> dimension, BlockPos pos, boolean caller, String name, boolean token) {
+    public PortalLinkData(ResourceKey<Level> dimension, BlockPos pos, boolean caller, String name, boolean token) {
         this.dimension = dimension;
         this.pos = pos;
         this.caller = caller;
@@ -47,11 +46,11 @@ public class PortalLinkData {
         this.token = token;
     }
 
-    public static PortalLinkData readFromNBT(CompoundNBT compound) {
-        return new PortalLinkData(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.fromLong(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"), compound.getBoolean("Token"));
+    public static PortalLinkData readFromNBT(CompoundTag compound) {
+        return new PortalLinkData(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.of(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"), compound.getBoolean("Token"));
     }
 
-    public RegistryKey<World> getDimension() {
+    public ResourceKey<Level> getDimension() {
         return dimension;
     }
 
@@ -75,10 +74,10 @@ public class PortalLinkData {
         return token;
     }
 
-    public CompoundNBT writeToNBT() {
-        CompoundNBT tagCompound = new CompoundNBT();
-        tagCompound.putString("Dimension", dimension.getLocation().toString());
-        tagCompound.putLong("Position", pos.toLong());
+    public CompoundTag writeToNBT() {
+        CompoundTag tagCompound = new CompoundTag();
+        tagCompound.putString("Dimension", dimension.location().toString());
+        tagCompound.putLong("Position", pos.asLong());
         tagCompound.putBoolean("Caller", caller);
         tagCompound.putString("Name", name);
         tagCompound.putBoolean("Token", token);

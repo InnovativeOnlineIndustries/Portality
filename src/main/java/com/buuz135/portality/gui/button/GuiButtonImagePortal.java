@@ -27,15 +27,15 @@ package com.buuz135.portality.gui.button;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.gui.PortalsScreen;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.resources.ResourceLocation;
 
 public class GuiButtonImagePortal extends ImageButton {
 
@@ -50,29 +50,29 @@ public class GuiButtonImagePortal extends ImageButton {
     }
 
     @Override
-    public void renderButton(MatrixStack stack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
+    public void renderButton(PoseStack stack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
         RenderSystem.color4f(1, 1, 1, 1);
         super.renderButton(stack, p_renderButton_1_, p_renderButton_2_, p_renderButton_3_);
         RenderSystem.pushMatrix();
         //RenderSystem.setupGui3DDiffuseLighting();
-        Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(information.getDisplay(), x + 5, y + 3);
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        TextFormatting color = TextFormatting.RESET;
-        if (information.isPrivate()) color = TextFormatting.GOLD;
-        if (information.isActive()) color = TextFormatting.RED;
-        fontRenderer.drawStringWithShadow(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(information.getDisplay(), x + 5, y + 3);
+        Font fontRenderer = Minecraft.getInstance().font;
+        ChatFormatting color = ChatFormatting.RESET;
+        if (information.isPrivate()) color = ChatFormatting.GOLD;
+        if (information.isActive()) color = ChatFormatting.RED;
+        fontRenderer.drawShadow(stack, color + information.getName().substring(0, Math.min(information.getName().length(), 25)), x + 28, 7 + y, isMouseOver(p_renderButton_1_, p_renderButton_2_) ? 16777120 : 0xFFFFFFFF);
         //fontRenderer.drawString(color + (information.isPrivate() ? I18n.format("portality.display.private") : I18n.format("portality.display.public")), x + 40, 10 + (fontRenderer.FONT_HEIGHT + 1) * 1 + y, 0xFFFFFF);
         RenderSystem.color4f(1, 1, 1, 1);
         if (information.isPrivate()) {
             RenderSystem.disableDepthTest();
-            Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/lock.png"));
-            AbstractGui.blit(stack, x + 4, y + 14, 0, 0, 8, 8, 8, 8);
+            Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/lock.png"));
+            GuiComponent.blit(stack, x + 4, y + 14, 0, 0, 8, 8, 8, 8);
             RenderSystem.enableDepthTest();
         }
-        RenderHelper.disableStandardItemLighting();
+        Lighting.turnOff();
         if (portals.getSelectedPortal() == information) {
-            Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-            Minecraft.getInstance().currentScreen.blit(stack, x, y, 0, 210, 157, 22);
+            Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+            Minecraft.getInstance().screen.blit(stack, x, y, 0, 210, 157, 22);
         }
         RenderSystem.popMatrix();
     }

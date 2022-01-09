@@ -26,9 +26,9 @@ package com.buuz135.portality.proxy.client;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
@@ -37,15 +37,15 @@ public class ClientProxy extends CommonProxy {
     public void onClient(Minecraft instance) {
         super.onClient(instance);
         ClientRegistry.bindTileEntityRenderer(CommonProxy.BLOCK_CONTROLLER.getTileEntityType(), TESRPortal::new);
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CONTROLLER, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_FRAME, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.getCutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CONTROLLER, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_FRAME, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE, RenderType.cutout());
         Minecraft.getInstance().getBlockColors().register((state, world, pos, index) -> {
             if (index == 0 && world != null) {
-                TileEntity tileEntity = world.getTileEntity(pos);
+                BlockEntity tileEntity = world.getBlockEntity(pos);
                 if (tileEntity instanceof IPortalColor) {
                     return ((IPortalColor) tileEntity).getColor();
                 }

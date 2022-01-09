@@ -64,9 +64,9 @@ public class CommonProxy {
     }
 
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getPlayer().isCrouching() && event.getPlayer().world.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
-            ControllerTile controller = (ControllerTile) event.getWorld().getTileEntity(event.getPos());
-            if (!controller.getDisplay().isItemEqual(event.getItemStack())) {
+        if (event.getPlayer().isCrouching() && event.getPlayer().level.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
+            ControllerTile controller = (ControllerTile) event.getWorld().getBlockEntity(event.getPos());
+            if (!controller.getDisplay().sameItem(event.getItemStack())) {
                 event.setUseBlock(Event.Result.ALLOW);
             }
         }

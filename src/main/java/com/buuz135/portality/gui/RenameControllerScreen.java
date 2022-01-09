@@ -26,22 +26,22 @@ package com.buuz135.portality.gui;
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.network.PortalRenameMessage;
 import com.buuz135.portality.tile.ControllerTile;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class RenameControllerScreen extends Screen {
 
     private final ControllerTile controller;
-    private TextFieldWidget textFieldWidget;
+    private EditBox textFieldWidget;
     private Button confirm;
 
     public RenameControllerScreen(ControllerTile controller) {
-        super(new TranslationTextComponent("portality.gui.controller.rename"));
+        super(new TranslatableComponent("portality.gui.controller.rename"));
         this.controller = controller;
     }
 
@@ -49,29 +49,29 @@ public class RenameControllerScreen extends Screen {
     protected void init() {
         super.init();
         int textFieldWidth = 140;
-        textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, width / 2 - textFieldWidth / 2, height / 2 - 10, textFieldWidth, 18, new StringTextComponent(""));
+        textFieldWidget = new EditBox(Minecraft.getInstance().font, width / 2 - textFieldWidth / 2, height / 2 - 10, textFieldWidth, 18, new TextComponent(""));
         textFieldWidget.setCanLoseFocus(false);
-        textFieldWidget.setMaxStringLength(28);
-        textFieldWidget.setSelectionPos(0);
-        textFieldWidget.setText(this.controller.getPortalDisplayName());
-        textFieldWidget.setFocused2(true);
+        textFieldWidget.setMaxLength(28);
+        textFieldWidget.setHighlightPos(0);
+        textFieldWidget.setValue(this.controller.getPortalDisplayName());
+        textFieldWidget.setFocus(true);
         addButton(textFieldWidget);
         //this.setFocused(this.textFieldWidget);
 
-        confirm = new Button(width / 2 + textFieldWidth / 2 + 5, height / 2 - 10, 50, 18, new StringTextComponent("Confirm"), button -> {
-            Portality.NETWORK.get().sendToServer(new PortalRenameMessage(textFieldWidget.getText(), controller.getPos()));
-            Minecraft.getInstance().displayGuiScreen(new ControllerScreen(controller));
+        confirm = new Button(width / 2 + textFieldWidth / 2 + 5, height / 2 - 10, 50, 18, new TextComponent("Confirm"), button -> {
+            Portality.NETWORK.get().sendToServer(new PortalRenameMessage(textFieldWidget.getValue(), controller.getBlockPos()));
+            Minecraft.getInstance().setScreen(new ControllerScreen(controller));
         });
         addButton(confirm);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, float p_render_3_) {
+    public void render(PoseStack matrixStack, int p_render_1_, int p_render_2_, float p_render_3_) {
         this.renderBackground(matrixStack, 0);//draw tinted background
         super.render(matrixStack, p_render_1_, p_render_2_, p_render_3_);
         //textFieldWidget.render(p_render_1_, p_render_2_, p_render_3_);
-        String rename = new TranslationTextComponent("portality.gui.controller.rename").getString();
-        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, rename, width / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(rename) / 2, height / 2 - 30, 0xFFFFFF);
+        String rename = new TranslatableComponent("portality.gui.controller.rename").getString();
+        Minecraft.getInstance().font.drawShadow(matrixStack, rename, width / 2 - Minecraft.getInstance().font.width(rename) / 2, height / 2 - 30, 0xFFFFFF);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class RenameControllerScreen extends Screen {
     }
 
     @Override
-    public void onClose() { //onClose
+    public void removed() { //onClose
 
     }
 }

@@ -24,8 +24,8 @@
 package com.buuz135.portality.proxy;
 
 import com.buuz135.portality.Portality;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 public class PortalitySoundHandler {
 

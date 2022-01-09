@@ -27,17 +27,17 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.block.FrameBlock;
 import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.tile.FrameTile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
@@ -50,19 +50,19 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
 
     public CapabilityModuleBlock(String name, Class<S> tileClass) {
         super(name, tileClass);
-        this.setDefaultState(this.getDefaultState().with(INPUT, true));
+        this.registerDefaultState(this.defaultBlockState().setValue(INPUT, true));
         setItemGroup(Portality.TAB);
     }
 
     @Override
     public void work(ControllerTile controller, BlockPos blockPos) {
         if (controller.getLinkData() == null) return;
-        TileEntity other = controller.getWorld().getServer().getWorld(controller.getLinkData().getDimension()).getTileEntity(controller.getLinkData().getPos());
-        if (other instanceof ControllerTile && this.isInput(controller.getWorld().getBlockState(blockPos))) {
+        BlockEntity other = controller.getLevel().getServer().getLevel(controller.getLinkData().getDimension()).getBlockEntity(controller.getLinkData().getPos());
+        if (other instanceof ControllerTile && this.isInput(controller.getLevel().getBlockState(blockPos))) {
             ControllerTile otherController = (ControllerTile) other;
-            internalWork(controller.getWorld(), blockPos, other.getWorld(), otherController.getModules().stream().filter(pos -> otherController.getWorld().getBlockState(pos).getBlock() instanceof CapabilityModuleBlock
-                    && !((CapabilityModuleBlock) otherController.getWorld().getBlockState(pos).getBlock()).isInput(otherController.getWorld().getBlockState(pos))
-                    && ((CapabilityModuleBlock) otherController.getWorld().getBlockState(pos).getBlock()).getCapability().equals(this.getCapability())).collect(Collectors.toList()));
+            internalWork(controller.getLevel(), blockPos, other.getLevel(), otherController.getModules().stream().filter(pos -> otherController.getLevel().getBlockState(pos).getBlock() instanceof CapabilityModuleBlock
+                    && !((CapabilityModuleBlock) otherController.getLevel().getBlockState(pos).getBlock()).isInput(otherController.getLevel().getBlockState(pos))
+                    && ((CapabilityModuleBlock) otherController.getLevel().getBlockState(pos).getBlock()).getCapability().equals(this.getCapability())).collect(Collectors.toList()));
         }
     }
 
@@ -75,10 +75,10 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
     public abstract Capability<T> getCapability();
 
     public boolean isInput(BlockState state) {
-        return state.get(INPUT);
+        return state.getValue(INPUT);
     }
 
-    abstract void internalWork(World current, BlockPos myself, World otherWorld, List<BlockPos> compatibleBlockPos);
+    abstract void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos);
 
     @Override
     public boolean allowsInterdimensionalTravel() {
@@ -86,13 +86,13 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(INPUT);
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public ItemStack getPickBlock(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
         return new ItemStack(this, 1);
     }
 

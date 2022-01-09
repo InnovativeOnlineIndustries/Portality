@@ -31,12 +31,12 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class PortalsScreen extends ScreenAddonScreen {
     private final int guiHeight;
     private final int guiWidth;
     private List<PortalInformation> informationList;
-    private TextFieldWidget textField;
+    private EditBox textField;
     private double scrolling;
     private double lastScrolling;
     private boolean isDragging;
@@ -75,10 +75,10 @@ public class PortalsScreen extends ScreenAddonScreen {
         this.x = this.width / 2 - guiWidth / 2;
         this.y = this.height / 2 - guiWidth / 2;
         if (informationList != null && !informationList.isEmpty()) addPortalButtons();
-        textField = new TextFieldWidget(Minecraft.getInstance().fontRenderer, this.x + guiWidth - 131, this.y + 3, 100, 10, new StringTextComponent(""));
-        textField.setFocused2(true);
+        textField = new EditBox(Minecraft.getInstance().font, this.x + guiWidth - 131, this.y + 3, 100, 10, new TextComponent(""));
+        textField.setFocus(true);
         textField.setVisible(true);
-        textField.setEnableBackgroundDrawing(true);
+        textField.setBordered(true);
         //this.setFocused(textField);
         getAddons().add(new PortalCallButton(x + 9, y + guiHeight + 2, controller, PortalCallButton.CallAction.OPEN, this));
         getAddons().add(new PortalCallButton(x + 53 + 9, y + guiHeight + 2, controller, PortalCallButton.CallAction.ONCE, this));
@@ -88,10 +88,10 @@ public class PortalsScreen extends ScreenAddonScreen {
     private void addPortalButtons() {
         if (this.informationList == null) return;
         List<PortalInformation> tempInformations = new ArrayList<>(this.informationList);
-        tempInformations.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUniqueID()));
+        tempInformations.removeIf(information -> information.isPrivate() && !information.getOwner().equals(Minecraft.getInstance().player.getUUID()));
         tempInformations.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
-        if (!textField.getText().isEmpty())
-            tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getText().toLowerCase()));
+        if (!textField.getValue().isEmpty())
+            tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getValue().toLowerCase()));
         this.buttons.removeIf(guiButton -> portalButtons.contains(guiButton));
         this.portalButtons.clear();
         this.visiblePortalInformations = tempInformations.size();
@@ -115,7 +115,7 @@ public class PortalsScreen extends ScreenAddonScreen {
     @Override
     public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
         boolean pressed = super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-        Minecraft.getInstance().enqueue(() -> {
+        Minecraft.getInstance().tell(() -> {
             this.scrolling = 0;
             this.lastScrolling = 0;
             addPortalButtons();
@@ -129,12 +129,12 @@ public class PortalsScreen extends ScreenAddonScreen {
     }
 
     @Override
-    public void renderBackground(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         checkForScrolling(mouseX, mouseY);
         this.renderBackground(stack);
-        Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        Minecraft.getInstance().currentScreen.blit(stack, x, y, 0, 0, guiWidth, guiHeight);
-        Minecraft.getInstance().currentScreen.blit(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
+        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+        Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, guiWidth, guiHeight);
+        Minecraft.getInstance().screen.blit(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
         super.renderBackground(stack, mouseX, mouseY, partialTicks);
         textField.renderButton(stack, mouseX, mouseY, partialTicks);
     }
@@ -154,14 +154,14 @@ public class PortalsScreen extends ScreenAddonScreen {
     }
 
     private void checkForScrolling(int mouseX, int mouseY) {
-        if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
+        if (GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
             if (!isDragging && mouseX > this.x + guiWidth - 22 && mouseX < this.x + guiWidth - 22 + 18 && mouseY > this.y + 10 && mouseY < this.y + 10 + 151) {
                 isDragging = true;
             }
             if (isDragging) {
                 mouseY -= (7 + 18 + this.y);
                 lastScrolling = scrolling;
-                scrolling = MathHelper.clamp(mouseY / 128D, 0, 1);
+                scrolling = Mth.clamp(mouseY / 128D, 0, 1);
                 addPortalButtons();
             }
         } else {
@@ -171,7 +171,7 @@ public class PortalsScreen extends ScreenAddonScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double z) {
-        scrolling = MathHelper.clamp(scrolling -= z / (currentlyShowing.size() - 7D), 0, 1);
+        scrolling = Mth.clamp(scrolling -= z / (currentlyShowing.size() - 7D), 0, 1);
         addPortalButtons();
         return true;
     }

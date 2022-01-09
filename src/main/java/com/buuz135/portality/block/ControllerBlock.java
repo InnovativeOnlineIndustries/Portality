@@ -31,26 +31,25 @@ import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,34 +58,34 @@ import java.util.UUID;
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     public ControllerBlock() {
-        super(Block.Properties.from(Blocks.IRON_BLOCK), ControllerTile.class);
+        super(Block.Properties.copy(Blocks.IRON_BLOCK), ControllerTile.class);
         setRegistryName(Portality.MOD_ID, "controller");
         setItemGroup(Portality.TAB);
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUniqueID(), false, false, worldIn.getDimensionKey(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
         PortalDataManager.addInformation(worldIn, information);
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        super.setPlacedBy(worldIn, pos, state, placer, stack);
     }
 
     @Override
-    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
-        super.onPlayerDestroy(worldIn, pos, state);
+    public void destroy(LevelAccessor worldIn, BlockPos pos, BlockState state) {
+        super.destroy(worldIn, pos, state);
         PortalDataManager.removeInformation(worldIn, pos);
     }
 
     @Override
-    public void onExplosionDestroy(World worldIn, BlockPos pos, Explosion explosionIn) {
-        super.onExplosionDestroy(worldIn, pos, explosionIn);
+    public void wasExploded(Level worldIn, BlockPos pos, Explosion explosionIn) {
+        super.wasExploded(worldIn, pos, explosionIn);
         PortalDataManager.removeInformation(worldIn, pos);
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING_HORIZONTAL, context.getPlacementHorizontalFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING_HORIZONTAL, context.getHorizontalDirection().getOpposite());
     }
 
     @Nonnull
@@ -96,51 +95,51 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult ray) {
-        TileEntity tile = worldIn.getTileEntity(pos);
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult ray) {
+        BlockEntity tile = worldIn.getBlockEntity(pos);
         if (tile instanceof ControllerTile) {
             ControllerTile controller = (ControllerTile) tile;
-            if (!worldIn.isRemote()) {
+            if (!worldIn.isClientSide()) {
                 if (!controller.isFormed()) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.size").mergeStyle(TextFormatting.RED), true);
-                    return ActionResultType.SUCCESS;
+                    playerIn.displayClientMessage(new TranslatableComponent("portality.controller.error.size").withStyle(ChatFormatting.RED), true);
+                    return InteractionResult.SUCCESS;
                 }
-                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID())) {
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portality.controller.error.privacy").mergeStyle(TextFormatting.RED), true);
-                    return ActionResultType.SUCCESS;
+                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUUID())) {
+                    playerIn.displayClientMessage(new TranslatableComponent("portality.controller.error.privacy").withStyle(ChatFormatting.RED), true);
+                    return InteractionResult.SUCCESS;
                 }
-                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUniqueID()) && !playerIn.getHeldItem(hand).isEmpty() && !playerIn.getHeldItem(hand).isItemEqual(controller.getDisplay())) {
-                    if (playerIn.getHeldItem(hand).getItem() instanceof TeleportationTokenItem){
-                        if (playerIn.getHeldItem(hand).hasTag()){
-                            controller.addTeleportationToken(playerIn.getHeldItem(hand));
-                            playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.added_token").mergeStyle(TextFormatting.GREEN), true);
+                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUUID()) && !playerIn.getItemInHand(hand).isEmpty() && !playerIn.getItemInHand(hand).sameItem(controller.getDisplay())) {
+                    if (playerIn.getItemInHand(hand).getItem() instanceof TeleportationTokenItem){
+                        if (playerIn.getItemInHand(hand).hasTag()){
+                            controller.addTeleportationToken(playerIn.getItemInHand(hand));
+                            playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.added_token").withStyle(ChatFormatting.GREEN), true);
                         }
-                        return ActionResultType.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
-                    playerIn.sendStatusMessage(new TranslationTextComponent("portility.controller.info.icon_changed").mergeStyle(TextFormatting.GREEN), true);
-                    controller.setDisplayNameEnabled(playerIn.getHeldItem(hand));
-                    return ActionResultType.SUCCESS;
+                    playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.icon_changed").withStyle(ChatFormatting.GREEN), true);
+                    controller.setDisplayNameEnabled(playerIn.getItemInHand(hand));
+                    return InteractionResult.SUCCESS;
                 }
             } else if (controller.isFormed()) {
-                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUniqueID()))
-                    return ActionResultType.SUCCESS;
-                Minecraft.getInstance().deferTask(() -> {
+                if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUUID()))
+                    return InteractionResult.SUCCESS;
+                Minecraft.getInstance().submitAsync(() -> {
                     ControllerTile.OpenGui.open(0, (ControllerTile) tile);
                 });
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
-        return super.onBlockActivated(state, worldIn, pos, playerIn, hand, ray);
+        return super.use(state, worldIn, pos, playerIn, hand, ray);
     }
 
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        TileEntity entity = worldIn.getTileEntity(pos);
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        BlockEntity entity = worldIn.getBlockEntity(pos);
         if (entity instanceof ControllerTile) {
             ((ControllerTile) entity).breakController();
         }
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
@@ -150,7 +149,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public BlockEntity newBlockEntity(BlockGetter worldIn) {
         return new ControllerTile();
     }
 

@@ -30,12 +30,12 @@ import com.hrznstudio.titanium.block.tile.GeneratorTile;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeColor;
-import net.minecraft.tileentity.FurnaceTileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 
 import javax.annotation.Nonnull;
 
@@ -49,18 +49,18 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
         this.addInventory(fuel = (SidedInventoryComponent<LowEfficiencyGeneratorTile>) new SidedInventoryComponent<LowEfficiencyGeneratorTile>("fuel", 46, 22, 1, 0)
                 .setColor(DyeColor.ORANGE)
                 .setColorGuiEnabled(false)
-                .setInputFilter((itemStack, integer) -> FurnaceTileEntity.isFuel(itemStack))
+                .setInputFilter((itemStack, integer) -> FurnaceBlockEntity.isFuel(itemStack))
                 .setComponentHarness(this)
         );
     }
 
     @Override
-    public ActionResultType onActivated(PlayerEntity playerIn, Hand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ActionResultType.SUCCESS) {
+    public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
             openGui(playerIn);
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -76,14 +76,14 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
 
     @Override
     public int consumeFuel() {
-        int time = FurnaceTileEntity.getBurnTimes().getOrDefault(fuel.getStackInSlot(0).getItem(), 100);
+        int time = FurnaceBlockEntity.getFuel().getOrDefault(fuel.getStackInSlot(0).getItem(), 100);
         fuel.getStackInSlot(0).shrink(1);
         return time;
     }
 
     @Override
     public boolean canStart() {
-        return !fuel.getStackInSlot(0).isEmpty() && FurnaceTileEntity.getBurnTimes().get(fuel.getStackInSlot(0).getItem()) != null;
+        return !fuel.getStackInSlot(0).isEmpty() && FurnaceBlockEntity.getFuel().get(fuel.getStackInSlot(0).getItem()) != null;
     }
 
     @Override

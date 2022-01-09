@@ -24,36 +24,36 @@
 package com.buuz135.portality.proxy.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.LocatableSound;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class TickeableSound extends LocatableSound implements ITickableSound {
+public class TickeableSound extends AbstractSoundInstance implements TickableSoundInstance {
 
     private boolean done;
-    private World world;
+    private Level world;
 
-    public TickeableSound(World world, BlockPos pos, SoundEvent soundIn) {
-        super(soundIn, SoundCategory.BLOCKS);
+    public TickeableSound(Level world, BlockPos pos, SoundEvent soundIn) {
+        super(soundIn, SoundSource.BLOCKS);
         this.world = world;
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
-        this.repeat = true;
+        this.looping = true;
         this.done = false;
         this.volume = 0.35f;
         this.pitch = 0f;
-        this.global = false;
+        this.relative = false;
     }
 
     @Override
-    public boolean isDonePlaying() {
+    public boolean isStopped() {
         return done;
     }
 
@@ -75,10 +75,10 @@ public class TickeableSound extends LocatableSound implements ITickableSound {
 
     @Override
     public void tick() {
-        if (world.getTileEntity(new BlockPos(x, y, z)) == null) {
+        if (world.getBlockEntity(new BlockPos(x, y, z)) == null) {
             setDone();
         }
-        double distance = Minecraft.getInstance().player.getPosition().manhattanDistance(new BlockPos(this.x, this.y, this.z));
+        double distance = Minecraft.getInstance().player.blockPosition().distManhattan(new BlockPos(this.x, this.y, this.z));
         if (distance > 16) {
             this.volume = 0;
         } else {

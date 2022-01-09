@@ -23,13 +23,13 @@
  */
 package com.buuz135.portality.data;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
@@ -40,13 +40,13 @@ public class PortalInformation {
     private String name;
     private boolean isActive;
     private boolean isPrivate;
-    private RegistryKey<World> dimension;
+    private ResourceKey<Level> dimension;
     private BlockPos location;
     private ItemStack display;
     private boolean interdimensional;
     private boolean isToken;
 
-    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, RegistryKey<World> dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
+    public PortalInformation(UUID id, UUID owner, boolean isActive, boolean isPrivate, ResourceKey<Level> dimension, BlockPos location, String name, ItemStack display, boolean interdimensional) {
         this.id = id;
         this.owner = owner;
         this.isActive = isActive;
@@ -59,9 +59,9 @@ public class PortalInformation {
         this.isToken = false;
     }
 
-    public static PortalInformation readFromNBT(CompoundNBT info) {
-        return new PortalInformation(info.getUniqueId("ID"), info.getUniqueId("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(info.getString("Dimension"))), BlockPos.fromLong(info.getLong("Position")), info.getString("Name"), ItemStack.read(info.getCompound("Display")), info.getBoolean("Interdimensional")).setToken(info.getBoolean("Token"));
+    public static PortalInformation readFromNBT(CompoundTag info) {
+        return new PortalInformation(info.getUUID("ID"), info.getUUID("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
+                ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(info.getString("Dimension"))), BlockPos.of(info.getLong("Position")), info.getString("Name"), ItemStack.of(info.getCompound("Display")), info.getBoolean("Interdimensional")).setToken(info.getBoolean("Token"));
     }
 
     public UUID getId() {
@@ -88,7 +88,7 @@ public class PortalInformation {
         isPrivate = aPrivate;
     }
 
-    public RegistryKey<World> getDimension() {
+    public ResourceKey<Level> getDimension() {
         return dimension;
     }
 
@@ -129,14 +129,14 @@ public class PortalInformation {
         return this;
     }
 
-    public CompoundNBT writetoNBT() {
-        CompoundNBT infoTag = new CompoundNBT();
-        infoTag.putUniqueId("ID", getId());
-        infoTag.putUniqueId("Owner", getOwner());
+    public CompoundTag writetoNBT() {
+        CompoundTag infoTag = new CompoundTag();
+        infoTag.putUUID("ID", getId());
+        infoTag.putUUID("Owner", getOwner());
         infoTag.putBoolean("Active", isActive());
         infoTag.putBoolean("Private", isPrivate());
-        infoTag.putString("Dimension", getDimension().getLocation().toString());
-        infoTag.putLong("Position", getLocation().toLong());
+        infoTag.putString("Dimension", getDimension().location().toString());
+        infoTag.putLong("Position", getLocation().asLong());
         infoTag.putString("Name", getName());
         infoTag.put("Display", display.serializeNBT());
         infoTag.putBoolean("Interdimensional", interdimensional);
