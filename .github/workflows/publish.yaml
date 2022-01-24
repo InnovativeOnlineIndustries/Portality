@@ -28,8 +28,8 @@ jobs:
         with:
           curseforge-id: 291493
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files-primary: build/libs/!(*-@(dev|sources)).jar
-          files-secondary: build/libs/*-@(dev|sources).jar
+          files-primary: build/libs/!(*-@(dev|sources|deobf)).jar
+          files-secondary: build/libs/*-@(dev|sources|deobf).jar
           version-type: beta
           loaders: forge
           game-versions: 1.18.1
