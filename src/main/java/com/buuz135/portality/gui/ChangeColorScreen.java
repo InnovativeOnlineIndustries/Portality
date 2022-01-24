@@ -8,6 +8,7 @@ import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.color.ColorPickerAddon;
 import com.hrznstudio.titanium.util.AssetUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -65,7 +66,7 @@ public class ChangeColorScreen extends ScreenAddonScreen {
     @Override
     public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         renderBackground(stack);
-        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/color_change.png"));
+        RenderSystem.setShaderTexture(0, new ResourceLocation(Portality.MOD_ID, "textures/gui/color_change.png"));
         Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, 175, 146);
         GuiComponent.fill(stack, x + 13, y + 9, x + 15 + 100, y + 91, -16739073);
         GuiComponent.fill(stack, x + 123, y + 9, x + 121 + 40, y + 91, -16739073);

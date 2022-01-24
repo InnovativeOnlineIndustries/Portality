@@ -31,6 +31,7 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
@@ -92,7 +93,7 @@ public class PortalsScreen extends ScreenAddonScreen {
         tempInformations.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
         if (!textField.getValue().isEmpty())
             tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getValue().toLowerCase()));
-        this.buttons.removeIf(guiButton -> portalButtons.contains(guiButton));
+        this.children().removeIf(guiButton -> portalButtons.contains(guiButton));
         this.portalButtons.clear();
         this.visiblePortalInformations = tempInformations.size();
         int pointer = (int) (((tempInformations.size() - 7) * scrolling));
@@ -106,7 +107,7 @@ public class PortalsScreen extends ScreenAddonScreen {
                         selectedPortal = currentlyShowing.get(finalI + (int) (((currentlyShowing.size() - 7) * scrolling)));
                     }
                 };
-                this.addButton(buttonImage);
+                this.addRenderableWidget(buttonImage);
                 this.portalButtons.add(buttonImage);
             }
         }
@@ -132,7 +133,7 @@ public class PortalsScreen extends ScreenAddonScreen {
     public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         checkForScrolling(mouseX, mouseY);
         this.renderBackground(stack);
-        Minecraft.getInstance().getTextureManager().bind(new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
+        RenderSystem.setShaderTexture(0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
         Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, guiWidth, guiHeight);
         Minecraft.getInstance().screen.blit(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
         super.renderBackground(stack, mouseX, mouseY, partialTicks);

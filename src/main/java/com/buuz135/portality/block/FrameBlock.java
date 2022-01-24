@@ -35,6 +35,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 
@@ -44,8 +45,7 @@ import javax.annotation.Nullable;
 public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     public FrameBlock(String name, Class<T> tileClass) {
-        super(Block.Properties.copy(Blocks.IRON_BLOCK), tileClass);
-        setRegistryName(Portality.MOD_ID, name);
+        super(name, Block.Properties.copy(Blocks.IRON_BLOCK), tileClass);
         setItemGroup(Portality.TAB);
     }
 
@@ -68,20 +68,8 @@ public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
     }
 
     @Override
-    public IFactory<T> getTileEntityFactory() {
-        return new IFactory<T>() {
-            @Nonnull
-            @Override
-            public T create() {
-                return (T) new BasicFrameTile();
-            }
-        };
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new BasicFrameTile();
+    public BlockEntityType.BlockEntitySupplier<?> getTileEntityFactory() {
+        return BasicFrameTile::new;
     }
 
     @Override

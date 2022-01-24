@@ -30,14 +30,17 @@ import com.hrznstudio.titanium.api.client.IAsset;
 import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ITileContainer;
+import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonAddon;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.button.ButtonComponent;
+import com.hrznstudio.titanium.network.locator.ILocatable;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -77,12 +80,17 @@ public abstract class PortalSettingButton extends ButtonComponent {
             }
 
             @Override
-            public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-                Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 1f, 1f, Minecraft.getInstance().player.blockPosition()));
-                if (tile instanceof ITileContainer) {
-                    Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getBlockPos()), getId(), new CompoundTag()));
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                Screen screen = Minecraft.getInstance().screen;
+                if (screen instanceof ScreenAddonScreen && screen instanceof ITileContainer) {
+                    if (!isMouseOver(mouseX - ((ScreenAddonScreen) screen).x, mouseY - ((ScreenAddonScreen) screen).y))
+                        return false;
+                    Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 0.2f, 1f, Minecraft.getInstance().player.blockPosition()));
+                    Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) screen).getTile().getBlockPos()), getId(), new CompoundTag()));
+                    supplier.get().run();
+                    return true;
                 }
-                supplier.get().run();
+                return false;
             }
         });
     }

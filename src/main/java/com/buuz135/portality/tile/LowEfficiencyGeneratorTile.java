@@ -26,16 +26,19 @@ package com.buuz135.portality.tile;
 import com.buuz135.portality.gui.TileAssetProvider;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.GeneratorTile;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 
@@ -44,8 +47,8 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
     @Save
     private SidedInventoryComponent<LowEfficiencyGeneratorTile> fuel;
 
-    public LowEfficiencyGeneratorTile() {
-        super(CommonProxy.BLOCK_GENERATOR);
+    public LowEfficiencyGeneratorTile(BlockPos pos, BlockState state) {
+        super((BasicTileBlock<LowEfficiencyGeneratorTile>) CommonProxy.BLOCK_GENERATOR.get(), pos, state);
         this.addInventory(fuel = (SidedInventoryComponent<LowEfficiencyGeneratorTile>) new SidedInventoryComponent<LowEfficiencyGeneratorTile>("fuel", 46, 22, 1, 0)
                 .setColor(DyeColor.ORANGE)
                 .setColorGuiEnabled(false)

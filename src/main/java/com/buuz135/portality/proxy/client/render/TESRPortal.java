@@ -31,14 +31,19 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -46,29 +51,49 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
-public class TESRPortal extends BlockEntityRenderer<ControllerTile> {
+public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
+
+    public static ResourceLocation TEXTURE = new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png");
 
     private static final Random RANDOM = new Random(31100L);
     public static RenderType TYPE = createRenderType();
 
-    public TESRPortal(BlockEntityRenderDispatcher dispatcher) {
-        super(dispatcher);
+    public TESRPortal(BlockEntityRendererProvider.Context context) {
+
     }
 
     public static RenderType createRenderType() {
-        RenderType.CompositeState state = RenderType.CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(new ResourceLocation(Portality.MOD_ID, "textures/blocks/portal_render.png"), false, false)).setTransparencyState(new RenderStateShard.TransparencyStateShard("translucent_transparency", () -> {
+        RenderType.CompositeState state = RenderType.CompositeState.builder()
+                //.setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexShader))
+                .setWriteMaskState(new RenderStateShard.WriteMaskStateShard(true, true))
+                .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorTexShader))
+                .setTextureState(new RenderStateShard.TextureStateShard(TEXTURE, false, false)).setTransparencyState(new RenderStateShard.TransparencyStateShard("translucent_transparency", () -> {
             RenderSystem.enableBlend();
+            //RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
         }, () -> {
-            RenderSystem.disableBlend();
-        })).createCompositeState(true);
-        return RenderType.create("portal_render", DefaultVertexFormat.POSITION_TEX_COLOR, 7, 256, false, true, state);
+                    RenderSystem.disableBlend();
+                    RenderSystem.defaultBlendFunc();
+        })).setLayeringState(new RenderStateShard.LayeringStateShard("view_offset_z_layering", () -> {
+                    PoseStack posestack = RenderSystem.getModelViewStack();
+                    posestack.pushPose();
+                    posestack.scale(0.99975586F, 0.99975586F, 0.99975586F);
+                    RenderSystem.applyModelViewMatrix();
+                }, () -> {
+                    PoseStack posestack = RenderSystem.getModelViewStack();
+                    posestack.popPose();
+                    RenderSystem.applyModelViewMatrix();
+                })).setCullState(new RenderStateShard.CullStateShard(false)).createCompositeState(true);
+        return RenderType.create("portal_render", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, false, state);
     }
 
     public void renderTop(PoseStack stack, VertexConsumer buffer, ControllerTile te, float frame, float xTrans, float yTrans, float zTrans, double offset, int width, int color) {
         double scale = 0.9335;
         float y = 3.999f;
         float off = /*0.0278*/ 4 - y;
+        float red = FastColor.ARGB32.red(color) / 256F;
+        float green = FastColor.ARGB32.green(color)  / 256F;
+        float blue = FastColor.ARGB32.blue(color)  / 256F;
         //RenderSystem.scale(scale, 1, 1);
         for (int posX = 0; posX < width; ++posX) {
             for (int posZ = 0; posZ < te.getLength(); ++posZ) {
@@ -96,13 +121,11 @@ public class TESRPortal extends BlockEntityRenderer<ControllerTile> {
                 float zOffset = posZ + zTrans;
                 Matrix4f matrix = stack.last().pose();
     
-                int red = FastColor.ARGB32.red(color);
-                int green = FastColor.ARGB32.green(color);
-                int blue = FastColor.ARGB32.blue(color);
-                buffer.vertex(matrix, pX2 + xOffset, yOffset, 0 + zOffset).uv(u2, 0).color(red, green, blue, alpha).endVertex();
-                buffer.vertex(matrix, pX1 + xOffset, yOffset, 0 + zOffset).uv(u, 0).color(red, green, blue, alpha).endVertex();
-                buffer.vertex(matrix, pX1 + xOffset, yOffset, 1 + zOffset).uv(u, 1).color(red, green, blue, alpha).endVertex();
-                buffer.vertex(matrix, pX2 + xOffset, yOffset, 1 + zOffset).uv(u2, 1).color(red, green, blue, alpha).endVertex();
+
+                buffer.vertex(matrix, pX2 + xOffset, yOffset, 0 + zOffset).color(red, green, blue, alpha).uv(u2, 0).endVertex();
+                buffer.vertex(matrix, pX1 + xOffset, yOffset, 0 + zOffset).color(red, green, blue, alpha).uv(u, 0).endVertex();
+                buffer.vertex(matrix, pX1 + xOffset, yOffset, 1 + zOffset).color(red, green, blue, alpha).uv(u, 1).endVertex();
+                buffer.vertex(matrix, pX2 + xOffset, yOffset, 1 + zOffset).color(red, green, blue, alpha).uv(u2, 1).endVertex();
                 //tessellator.draw();
                 //RenderSystem.translated(-(posX - 2.1 + frame + off), 0, -posZ);
 
@@ -111,86 +134,10 @@ public class TESRPortal extends BlockEntityRenderer<ControllerTile> {
         //RenderSystem.scale(1 / scale, 1, 1);
     }
 
-    //@Override
-    //public void render(TileController te, float p_225616_2_, MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int p_225616_5_, int p_225616_6_) {
-    //    //super.render(te, x, y, z, partialTicks, destroyStage);
-    //    if (!te.isFormed()) return;
-    //    RenderSystem.pushMatrix();
-    //    //matrixStack.pushPose();
-    //    //RenderSystem.enableBlend();
-    //    //BufferBuilder buffer = tessellator.getBuffer();
-    //    ResourceLocation texture = new ResourceLocation("textures/entity/beacon_beam.png");
-    //    IVertexBuilder buffer = typeBuffer.getBuffer(TYPE);
-    //    int j = 240;
-    //    int k = 224;
-    //    int x = te.getPos().getX();
-    //    int y = te.getPos().getY();
-    //    int z = te.getPos().getZ();
-    //    RenderHelper.disableStandardItemLighting();
-    //    if (Minecraft.isAmbientOcclusionEnabled()) {
-    //        RenderSystem.shadeModel(GL11.GL_SMOOTH);
-    //    } else {
-    //        RenderSystem.shadeModel(GL11.GL_FLAT);
-    //    }
-    //    //Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(Portality.MOD_ID, "blocks/portal_render.png"));
-    //    //Minecraft.getInstance().getTextureManager().bindTexture(;
-    //    //RenderSystem.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-    //    //matrixStack.translate(x, y, z);
-    //    //ROTATE Z TO COMPLETE TUNNEL ROTATE Y TO ROTATE FACINGB
-    //    Direction facing = te.getWorld().getBlockState(te.getPos()).get(BlockController.FACING);
-    //    if (facing == Direction.SOUTH) {
-    //        RenderSystem.translated(1, 0, 1);
-    //        RenderSystem.rotatef(-180, 0, 1, 0);
-    //    }
-    //    if (facing == Direction.EAST) {
-    //        RenderSystem.translated(1, 0, 0);
-    //        RenderSystem.rotatef(-90, 0, 1, 0);
-    //    }
-    //    if (facing == Direction.WEST) {
-    //        RenderSystem.translated(0, 0, 1);
-    //        RenderSystem.rotatef(90, 0, 1, 0);
-    //    }
-    //    float frame = (te.getWorld().getGameTime() % 60) / 60f;
-    //    //frame = 0.4;
-    //    //TOP
-    //    RenderSystem.translated(0.1 - te.getWidth() + 2, te.getHeight() - 5, 0);
-    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.4, te.getWidth() * 2);
-    //    RenderSystem.translated(-0.1 - (-te.getWidth() + 2), -(te.getHeight() - 5), 0);
-    //    //RIGHT
-    //    RenderSystem.translated(3 - te.getWidth() + 2, 2.1, 0);
-    //    RenderSystem.rotatef(90, 0, 0, 1);
-    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.2, te.getHeight() - 1);
-    //    RenderSystem.rotatef(-90, 0, 0, 1);
-    //    RenderSystem.translated(-3 - (-te.getWidth() + 2), -2.1, 0);
-    //    //LEFT
-    //    RenderSystem.translated(-2 + te.getWidth() - 2, te.getHeight() - 2.1, 0);
-    //    RenderSystem.rotatef(-90, 0, 0, 1);
-    //    renderTop(matrixStack, buffer, te, frame, j, k, 0, te.getHeight() - 1);
-    //    RenderSystem.rotatef(90, 0, 0, 1);
-    //    RenderSystem.translated(2 - (te.getWidth() - 2), -(te.getHeight() - 2.1), 0);
-    //    //BOTTOM
-    //    RenderSystem.translated(0.9 + te.getWidth() - 2, 5, 0);
-    //    RenderSystem.rotatef(-180, 0, 0, 1);
-    //    renderTop(matrixStack, buffer, te, frame, j, k, 0.6, te.getWidth() * 2);
-    //    RenderSystem.rotatef(190, 0, 0, 1);
-    //    RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
-//
-    //    matrixStack.translate(0,0,0);
-    //    //buffer.setTranslation(0, 0, 0);
-    //    RenderSystem.setupGui3DDiffuseLighting();
-    //    RenderSystem.disableBlend();
-    //    RenderSystem.popMatrix();
-    //    if (te.isActive() && te.getLinkData() != null && te.isDisplayNameEnabled()) {
-    //        //this.setLightmapDisabled(true);
-    //        //drawNameplate(te, te.getLinkData().getName(), x, y, z, 16);
-    //        //this.setLightmapDisabled(false);
-    //    }
-    //}
-
     @Override
     public void render(ControllerTile te, float p_225616_2_, PoseStack matrixStack, MultiBufferSource typeBuffer, int p_225616_5_, int p_225616_6_) {
         if (!te.isFormed()) return;
-        RenderSystem.pushMatrix();
+        matrixStack.pushPose();
         float frame = (te.getLevel().getGameTime() % 60) / 60f;
         //Color color = Color.getHSBColor((te.getWorld().getGameTime() % 360)/ 360f , 01f ,1f);
         //renderTop(stack, p_225616_4_.getBuffer(TYPE), te, frame,0,0, -0.6, te.getWidth() * 2);
@@ -270,7 +217,7 @@ public class TESRPortal extends BlockEntityRenderer<ControllerTile> {
         renderTop(matrixStack, buffer, te, frame, -te.getWidth() - x + 1, -1 - y, z, 0.6, te.getWidth() * 2, te.getColor());
         //RenderSystem.rotatef(190, 0, 0, 1);180f));
         //RenderSystem.translated(-0.9 - (+te.getWidth() - 2), -5, 0);
-        RenderSystem.popMatrix();
+        matrixStack.popPose();
 
     }
 }

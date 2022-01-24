@@ -35,26 +35,25 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     private BlockPos controllerPos;
     private int color;
 
-    public FrameTile(BasicTileBlock<T> base) {
-        super(base);
+    public FrameTile(BasicTileBlock<T> base, BlockPos pos, BlockState state) {
+        super(base, pos, state);
         this.color = Integer.parseInt("0094ff", 16); //Default Blue
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
-        compound = super.save(compound);
+    protected void saveAdditional(CompoundTag compoundTag) {
+        super.saveAdditional(compoundTag);
         if (controllerPos != null) {
-            compound.putInt("X", controllerPos.getX());
-            compound.putInt("Y", controllerPos.getY());
-            compound.putInt("Z", controllerPos.getZ());
+            compoundTag.putInt("X", controllerPos.getX());
+            compoundTag.putInt("Y", controllerPos.getY());
+            compoundTag.putInt("Z", controllerPos.getZ());
         }
-        compound.putInt("Color", color);
-        return compound;
+        compoundTag.putInt("Color", color);
     }
 
     @Override
-    public void load(BlockState state, CompoundTag compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         if (compound.contains("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }

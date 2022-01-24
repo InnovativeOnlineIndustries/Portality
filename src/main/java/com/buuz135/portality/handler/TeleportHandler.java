@@ -46,7 +46,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.network.NetworkDirection;
 
 import java.util.*;
 
@@ -128,7 +128,7 @@ public class TeleportHandler {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
                 if (entry.getKey().level.isClientSide)
-                    entry.getKey().level.getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ(), entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()).inflate(16)).forEach(entityPlayer -> entityPlayer.connection.send(new ClientboundCustomSoundPacket(PortalitySoundHandler.PORTAL_TP.getRegistryName(), SoundSource.BLOCKS, new Vec3(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()), 0.5f, 1f)));
+                    entry.getKey().level.getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ(), entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()).inflate(16)).forEach(entityPlayer -> entityPlayer.connection.send(new ClientboundCustomSoundPacket(PortalitySoundHandler.PORTAL_TP.get().getRegistryName(), SoundSource.BLOCKS, new Vec3(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()), 0.5f, 1f)));
                 entry.getValue().moved = true;
                 Level tpWorld = entry.getKey().level;
                 Direction tpFacing = Direction.NORTH;

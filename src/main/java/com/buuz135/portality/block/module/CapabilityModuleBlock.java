@@ -92,7 +92,7 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockGetter p_49823_, BlockPos p_49824_, BlockState p_49825_) {
         return new ItemStack(this, 1);
     }
 

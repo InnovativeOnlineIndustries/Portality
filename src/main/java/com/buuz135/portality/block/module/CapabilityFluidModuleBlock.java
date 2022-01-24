@@ -24,11 +24,11 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.FluidModuleTile;
-import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -66,13 +66,7 @@ public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHand
     }
 
     @Override
-    public IFactory<FluidModuleTile> getTileEntityFactory() {
+    public BlockEntityType.BlockEntitySupplier<?> getTileEntityFactory() {
         return FluidModuleTile::new;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new FluidModuleTile();
     }
 }

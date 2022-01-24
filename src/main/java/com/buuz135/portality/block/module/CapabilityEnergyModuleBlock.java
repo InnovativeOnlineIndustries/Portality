@@ -24,11 +24,11 @@
 package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.EnergyModuleTile;
-import com.hrznstudio.titanium.api.IFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -64,13 +64,8 @@ public class CapabilityEnergyModuleBlock extends CapabilityModuleBlock<IEnergySt
     }
 
     @Override
-    public IFactory<EnergyModuleTile> getTileEntityFactory() {
+    public BlockEntityType.BlockEntitySupplier<?> getTileEntityFactory() {
         return EnergyModuleTile::new;
     }
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new EnergyModuleTile();
-    }
 }

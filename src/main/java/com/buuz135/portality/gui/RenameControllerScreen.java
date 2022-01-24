@@ -55,14 +55,14 @@ public class RenameControllerScreen extends Screen {
         textFieldWidget.setHighlightPos(0);
         textFieldWidget.setValue(this.controller.getPortalDisplayName());
         textFieldWidget.setFocus(true);
-        addButton(textFieldWidget);
+        this.addRenderableWidget(textFieldWidget);
         //this.setFocused(this.textFieldWidget);
 
         confirm = new Button(width / 2 + textFieldWidth / 2 + 5, height / 2 - 10, 50, 18, new TextComponent("Confirm"), button -> {
             Portality.NETWORK.get().sendToServer(new PortalRenameMessage(textFieldWidget.getValue(), controller.getBlockPos()));
             Minecraft.getInstance().setScreen(new ControllerScreen(controller));
         });
-        addButton(confirm);
+        this.addRenderableWidget(confirm);
     }
 
     @Override

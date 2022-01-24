@@ -26,11 +26,16 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.client.screen.addon.EnergyBarScreenAddon;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -46,10 +51,16 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
     private final EnergyStorageComponent<EnergyModuleTile> energyStorage;
     private final LazyOptional<IEnergyStorage> lazyEnergyStorage = LazyOptional.of(this::getEnergyStorage);
 
-    public EnergyModuleTile() {
-        super(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE);
+    public EnergyModuleTile(BlockPos pos, BlockState state) {
+        super((BasicTileBlock<EnergyModuleTile>) CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), pos, state);
         this.energyStorage = new EnergyStorageComponent<>(10000, 10000, 10000, 10, 20);
         this.energyStorage.setComponentHarness(this.getSelf());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public void initClient() {
+        super.initClient();
         this.addGuiAddonFactory(() -> new EnergyBarScreenAddon(10, 20, energyStorage));
     }
 
@@ -66,7 +77,8 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
     }
 
     @Override
-    public void tick() {
+    public void serverTick(Level level, BlockPos pos, BlockState state, EnergyModuleTile blockEntity) {
+        super.serverTick(level, pos, state, blockEntity);
         if (!isInput()) {
             for (Direction facing : Direction.values()) {
                 BlockPos checking = this.worldPosition.relative(facing);

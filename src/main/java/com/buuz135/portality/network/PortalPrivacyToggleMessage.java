@@ -28,7 +28,7 @@ import com.hrznstudio.titanium.network.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PortalPrivacyToggleMessage extends Message {
 

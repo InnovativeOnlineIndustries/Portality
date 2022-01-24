@@ -23,15 +23,22 @@
  */
 package com.buuz135.portality;
 
+import com.buuz135.portality.block.ControllerBlock;
+import com.buuz135.portality.block.FrameBlock;
+import com.buuz135.portality.block.GeneratorBlock;
+import com.buuz135.portality.block.InterdimensionalModuleBlock;
+import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
+import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
+import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
+import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.network.*;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
 import com.buuz135.portality.proxy.client.render.AuraRender;
+import com.buuz135.portality.tile.BasicFrameTile;
 import com.hrznstudio.titanium.TitaniumClient;
 import com.hrznstudio.titanium.event.handler.EventManager;
-import com.hrznstudio.titanium.module.Feature;
-import com.hrznstudio.titanium.module.Module;
 import com.hrznstudio.titanium.module.ModuleController;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.reward.Reward;
@@ -66,7 +73,7 @@ public class Portality extends ModuleController {
     public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(CommonProxy.BLOCK_CONTROLLER);
+            return new ItemStack(CommonProxy.BLOCK_CONTROLLER.get());
         }
     };
 
@@ -88,9 +95,6 @@ public class Portality extends ModuleController {
         RewardGiver giver = RewardManager.get().getGiver(UUID.fromString("d28b7061-fb92-4064-90fb-7e02b95a72a6"), "Buuz135");
         try {
             giver.addReward(new Reward(new ResourceLocation(Portality.MOD_ID, "aura"), new URL("https://raw.githubusercontent.com/Buuz135/Industrial-Foregoing/master/contributors.json"), () -> dist -> {
-                if (dist == Dist.CLIENT) {
-                    registerAura();
-                }
             }, Arrays.stream(AuraType.values()).map(Enum::toString).collect(Collectors.toList()).toArray(new String[]{})));
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -99,19 +103,17 @@ public class Portality extends ModuleController {
 
     @Override
     protected void initModules() {
-        addModule(Module.builder("core").force()
-                .feature(Feature.builder("core")
-                        .content(Block.class, CommonProxy.BLOCK_CONTROLLER)
-                        .content(Block.class, CommonProxy.BLOCK_FRAME)
-                        .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE)
-                        .content(Block.class, CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE)
-                        .content(Block.class, CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE)
-                        .content(Block.class, CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE)
-                        .content(Block.class, CommonProxy.BLOCK_GENERATOR)
-                        .content(Item.class, CommonProxy.TELEPORTATION_TOKEN_ITEM)
-                        .content(SoundEvent.class, PortalitySoundHandler.PORTAL)
-                        .content(SoundEvent.class, PortalitySoundHandler.PORTAL_TP)
-                        .force()));
+        CommonProxy.BLOCK_CONTROLLER = getRegistries().register(Block.class, "controller", ControllerBlock::new);
+        CommonProxy.BLOCK_FRAME = getRegistries().register(Block.class, "frame", () -> new FrameBlock<BasicFrameTile>("frame", BasicFrameTile.class));
+        CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE = getRegistries().register(Block.class, "module_energy", CapabilityEnergyModuleBlock::new);
+        CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE = getRegistries().register(Block.class, "module_fluids", CapabilityFluidModuleBlock::new);
+        CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE = getRegistries().register(Block.class, "module_items", CapabilityItemModuleBlock::new);
+        CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE = getRegistries().register(Block.class, "module_interdimensional", InterdimensionalModuleBlock::new);
+        CommonProxy.BLOCK_GENERATOR = getRegistries().register(Block.class, "generator", GeneratorBlock::new);
+        CommonProxy.TELEPORTATION_TOKEN_ITEM = getRegistries().register(Item.class, "teleportation_token", TeleportationTokenItem::new);
+
+        PortalitySoundHandler.PORTAL = getRegistries().register(SoundEvent.class, "portal", () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal")));
+        PortalitySoundHandler.PORTAL_TP = getRegistries().register(SoundEvent.class, "portal_teleport",  () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")));
     }
 
     public void onCommon(FMLCommonSetupEvent event) {
@@ -119,7 +121,7 @@ public class Portality extends ModuleController {
     }
 
     public void onClient(FMLClientSetupEvent event) {
-        proxy.onClient(event.getMinecraftSupplier().get());
+        proxy.onClient(Minecraft.getInstance());
     }
 
     public enum AuraType {
@@ -154,11 +156,4 @@ public class Portality extends ModuleController {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private void registerAura() {
-        Minecraft instance = Minecraft.getInstance();
-        EntityRenderDispatcher manager = instance.getEntityRenderDispatcher();
-        manager.getSkinMap().get("default").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
-        manager.getSkinMap().get("slim").addLayer(new AuraRender(TitaniumClient.getPlayerRenderer(instance)));
-    }
 }

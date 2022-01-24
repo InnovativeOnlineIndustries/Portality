@@ -29,7 +29,6 @@ import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.ControllerTile;
-import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -48,6 +47,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -58,14 +58,13 @@ import java.util.UUID;
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     public ControllerBlock() {
-        super(Block.Properties.copy(Blocks.IRON_BLOCK), ControllerTile.class);
-        setRegistryName(Portality.MOD_ID, "controller");
+        super("controller", Block.Properties.copy(Blocks.IRON_BLOCK), ControllerTile.class);
         setItemGroup(Portality.TAB);
     }
 
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME.get()), false);
         PortalDataManager.addInformation(worldIn, information);
         super.setPlacedBy(worldIn, pos, state, placer, stack);
     }
@@ -132,7 +131,6 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
         return super.use(state, worldIn, pos, playerIn, hand, ray);
     }
 
-
     @Override
     public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         BlockEntity entity = worldIn.getBlockEntity(pos);
@@ -143,14 +141,9 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     }
 
     @Override
-    public IFactory<ControllerTile> getTileEntityFactory() {
+    public BlockEntityType.BlockEntitySupplier<?> getTileEntityFactory() {
         return ControllerTile::new;
     }
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new ControllerTile();
-    }
 
 }

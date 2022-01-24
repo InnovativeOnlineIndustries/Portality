@@ -35,24 +35,27 @@ import com.buuz135.portality.tile.BasicFrameTile;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.registries.RegistryObject;
 
 
 public class CommonProxy {
 
-    public static final ControllerBlock BLOCK_CONTROLLER = new ControllerBlock();
-    public static final FrameBlock<BasicFrameTile> BLOCK_FRAME = new FrameBlock<BasicFrameTile>("frame", BasicFrameTile.class);
-    public static final GeneratorBlock BLOCK_GENERATOR = new GeneratorBlock();
+    public static RegistryObject<Block> BLOCK_CONTROLLER;
+    public static RegistryObject<Block> BLOCK_FRAME;
+    public static RegistryObject<Block> BLOCK_GENERATOR;
 
-    public static final InterdimensionalModuleBlock BLOCK_INTERDIMENSIONAL_MODULE = new InterdimensionalModuleBlock();
-    public static final CapabilityItemModuleBlock BLOCK_CAPABILITY_ITEM_MODULE = new CapabilityItemModuleBlock();
-    public static final CapabilityFluidModuleBlock BLOCK_CAPABILITY_FLUID_MODULE = new CapabilityFluidModuleBlock();
-    public static final CapabilityEnergyModuleBlock BLOCK_CAPABILITY_ENERGY_MODULE = new CapabilityEnergyModuleBlock();
+    public static RegistryObject<Block> BLOCK_INTERDIMENSIONAL_MODULE;
+    public static RegistryObject<Block> BLOCK_CAPABILITY_ITEM_MODULE;
+    public static RegistryObject<Block> BLOCK_CAPABILITY_FLUID_MODULE;
+    public static RegistryObject<Block> BLOCK_CAPABILITY_ENERGY_MODULE;
 
-    public static final TeleportationTokenItem TELEPORTATION_TOKEN_ITEM = new TeleportationTokenItem();
+    public static RegistryObject<Item> TELEPORTATION_TOKEN_ITEM;
 
     public void onCommon() {
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();

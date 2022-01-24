@@ -25,11 +25,11 @@ package com.buuz135.portality.block;
 
 import com.buuz135.portality.Portality;
 import com.buuz135.portality.tile.LowEfficiencyGeneratorTile;
-import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
@@ -38,13 +38,12 @@ import javax.annotation.Nullable;
 public class GeneratorBlock extends RotatableBlock<LowEfficiencyGeneratorTile> {
 
     public GeneratorBlock() {
-        super(Block.Properties.copy(Blocks.IRON_BLOCK), LowEfficiencyGeneratorTile.class);
-        setRegistryName(Portality.MOD_ID, "generator");
+        super("generator", Block.Properties.copy(Blocks.IRON_BLOCK), LowEfficiencyGeneratorTile.class);
         setItemGroup(Portality.TAB);
     }
 
     @Override
-    public IFactory<LowEfficiencyGeneratorTile> getTileEntityFactory() {
+    public BlockEntityType.BlockEntitySupplier<?> getTileEntityFactory() {
         return LowEfficiencyGeneratorTile::new;
     }
 

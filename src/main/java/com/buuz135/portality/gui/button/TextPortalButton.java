@@ -27,6 +27,7 @@ import com.hrznstudio.titanium.Titanium;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ITileContainer;
+import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.BasicButtonAddon;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.button.ButtonComponent;
@@ -36,6 +37,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -88,17 +90,22 @@ public class TextPortalButton extends ButtonComponent {
         public void drawBackgroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
             super.drawBackgroundLayer(stack, screen, provider, guiX, guiY, mouseX, mouseY, partialTicks);
             String string = new TranslatableComponent(text).getString();
-            ChatFormatting color = isInside(screen, mouseX - guiX, mouseY - guiY) ? ChatFormatting.YELLOW : ChatFormatting.WHITE;
+            ChatFormatting color = isMouseOver(mouseX - guiX, mouseY - guiY) ? ChatFormatting.YELLOW : ChatFormatting.WHITE;
             Minecraft.getInstance().font.draw(stack, color + string, guiX + this.getPosX() + this.getXSize() / 2 - Minecraft.getInstance().font.width(string) / 2, guiY + this.getPosY() + this.getYSize() / 2f - 3.5f, 0xFFFFFF);
         }
 
         @Override
-        public void handleClick(Screen tile, int guiX, int guiY, double mouseX, double mouseY, int button) {
-            Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 1f, 1f, Minecraft.getInstance().player.blockPosition()));
-            if (tile instanceof ITileContainer) {
-                Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) tile).getTile().getBlockPos()), getId(), new CompoundTag()));
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            Screen screen = Minecraft.getInstance().screen;
+            if (screen instanceof ScreenAddonScreen && screen instanceof ITileContainer) {
+                if (!isMouseOver(mouseX - ((ScreenAddonScreen) screen).x, mouseY - ((ScreenAddonScreen) screen).y))
+                    return false;
+                Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 0.2f, 1f, Minecraft.getInstance().player.blockPosition()));
+                Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(new TileEntityLocatorInstance(((ITileContainer) screen).getTile().getBlockPos()), getId(), new CompoundTag()));
+                supplier.accept(screen);
+                return true;
             }
-            supplier.accept(tile);
+            return false;
         }
     }
 }

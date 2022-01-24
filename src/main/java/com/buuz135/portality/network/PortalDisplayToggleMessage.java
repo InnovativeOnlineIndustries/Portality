@@ -27,7 +27,7 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PortalDisplayToggleMessage extends Message {
 

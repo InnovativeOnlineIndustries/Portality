@@ -27,12 +27,6 @@ description = '''
 Thinkig through portals
 '''
 [[dependencies.portality]] #optional
-modId = "titanium" #mandatory
-mandatory = true #mandatory
-versionRange = "[2.2.9,)" #mandatory
-ordering = "NONE"
-side = "BOTH"
-[[dependencies.portality]] #optional
 modId = "forge" #mandatory
 mandatory = true #mandatory
 versionRange = "[36.2.8,)" #mandatory

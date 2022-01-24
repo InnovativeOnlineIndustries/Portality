@@ -25,8 +25,11 @@ package com.buuz135.portality.tile;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.hrznstudio.titanium.annotation.Save;
+import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 
@@ -35,8 +38,8 @@ public class ItemModuleTile extends ModuleTile<ItemModuleTile> {
     @Save
     public SidedInventoryComponent<ItemModuleTile> handler;
 
-    public ItemModuleTile() {
-        super(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE);
+    public ItemModuleTile(BlockPos pos, BlockState state) {
+        super((BasicTileBlock<ItemModuleTile>) CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), pos, state);
         this.addInventory(this.handler = (SidedInventoryComponent<ItemModuleTile>) new SidedInventoryComponent<ItemModuleTile>("inventory", 52, 20, 3 * 4, 0)
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)

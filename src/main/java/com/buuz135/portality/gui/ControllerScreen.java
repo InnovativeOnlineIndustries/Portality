@@ -34,6 +34,7 @@ import com.hrznstudio.titanium.client.screen.ITileContainer;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -63,7 +64,7 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
     @Override
     public void renderForeground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
-        String name = new TranslatableComponent(CommonProxy.BLOCK_CONTROLLER.getDescriptionId()).getString();
+        String name = new TranslatableComponent(CommonProxy.BLOCK_CONTROLLER.get().getDescriptionId()).getString();
         Font fontRenderer = Minecraft.getInstance().font;
         fontRenderer.drawShadow(stack, ChatFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.width(name) / 2, this.y + 3, 0x000000);
         fontRenderer.drawShadow(stack, I18n.get("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF);
@@ -92,12 +93,12 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
             @Override
             public void drawBackgroundLayer(PoseStack stack, Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float v) {
                 IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
-                Minecraft.getInstance().getTextureManager().bind(background.getResourceLocation());
+                RenderSystem.setShaderTexture(0, background.getResourceLocation());
                 guiScreen.blit(stack, x - 25, y + 9, 0, 110, 25, 97);
             }
 
             @Override
-            public void drawForegroundLayer(PoseStack stack, Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3) {
+            public void drawForegroundLayer(PoseStack stack, Screen guiScreen, IAssetProvider iAssetProvider, int i, int i1, int i2, int i3, float partial) {
 
             }
         });

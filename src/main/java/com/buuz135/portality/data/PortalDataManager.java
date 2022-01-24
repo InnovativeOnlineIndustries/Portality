@@ -41,13 +41,9 @@ public class PortalDataManager extends SavedData {
     public static final String NAME = "Portality";
     private List<PortalInformation> informationList;
 
-    public PortalDataManager(String name) {
-        super(name);
-        informationList = new ArrayList<>();
-    }
-
     public PortalDataManager() {
-        this(NAME);
+        super();
+        informationList = new ArrayList<>();
     }
 
     public static void addInformation(Level world, PortalInformation information) {
@@ -138,11 +134,7 @@ public class PortalDataManager extends SavedData {
     public static PortalDataManager getData(LevelAccessor world) {
         if (world instanceof ServerLevel) {
             ServerLevel serverWorld = ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD);
-            PortalDataManager data = serverWorld.getDataStorage().computeIfAbsent(PortalDataManager::new, NAME);
-            //if (data == null) {
-            //    data = new PortalDataManager();
-            //    world.getMapStorage().func_212424_a(world.getDimension().getType(), NAME, data);
-            //}
+            PortalDataManager data = serverWorld.getDataStorage().computeIfAbsent(PortalDataManager::load, PortalDataManager::new, NAME);
             return data;
         }
         return null;
@@ -158,14 +150,15 @@ public class PortalDataManager extends SavedData {
         }
     }
 
-    @Override
-    public void load(CompoundTag nbt) {
-        informationList.clear();
+
+    public static PortalDataManager load(CompoundTag nbt) {
+        PortalDataManager portalDataManager = new PortalDataManager();
         CompoundTag root = nbt.getCompound(NAME);
         for (String key : root.getAllKeys()) {
             CompoundTag info = root.getCompound(key);
-            informationList.add(PortalInformation.readFromNBT(info));
+            portalDataManager.getInformationList().add(PortalInformation.readFromNBT(info));
         }
+        return portalDataManager;
     }
 
     @Override

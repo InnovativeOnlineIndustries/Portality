@@ -105,9 +105,13 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.8'
-    implementation fg.deobf("curse.maven:titanium-287342:3346366")
-    //runtimeOnly fg.deobf("team.chisel.ctm:CTM:MC1.16.1-+")
+    minecraft 'net.minecraftforge:forge:1.18.1-39.0.59'
+    if (findProject(':titanium') != null) {
+        implementation project(':titanium')
+    } else {
+        implementation fg.deobf (project.dependencies.create('com.hrznstudio:titanium:1.18-3.4.0-27'))
+    }
+    runtimeOnly fg.deobf("team.chisel.ctm:CTM:1.18-+")
 }
 
 afterEvaluate {

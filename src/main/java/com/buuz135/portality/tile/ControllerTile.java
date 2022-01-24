@@ -44,6 +44,7 @@ import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.IPortalColor;
 import com.buuz135.portality.proxy.client.TickeableSound;
 import com.buuz135.portality.util.BlockPosUtils;
+import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
@@ -98,8 +99,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private TeleportHandler teleportHandler;
     private StructureHandler structureHandler;
 
-    public ControllerTile() {
-        super(CommonProxy.BLOCK_CONTROLLER);
+    public ControllerTile(BlockPos pos, BlockState state) {
+        super((BasicTileBlock<ControllerTile>) CommonProxy.BLOCK_CONTROLLER.get(), pos, state);
         this.teleportationTokens = new LinkedHashMap<>();
         this.isFormed = false;
         this.onceCall = false;
@@ -156,7 +157,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    public void tick() {
+    public void serverTick(Level level, BlockPos pos, BlockState state, ControllerTile blockEntity) {
+        super.serverTick(level, pos, state, blockEntity);
         if (isActive()) {
             teleportHandler.tick();
             if (linkData != null) {
@@ -164,13 +166,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     teleportHandler.addEntityToTeleport(entity, linkData);
                 }
             }
-        }
-        if (!level.isClientSide) {
             workModules();
-        }
-        if (level.isClientSide) {
-            tickSound();
-            return;
         }
         if (isActive() && linkData != null) {
             this.getEnergyStorage().extractEnergy((linkData.isCaller() ? 2 : 1) * structureHandler.getLength() * PortalityConfig.POWER_PORTAL_TICK, false);
@@ -205,6 +201,21 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         }
     }
 
+    @Override
+    public void clientTick(Level level, BlockPos pos, BlockState state, ControllerTile blockEntity) {
+        super.clientTick(level, pos, state, blockEntity);
+        if (isActive()) {
+            teleportHandler.tick();
+            if (linkData != null) {
+                for (Entity entity : this.level.getEntitiesOfClass(Entity.class, getPortalArea())) {
+                    teleportHandler.addEntityToTeleport(entity, linkData);
+                }
+            }
+        }
+        tickSound();
+    }
+
+
     @Nonnull
     @Override
     public ControllerTile getSelf() {
@@ -215,7 +226,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private void tickSound() {
         if (isActive()) {
             if (sound == null) {
-                Minecraft.getInstance().getSoundManager().play(sound = new TickeableSound(this.level, this.worldPosition, PortalitySoundHandler.PORTAL));
+                Minecraft.getInstance().getSoundManager().play(sound = new TickeableSound(this.level, this.worldPosition, PortalitySoundHandler.PORTAL.get()));
             } else {
                 sound.increase();
             }
@@ -230,8 +241,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
-        compound = super.save(compound);
+    protected void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
         compound.putBoolean(NBT_FORMED, isFormed);
         compound.putInt(NBT_LENGTH, structureHandler.getLength());
         compound.putInt(NBT_WIDTH, structureHandler.getWidth());
@@ -246,11 +257,10 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             tokens.put(s, teleportationTokens.get(s));
         }
         compound.put(NBT_TOKENS, tokens);
-        return compound;
     }
 
     @Override
-    public void load(BlockState state, CompoundTag compound) {
+    public void load(CompoundTag compound) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
@@ -270,7 +280,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 this.teleportationTokens.put(s, tokens.getCompound(s));
             }
         }
-        super.load(state, compound);
+        super.load(compound);
     }
 
     public void breakController() {
