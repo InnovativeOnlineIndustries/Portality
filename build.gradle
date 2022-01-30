@@ -109,7 +109,7 @@ dependencies {
     if (findProject(':titanium') != null) {
         implementation project(':titanium')
     } else {
-        implementation fg.deobf (project.dependencies.create('com.hrznstudio:titanium:1.18-3.4.0-27'))
+        implementation fg.deobf (project.dependencies.create('com.hrznstudio:titanium:1.18-3.4.1-31'))
     }
     runtimeOnly fg.deobf("team.chisel.ctm:CTM:1.18-+")
 }

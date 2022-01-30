@@ -37,12 +37,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,11 +71,13 @@ public class TextPortalButton extends ButtonComponent {
         return this;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Collections.singletonList(() -> new TextButtonAddon(this, display, screenConsumer.get()));
     }
 
+    @OnlyIn(Dist.CLIENT)
     public class TextButtonAddon extends BasicButtonAddon {
 
         private String text;
