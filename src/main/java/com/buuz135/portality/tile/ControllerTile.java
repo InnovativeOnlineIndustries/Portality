@@ -482,12 +482,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     @Override
     public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
         if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
-            if (!level.isClientSide()) {
-                Minecraft.getInstance().submitAsync(() -> {
-                    OpenGui.open(0, this);
-                });
-                return InteractionResult.SUCCESS;
-            }
+            Minecraft.getInstance().submitAsync(() -> OpenGui.open(0, this));
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
