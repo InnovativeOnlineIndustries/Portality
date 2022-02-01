@@ -30,14 +30,13 @@ import com.buuz135.portality.block.InterdimensionalModuleBlock;
 import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
 import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
 import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
+import com.buuz135.portality.datagen.PortalityBlockTagsProvider;
 import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.network.*;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
-import com.buuz135.portality.proxy.client.render.AuraRender;
 import com.buuz135.portality.tile.BasicFrameTile;
-import com.hrznstudio.titanium.TitaniumClient;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.ModuleController;
 import com.hrznstudio.titanium.network.NetworkHandler;
@@ -45,19 +44,17 @@ import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -113,7 +110,7 @@ public class Portality extends ModuleController {
         CommonProxy.TELEPORTATION_TOKEN_ITEM = getRegistries().register(Item.class, "teleportation_token", TeleportationTokenItem::new);
 
         PortalitySoundHandler.PORTAL = getRegistries().register(SoundEvent.class, "portal", () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal")));
-        PortalitySoundHandler.PORTAL_TP = getRegistries().register(SoundEvent.class, "portal_teleport",  () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")));
+        PortalitySoundHandler.PORTAL_TP = getRegistries().register(SoundEvent.class, "portal_teleport", () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")));
     }
 
     public void onCommon(FMLCommonSetupEvent event) {
@@ -122,6 +119,12 @@ public class Portality extends ModuleController {
 
     public void onClient(FMLClientSetupEvent event) {
         proxy.onClient(Minecraft.getInstance());
+    }
+
+    @Override
+    public void addDataProvider(GatherDataEvent event) {
+        super.addDataProvider(event);
+        event.getGenerator().addProvider(new PortalityBlockTagsProvider(event.getGenerator(), MOD_ID, event.getExistingFileHelper()));
     }
 
     public enum AuraType {
