@@ -38,6 +38,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -49,8 +50,8 @@ public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
     private boolean input;
     private ButtonComponent button;
 
-    public ModuleTile(BasicTileBlock<T> base, BlockPos pos, BlockState state) {
-        super(base, pos, state);
+    public ModuleTile(BasicTileBlock<T> base, BlockEntityType<?> blockEntityType,  BlockPos pos, BlockState state) {
+        super(base, blockEntityType, pos, state);
         this.input = true;
         this.addButton(button = new ButtonComponent(153, 84, 14, 14) {
             @Override

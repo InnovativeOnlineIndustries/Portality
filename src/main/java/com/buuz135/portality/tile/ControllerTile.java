@@ -100,7 +100,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private StructureHandler structureHandler;
 
     public ControllerTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<ControllerTile>) CommonProxy.BLOCK_CONTROLLER.get(), pos, state);
+        super((BasicTileBlock<ControllerTile>) CommonProxy.BLOCK_CONTROLLER.getLeft().get(),  CommonProxy.BLOCK_CONTROLLER.getRight().get(), pos, state);
         this.teleportationTokens = new LinkedHashMap<>();
         this.isFormed = false;
         this.onceCall = false;

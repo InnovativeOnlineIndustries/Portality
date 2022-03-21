@@ -39,7 +39,7 @@ public class ItemModuleTile extends ModuleTile<ItemModuleTile> {
     public SidedInventoryComponent<ItemModuleTile> handler;
 
     public ItemModuleTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<ItemModuleTile>) CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), pos, state);
+        super((BasicTileBlock<ItemModuleTile>) CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.getRight().get(), pos, state);
         this.addInventory(this.handler = (SidedInventoryComponent<ItemModuleTile>) new SidedInventoryComponent<ItemModuleTile>("inventory", 52, 20, 3 * 4, 0)
                 .setColor(DyeColor.YELLOW)
                 .setColorGuiEnabled(false)

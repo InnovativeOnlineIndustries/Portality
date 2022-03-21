@@ -39,7 +39,7 @@ public class FluidModuleTile extends ModuleTile<FluidModuleTile> {
     private SidedFluidTankComponent<FluidModuleTile> tank;
 
     public FluidModuleTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<FluidModuleTile>) CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.get(), pos, state);
+        super((BasicTileBlock<FluidModuleTile>) CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.getRight().get(), pos, state);
         this.addTank(tank = (SidedFluidTankComponent<FluidModuleTile>) new SidedFluidTankComponent<FluidModuleTile>("tank", 16000, 76, 20, 0).
                 setColor(DyeColor.CYAN).
                 setComponentHarness(this)

@@ -69,7 +69,7 @@ public class PortalNetworkMessage {
         infos.removeIf(information -> {
             Level world = playerEntity.getCommandSenderWorld().getServer().getLevel(information.getDimension());
             BlockEntity entity = world.getBlockEntity(information.getLocation());
-            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getLevel().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
+            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getLevel().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(pos, distance) || !information.getLocation().closerThan(pos, BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
         });
         Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }

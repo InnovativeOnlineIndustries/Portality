@@ -48,7 +48,7 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
     private SidedInventoryComponent<LowEfficiencyGeneratorTile> fuel;
 
     public LowEfficiencyGeneratorTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<LowEfficiencyGeneratorTile>) CommonProxy.BLOCK_GENERATOR.get(), pos, state);
+        super((BasicTileBlock<LowEfficiencyGeneratorTile>) CommonProxy.BLOCK_GENERATOR.getLeft().get(), CommonProxy.BLOCK_GENERATOR.getRight().get(), pos, state);
         this.addInventory(fuel = (SidedInventoryComponent<LowEfficiencyGeneratorTile>) new SidedInventoryComponent<LowEfficiencyGeneratorTile>("fuel", 46, 22, 1, 0)
                 .setColor(DyeColor.ORANGE)
                 .setColorGuiEnabled(false)

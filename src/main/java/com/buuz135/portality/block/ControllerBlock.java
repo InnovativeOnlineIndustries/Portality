@@ -64,7 +64,7 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME.get()), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME.getLeft().get()), false);
         PortalDataManager.addInformation(worldIn, information);
         super.setPlacedBy(worldIn, pos, state, placer, stack);
     }

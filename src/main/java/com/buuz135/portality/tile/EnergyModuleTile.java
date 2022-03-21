@@ -52,7 +52,7 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
     private final LazyOptional<IEnergyStorage> lazyEnergyStorage = LazyOptional.of(this::getEnergyStorage);
 
     public EnergyModuleTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<EnergyModuleTile>) CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), pos, state);
+        super((BasicTileBlock<EnergyModuleTile>) CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.getRight().get(), pos, state);
         this.energyStorage = new EnergyStorageComponent<>(10000, 10000, 10000, 10, 20);
         this.energyStorage.setComponentHarness(this.getSelf());
     }

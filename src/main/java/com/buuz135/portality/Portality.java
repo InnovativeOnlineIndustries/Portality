@@ -73,7 +73,7 @@ public class Portality extends ModuleController {
     public static final CreativeModeTab TAB = new CreativeModeTab(MOD_ID) {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(CommonProxy.BLOCK_CONTROLLER.get());
+            return new ItemStack(CommonProxy.BLOCK_CONTROLLER.getLeft().get());
         }
     };
 
@@ -103,17 +103,17 @@ public class Portality extends ModuleController {
 
     @Override
     protected void initModules() {
-        CommonProxy.BLOCK_CONTROLLER = getRegistries().register(Block.class, "controller", ControllerBlock::new);
-        CommonProxy.BLOCK_FRAME = getRegistries().register(Block.class, "frame", () -> new FrameBlock<BasicFrameTile>("frame", BasicFrameTile.class));
-        CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE = getRegistries().register(Block.class, "module_energy", CapabilityEnergyModuleBlock::new);
-        CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE = getRegistries().register(Block.class, "module_fluids", CapabilityFluidModuleBlock::new);
-        CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE = getRegistries().register(Block.class, "module_items", CapabilityItemModuleBlock::new);
-        CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE = getRegistries().register(Block.class, "module_interdimensional", InterdimensionalModuleBlock::new);
-        CommonProxy.BLOCK_GENERATOR = getRegistries().register(Block.class, "generator", GeneratorBlock::new);
-        CommonProxy.TELEPORTATION_TOKEN_ITEM = getRegistries().register(Item.class, "teleportation_token", TeleportationTokenItem::new);
+        CommonProxy.BLOCK_CONTROLLER = getRegistries().registerBlockWithTile("controller", ControllerBlock::new);
+        CommonProxy.BLOCK_FRAME = getRegistries().registerBlockWithTile( "frame", () -> new FrameBlock<BasicFrameTile>("frame", BasicFrameTile.class));
+        CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE = getRegistries().registerBlockWithTile("module_energy", CapabilityEnergyModuleBlock::new);
+        CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE = getRegistries().registerBlockWithTile("module_fluids", CapabilityFluidModuleBlock::new);
+        CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE = getRegistries().registerBlockWithTile("module_items", CapabilityItemModuleBlock::new);
+        CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE = getRegistries().registerBlockWithTile("module_interdimensional", InterdimensionalModuleBlock::new);
+        CommonProxy.BLOCK_GENERATOR = getRegistries().registerBlockWithTile("generator", GeneratorBlock::new);
+        CommonProxy.TELEPORTATION_TOKEN_ITEM = getRegistries().registerGeneric(Item.class, "teleportation_token", TeleportationTokenItem::new);
 
-        PortalitySoundHandler.PORTAL = getRegistries().register(SoundEvent.class, "portal", () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal")));
-        PortalitySoundHandler.PORTAL_TP = getRegistries().register(SoundEvent.class, "portal_teleport",  () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")));
+        PortalitySoundHandler.PORTAL = getRegistries().registerGeneric(SoundEvent.class, "portal", () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal")));
+        PortalitySoundHandler.PORTAL_TP = getRegistries().registerGeneric(SoundEvent.class, "portal_teleport",  () -> new SoundEvent(new ResourceLocation(Portality.MOD_ID, "portal_teleport")));
     }
 
     public void onCommon(FMLCommonSetupEvent event) {

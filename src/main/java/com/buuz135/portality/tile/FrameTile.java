@@ -28,6 +28,7 @@ import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> implements IPortalColor {
@@ -35,8 +36,8 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     private BlockPos controllerPos;
     private int color;
 
-    public FrameTile(BasicTileBlock<T> base, BlockPos pos, BlockState state) {
-        super(base, pos, state);
+    public FrameTile(BasicTileBlock<T> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+        super(base,blockEntityType ,pos, state);
         this.color = Integer.parseInt("0094ff", 16); //Default Blue
     }
 

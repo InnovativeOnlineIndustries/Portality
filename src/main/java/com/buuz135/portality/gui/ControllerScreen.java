@@ -64,7 +64,7 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
     @Override
     public void renderForeground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         IBackgroundAsset background = (IBackgroundAsset) IAssetProvider.getAsset(PortalityAssetProvider.PROVIDER, AssetTypes.BACKGROUND);
-        String name = new TranslatableComponent(CommonProxy.BLOCK_CONTROLLER.get().getDescriptionId()).getString();
+        String name = new TranslatableComponent(CommonProxy.BLOCK_CONTROLLER.getLeft().get().getDescriptionId()).getString();
         Font fontRenderer = Minecraft.getInstance().font;
         fontRenderer.drawShadow(stack, ChatFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.width(name) / 2, this.y + 3, 0x000000);
         fontRenderer.drawShadow(stack, I18n.get("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF);

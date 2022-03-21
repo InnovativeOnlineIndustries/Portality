@@ -26,6 +26,7 @@ package com.buuz135.portality.proxy.client;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.AuraRender;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.TitaniumClient;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.event.handler.EventManager;
@@ -36,6 +37,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -44,8 +46,7 @@ public class ClientProxy extends CommonProxy {
 
     public ClientProxy() {
         EventManager.mod(EntityRenderersEvent.RegisterRenderers.class).process(registerRenderers -> {
-            System.out.println(((BasicTileBlock)CommonProxy.BLOCK_CONTROLLER.get()).getTileEntityType());
-            registerRenderers.registerBlockEntityRenderer(((BasicTileBlock)CommonProxy.BLOCK_CONTROLLER.get()).getTileEntityType(), TESRPortal::new);
+            registerRenderers.registerBlockEntityRenderer((BlockEntityType<? extends ControllerTile>) CommonProxy.BLOCK_CONTROLLER.getRight().get(), TESRPortal::new);
         }).subscribe();
         EventManager.mod(EntityRenderersEvent.AddLayers.class).process(registerRenderers -> {
             for (String skin : registerRenderers.getSkins()) {
@@ -63,12 +64,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void onClient(Minecraft instance) {
         super.onClient(instance);
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CONTROLLER.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_FRAME.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CONTROLLER.getLeft().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_FRAME.getLeft().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.getLeft().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.getLeft().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.getLeft().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.getLeft().get(), RenderType.cutout());
         Minecraft.getInstance().getBlockColors().register((state, world, pos, index) -> {
             if (index == 0 && world != null) {
                 BlockEntity tileEntity = world.getBlockEntity(pos);
@@ -77,6 +78,6 @@ public class ClientProxy extends CommonProxy {
                 }
             }
             return -16739073;
-        }, CommonProxy.BLOCK_FRAME.get(), CommonProxy.BLOCK_CONTROLLER.get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.get());
+        }, CommonProxy.BLOCK_FRAME.getLeft().get(), CommonProxy.BLOCK_CONTROLLER.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.getLeft().get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.getLeft().get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.getLeft().get());
     }
 }

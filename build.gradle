@@ -33,7 +33,7 @@ archivesBaseName = "portality"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'official', version: '1.18.1'
+    mappings channel: 'official', version: '1.18.2'
     runs {
         client = {
             // recommended logging data for a userdev environment
@@ -105,13 +105,13 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.59'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.19'
     if (findProject(':titanium') != null) {
         implementation project(':titanium')
     } else {
         implementation fg.deobf (project.dependencies.create('com.hrznstudio:titanium:1.18-3.4.0-27'))
     }
-    runtimeOnly fg.deobf("team.chisel.ctm:CTM:1.18-+")
+    //runtimeOnly fg.deobf("team.chisel.ctm:CTM:1.18-+")
 }
 
 afterEvaluate {
