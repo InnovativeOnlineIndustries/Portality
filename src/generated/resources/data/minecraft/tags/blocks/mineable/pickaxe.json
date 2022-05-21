@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "portality:controller",
+    "portality:frame",
+    "portality:module_energy",
+    "portality:module_fluids",
+    "portality:module_items",
+    "portality:module_interdimensional",
+    "portality:generator"
+  ]
+}

@@ -40,6 +40,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +56,8 @@ public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
         super(base, blockEntityType, pos, state);
         this.input = true;
         this.addButton(button = new ButtonComponent(153, 84, 14, 14) {
+
+            @OnlyIn(Dist.CLIENT)
             @Override
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(button,

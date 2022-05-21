@@ -117,6 +117,21 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 return 0;
             }
         }.setId(1));
+        this.addButton(new PortalSettingButton(-22, 12 + 22 * 3, () -> () -> {
+            OpenGui.open(3, ControllerTile.this);
+        }, new StateButtonInfo(0, PortalSettingButton.CHANGE_COLOR, "portality.display.change_color")) {
+            @Override
+            public int getState() {
+                return 0;
+            }
+        }.setId(5));
+        this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
+                .setClientConsumer(() -> screen -> {
+                    OpenGui.open(2, ControllerTile.this);
+                })
+                .setId(4)
+                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayer) playerEntity, isInterdimensional(), getBlockPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
+        );
 
         this.addButton(new PortalSettingButton(-22, 12 + 22, () -> () -> {
         }, new StateButtonInfo(0, PortalSettingButton.PUBLIC, "portality.display.make_private"), new StateButtonInfo(1, PortalSettingButton.PRIVATE, "portality.display.make_public")) {
@@ -138,21 +153,6 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             if (information.getOwner().equals(playerEntity.getUUID()))
                 setDisplayNameEnabled(!isDisplayNameEnabled());
         }).setId(3));
-        this.addButton(new PortalSettingButton(-22, 12 + 22 * 3, () -> () -> {
-            OpenGui.open(3, ControllerTile.this);
-        }, new StateButtonInfo(0, PortalSettingButton.CHANGE_COLOR, "portality.display.change_color")) {
-            @Override
-            public int getState() {
-                return 0;
-            }
-        }.setId(5));
-        this.addButton(new TextPortalButton(5, 90, 80, 16, "portality.display.call_portal")
-                .setClientConsumer(() -> screen -> {
-                    OpenGui.open(2, ControllerTile.this);
-                })
-                .setId(4)
-                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayer) playerEntity, isInterdimensional(), getBlockPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
-        );
         this.addButton(new TextPortalButton(90, 90, 80, 16, "portality.display.close_portal").setPredicate((playerEntity, compoundNBT) -> closeLink()).setId(5));
     }
 
@@ -384,6 +384,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         }
         PortalDataManager.setActiveStatus(this.level, this.worldPosition, true);
         this.linkData = data;
+        markForUpdate();
     }
 
     public void closeLink() {
@@ -402,6 +403,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             linkData = null;
         }
         ChunkLoaderHandler.removePortalAsChunkloader(this);
+        markForUpdate();
     }
 
     public boolean isActive() {
@@ -480,12 +482,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     @Override
     public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
         if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
-            if (!level.isClientSide()) {
-                Minecraft.getInstance().submitAsync(() -> {
-                    OpenGui.open(0, this);
-                });
-                return InteractionResult.SUCCESS;
-            }
+            Minecraft.getInstance().submitAsync(() -> OpenGui.open(0, this));
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }

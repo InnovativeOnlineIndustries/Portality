@@ -30,6 +30,7 @@ import com.buuz135.portality.block.InterdimensionalModuleBlock;
 import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
 import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
 import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
+import com.buuz135.portality.datagen.PortalityBlockTagsProvider;
 import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.network.*;
 import com.buuz135.portality.proxy.CommonProxy;
@@ -58,6 +59,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -122,6 +124,12 @@ public class Portality extends ModuleController {
 
     public void onClient(FMLClientSetupEvent event) {
         proxy.onClient(Minecraft.getInstance());
+    }
+
+    @Override
+    public void addDataProvider(GatherDataEvent event) {
+        super.addDataProvider(event);
+        event.getGenerator().addProvider(new PortalityBlockTagsProvider(event.getGenerator(), MOD_ID, event.getExistingFileHelper()));
     }
 
     public enum AuraType {
