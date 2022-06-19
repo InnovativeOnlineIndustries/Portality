@@ -52,6 +52,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -86,13 +87,24 @@ public class Portality extends ModuleController {
         EventManager.mod(FMLCommonSetupEvent.class).process(this::onCommon).subscribe();
         EventManager.mod(FMLClientSetupEvent.class).process(this::onClient).subscribe();
         RewardGiver giver = RewardManager.get().getGiver(UUID.fromString("d28b7061-fb92-4064-90fb-7e02b95a72a6"), "Buuz135");
+        String contributorURLString = "https://raw.githubusercontent.com/Buuz135/Industrial-Foregoing/master/contributors.json";
+
         try {
-            giver.addReward(new Reward(new ResourceLocation(Portality.MOD_ID, "aura"), new URL("https://raw.githubusercontent.com/Buuz135/Industrial-Foregoing/master/contributors.json"), () -> dist -> {
-                if (dist == Dist.CLIENT) {
-                    registerAura();
-                }
-            }, Arrays.stream(AuraType.values()).map(Enum::toString).collect(Collectors.toList()).toArray(new String[]{})));
-        } catch (MalformedURLException e) {
+            URL contributorURL = new URL(contributorURLString);
+            //Open HTTP Connection
+            HttpURLConnection testConnect = (HttpURLConnection) contributorURL.openConnection();
+            //Send request
+            testConnect.setRequestMethod("GET");
+            int response = testConnect.getResponseCode();
+            if (response == 200) {
+                //Reading the response to a StringBuffer
+                giver.addReward(new Reward(new ResourceLocation(Portality.MOD_ID, "aura"), contributorURL, () -> dist -> {
+                    if (dist == Dist.CLIENT) {
+                        registerAura();
+                    }
+                }, Arrays.stream(AuraType.values()).map(Enum::toString).collect(Collectors.toList()).toArray(new String[]{})));
+            }          
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
