@@ -65,8 +65,10 @@ public class PortalDataManager extends SavedData {
     @Nullable
     public static PortalInformation getInfoFromID(Level world, UUID uuid) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getId().equals(uuid)) return information;
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getId().equals(uuid)) return information;
+            }
         }
         return null;
     }
@@ -74,8 +76,10 @@ public class PortalDataManager extends SavedData {
     @Nullable
     public static PortalInformation getInfoFromPos(Level world, BlockPos pos) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) return information;
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) return information;
+            }
         }
         return null;
     }
@@ -92,40 +96,48 @@ public class PortalDataManager extends SavedData {
 
     public static void setPortalPrivacy(Level world, BlockPos pos, boolean privacy) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) {
-                information.setPrivate(privacy);
-                dataManager.setDirty();
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) {
+                    information.setPrivate(privacy);
+                    dataManager.setDirty();
+                }
             }
         }
     }
 
     public static void setPortalName(Level world, BlockPos pos, String name) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) {
-                information.setName(name);
-                dataManager.setDirty();
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) {
+                    information.setName(name);
+                    dataManager.setDirty();
+                }
             }
         }
     }
 
     public static void setPortalInterdimensional(Level world, BlockPos pos, boolean interdimensional) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) {
-                information.setInterdimensional(interdimensional);
-                dataManager.setDirty();
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) {
+                    information.setInterdimensional(interdimensional);
+                    dataManager.setDirty();
+                }
             }
         }
     }
 
     public static void setPortalDisplay(Level world, BlockPos pos, ItemStack stack) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) {
-                information.setDisplay(stack);
-                dataManager.setDirty();
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) {
+                    information.setDisplay(stack);
+                    dataManager.setDirty();
+                }
             }
         }
     }
@@ -142,10 +154,12 @@ public class PortalDataManager extends SavedData {
 
     public static void setActiveStatus(Level world, BlockPos pos, boolean active) {
         PortalDataManager dataManager = getData(world);
-        for (PortalInformation information : dataManager.getInformationList()) {
-            if (information.getLocation().equals(pos)) {
-                information.setActive(active);
-                dataManager.setDirty();
+        if (dataManager != null){
+            for (PortalInformation information : dataManager.getInformationList()) {
+                if (information.getLocation().equals(pos)) {
+                    information.setActive(active);
+                    dataManager.setDirty();
+                }
             }
         }
     }
