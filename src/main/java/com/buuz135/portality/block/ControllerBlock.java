@@ -30,6 +30,7 @@ import com.buuz135.portality.item.TeleportationTokenItem;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.block.RotatableBlock;
+import com.hrznstudio.titanium.event.handler.EventManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -50,6 +51,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -105,18 +107,6 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUUID())) {
                     playerIn.displayClientMessage(new TranslatableComponent("portality.controller.error.privacy").withStyle(ChatFormatting.RED), true);
-                    return InteractionResult.SUCCESS;
-                }
-                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUUID()) && !playerIn.getItemInHand(hand).isEmpty() && !playerIn.getItemInHand(hand).sameItem(controller.getDisplay())) {
-                    if (playerIn.getItemInHand(hand).getItem() instanceof TeleportationTokenItem){
-                        if (playerIn.getItemInHand(hand).hasTag()){
-                            controller.addTeleportationToken(playerIn.getItemInHand(hand));
-                            playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.added_token").withStyle(ChatFormatting.GREEN), true);
-                        }
-                        return InteractionResult.SUCCESS;
-                    }
-                    playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.icon_changed").withStyle(ChatFormatting.GREEN), true);
-                    controller.setDisplayNameEnabled(playerIn.getItemInHand(hand));
                     return InteractionResult.SUCCESS;
                 }
             } else if (controller.isFormed()) {

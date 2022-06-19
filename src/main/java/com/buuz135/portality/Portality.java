@@ -38,6 +38,7 @@ import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.ClientProxy;
 import com.buuz135.portality.proxy.client.render.AuraRender;
 import com.buuz135.portality.tile.BasicFrameTile;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.TitaniumClient;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.ModuleController;
@@ -45,16 +46,20 @@ import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardGiver;
 import com.hrznstudio.titanium.reward.RewardManager;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -101,6 +106,21 @@ public class Portality extends ModuleController {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        EventManager.forge(PlayerInteractEvent.RightClickBlock.class).filter(event -> !event.getWorld().isClientSide && event.getPlayer().isCrouching() && event.getWorld().getBlockEntity(event.getPos()) instanceof ControllerTile && !event.getPlayer().getItemInHand(event.getHand()).isEmpty()).process(event -> {
+            ControllerTile controllerTile = (ControllerTile) event.getWorld().getBlockEntity(event.getPos());
+            ItemStack stack = event.getPlayer().getItemInHand(event.getHand());
+            if (!stack.sameItem(controllerTile.getDisplay())) {
+                if (stack.getItem() instanceof TeleportationTokenItem){
+                    if (stack.hasTag()){
+                        controllerTile.addTeleportationToken(stack);
+                        event.getPlayer().displayClientMessage(new TranslatableComponent("portility.controller.info.added_token").withStyle(ChatFormatting.GREEN), true);
+                    }
+                    return;
+                }
+                event.getPlayer().displayClientMessage(new TranslatableComponent("portility.controller.info.icon_changed").withStyle(ChatFormatting.GREEN), true);
+                controllerTile.setDisplayNameEnabled(stack);
+            }
+        }).subscribe();
     }
 
     @Override
