@@ -93,7 +93,7 @@ public class PortalsScreen extends ScreenAddonScreen {
         tempInformations.sort((o1, o2) -> Boolean.compare(o2.isPrivate(), o1.isPrivate()));
         if (!textField.getValue().isEmpty())
             tempInformations.removeIf(portalInformation -> !portalInformation.getName().toLowerCase().contains(textField.getValue().toLowerCase()));
-        this.children().removeIf(guiButton -> portalButtons.contains(guiButton));
+        this.portalButtons.forEach(this::removeWidget);
         this.portalButtons.clear();
         this.visiblePortalInformations = tempInformations.size();
         int pointer = (int) (((tempInformations.size() - 7) * scrolling));
