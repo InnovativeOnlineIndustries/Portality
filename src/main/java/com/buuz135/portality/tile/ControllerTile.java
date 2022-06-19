@@ -179,6 +179,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 this.isFormed = structureHandler.checkArea();
                 if (this.isFormed) {
                     structureHandler.setShouldCheckForStructure(false);
+                    PortalDataManager.setPortalInterdimensional(this.level, this.worldPosition, structureHandler.getModules().stream().map(blockPos -> this.level.getBlockState(blockPos)).filter(blockState -> blockState.getBlock() instanceof IPortalModule && ((IPortalModule) blockState.getBlock()).allowsInterdimensionalTravel()).count() > 0);
                 } else {
                     structureHandler.cancelFrameBlocks();
                 }
