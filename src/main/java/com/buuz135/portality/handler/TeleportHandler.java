@@ -97,7 +97,7 @@ public class TeleportHandler {
                         Direction tpFacing = Direction.NORTH;
                         if (controller.getLinkData().isToken()){
                             tpFacing = Direction.byName(controller.getTeleportationTokens().get(controller.getLinkData().getName()).getString("Direction"));
-                        } else {
+                        } else if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock){
                             tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
                         }
                         BlockPos pos = entry.getValue().data.getPos().relative(tpFacing, 2);
