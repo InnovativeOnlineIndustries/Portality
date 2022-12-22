@@ -391,7 +391,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     public void closeLink() {
         if (linkData != null) {
             PortalDataManager.setActiveStatus(this.level, this.worldPosition, false);
-            if (!linkData.isToken()){
+            if (!linkData.isToken() && this.level.getServer() != null){
                 Level world = this.level.getServer().getLevel(linkData.getDimension());
                 if (world != null){
                     BlockEntity entity = world.getBlockEntity(linkData.getPos());
