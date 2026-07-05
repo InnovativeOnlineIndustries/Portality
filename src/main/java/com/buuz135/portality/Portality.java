@@ -110,7 +110,7 @@ public class Portality extends ModuleController {
     }
 
     public enum AuraType {
-        PORTAL(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/blocks/player_render.png"), true),
+        PORTAL(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/block/player_render.png"), true),
         FORCE_FIELD(ResourceLocation.withDefaultNamespace("textures/misc/forcefield.png"), true),
         UNDERWATER(ResourceLocation.withDefaultNamespace("textures/misc/underwater.png"), true),
         SPOOK(ResourceLocation.withDefaultNamespace("textures/misc/pumpkinblur.png"), false),

@@ -67,6 +67,9 @@ public class EnergyModuleTile extends ModuleTile<EnergyModuleTile> {
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, EnergyModuleTile blockEntity) {
         super.serverTick(level, pos, state, blockEntity);
+        if (level.getGameTime() % 10 == 0) {
+            syncObject(this.energyStorage);
+        }
         if (!isInput()) {
             for (Direction facing : Direction.values()) {
                 BlockPos checking = this.worldPosition.relative(facing);
