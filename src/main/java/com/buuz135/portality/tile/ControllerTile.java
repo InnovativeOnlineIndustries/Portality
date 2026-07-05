@@ -568,7 +568,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     @OnlyIn(Dist.CLIENT)
     @Override
     public ItemInteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ItemInteractionResult.SUCCESS) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ItemInteractionResult.SUCCESS && this.isFormed) {
             Minecraft.getInstance().submitAsync(() -> OpenGui.open(0, this));
             return ItemInteractionResult.SUCCESS;
         }

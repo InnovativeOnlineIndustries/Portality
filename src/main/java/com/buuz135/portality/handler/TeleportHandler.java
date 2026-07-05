@@ -148,7 +148,7 @@ public class TeleportHandler {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
                 if (!entry.getKey().level().isClientSide)
-                    entry.getKey().level().getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition()).inflate(16)).forEach(entityPlayer -> entityPlayer.playNotifySound(PortalitySoundHandler.PORTAL_TP.get(), SoundSource.BLOCKS, 0.5f, 1f));
+                    entry.getKey().level().getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition()).inflate(8)).forEach(entityPlayer -> entityPlayer.playNotifySound(PortalitySoundHandler.PORTAL_TP.get(), SoundSource.BLOCKS, 0.25f, 0.5f));
                 entry.getValue().moved = true;
                 Level tpWorld = entry.getKey().level();
                 Direction tpFacing = Direction.NORTH;

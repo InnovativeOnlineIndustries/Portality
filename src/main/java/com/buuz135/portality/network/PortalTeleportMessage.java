@@ -28,7 +28,9 @@ import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -50,7 +52,7 @@ public class PortalTeleportMessage extends Message {
     protected void handleMessage(IPayloadContext context) {
         Minecraft.getInstance().submitAsync(() -> {
             //Minecraft.getMinecraft().player.playSound(new SoundEvent(ResourceLocation.fromNamespaceAndPath("entity.shulker.teleport")), 1, 1);
-            Minecraft.getInstance().player.playSound(PortalitySoundHandler.PORTAL_TP.get(), 0.1f, 1f);
+            Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(PortalitySoundHandler.PORTAL_TP.get(), SoundSource.BLOCKS, 0.25f, 0.5f, Minecraft.getInstance().level.getRandom(), Minecraft.getInstance().player.getOnPos()));
             if (PortalityConfig.LAUNCH_PLAYERS) {
                 Direction facing = Direction.values()[this.facing];
                 Vec3 vector = new Vec3(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()).scale(2 * length / (double) PortalityConfig.MAX_PORTAL_LENGTH);
