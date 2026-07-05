@@ -381,7 +381,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
             }
             int power = PortalityConfig.PORTAL_POWER_OPEN_INTERDIMENSIONAL;
             if (data.getDimension().location().equals(this.level.dimension().location())) {
-                power = (int) this.worldPosition.distSqr(data.getPos()) * structureHandler.getLength();
+                power = Math.min((int) this.worldPosition.distSqr(data.getPos()) * structureHandler.getLength(), (int) (this.getEnergyStorage().getMaxEnergyStored() * 0.75));
             }
             this.getEnergyStorage().extractEnergy(power, false);
         }
