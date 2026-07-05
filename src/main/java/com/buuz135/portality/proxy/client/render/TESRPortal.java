@@ -12,23 +12,28 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 
 public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
 
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/block/portal_render.png");
     private static final RenderType TYPE = createRenderType();
+    private static final int HOLOGRAM_ALPHA = 120;
 
     public TESRPortal(BlockEntityRendererProvider.Context context) {
     }
@@ -61,6 +66,7 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
             return;
         }
 
+        renderLinkedWorld(tile, poseStack, bufferSource, packedOverlay);
         renderDisplayName(tile, poseStack, bufferSource);
 
         BlockState blockState = tile.getLevel().getBlockState(tile.getBlockPos());
@@ -103,6 +109,82 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         renderStrip(poseStack, buffer, tile, frame, -tile.getWidth() - x + 1, -1 - y, z, tile.getWidth() * 2, color);
 
         poseStack.popPose();
+    }
+
+    private void renderLinkedWorld(ControllerTile tile, PoseStack poseStack, MultiBufferSource bufferSource, int packedOverlay) {
+        if (!tile.isActive() || tile.getLinkData() == null || tile.getLinkData().isToken()) {
+            return;
+        }
+
+        Level level = tile.getLevel();
+        if (level == null || !level.dimension().equals(tile.getLinkData().getDimension())) {
+            return;
+        }
+
+        BlockState currentState = level.getBlockState(tile.getBlockPos());
+        if (!currentState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+            return;
+        }
+
+        BlockEntity targetEntity = level.getBlockEntity(tile.getLinkData().getPos());
+        if (!(targetEntity instanceof ControllerTile linkedTile) || !linkedTile.isFormed()) {
+            return;
+        }
+
+        BlockState linkedState = level.getBlockState(linkedTile.getBlockPos());
+        if (!linkedState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+            return;
+        }
+
+        Direction currentFacing = currentState.getValue(ControllerBlock.FACING_HORIZONTAL);
+        Direction linkedFacing = linkedState.getValue(ControllerBlock.FACING_HORIZONTAL);
+        Direction currentRight = currentFacing.getClockWise();
+        Direction linkedRight = linkedFacing.getClockWise();
+        int halfWidth = Math.min(tile.getWidth(), linkedTile.getWidth());
+        int height = Math.min(tile.getHeight(), linkedTile.getHeight());
+        int depth = tile.getLength();
+        BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+        RandomSource random = RandomSource.create();
+
+        for (int lateral = -halfWidth; lateral <= halfWidth; lateral++) {
+            for (int vertical = 1; vertical < height; vertical++) {
+                for (int forward = 1; forward <= depth; forward++) {
+                    BlockPos remotePos = linkedTile.getBlockPos()
+                            .relative(linkedRight, lateral)
+                            .above(vertical)
+                            .relative(linkedFacing, forward);
+                    if (!level.hasChunkAt(remotePos)) {
+                        continue;
+                    }
+
+                    BlockState remoteState = level.getBlockState(remotePos);
+                    if (remoteState.isAir()) {
+                        continue;
+                    }
+
+                    BlockPos localPos = tile.getBlockPos()
+                            .relative(currentRight, -lateral)
+                            .above(vertical)
+                            .relative(currentFacing.getOpposite(), forward - 1);
+                    poseStack.pushPose();
+                    poseStack.translate(
+                            localPos.getX() - tile.getBlockPos().getX(),
+                            localPos.getY() - tile.getBlockPos().getY(),
+                            localPos.getZ() - tile.getBlockPos().getZ()
+                    );
+                    VertexConsumer hologramBuffer = new HolographicVertexConsumer(bufferSource.getBuffer(RenderType.translucent()), tile.getColor(), HOLOGRAM_ALPHA);
+                    for (RenderType renderType : ItemBlockRenderTypes.getRenderLayers(remoteState)) {
+                        blockRenderer.renderBatched(remoteState, remotePos, level, poseStack, hologramBuffer, true, random, ModelData.EMPTY, renderType);
+                    }
+                    poseStack.popPose();
+                }
+            }
+        }
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(ControllerTile blockEntity) {
+        return blockEntity.getRenderBoundingBox();
     }
 
     private void renderDisplayName(ControllerTile tile, PoseStack poseStack, MultiBufferSource bufferSource) {
@@ -167,5 +249,62 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
 
     private void addVertex(VertexConsumer buffer, Matrix4f matrix, float x, float y, float z, int red, int green, int blue, float u, float v) {
         buffer.addVertex(matrix, x, y, z).setColor(red, green, blue, 255).setUv(u, v);
+    }
+
+    private static class HolographicVertexConsumer implements VertexConsumer {
+
+        private final VertexConsumer delegate;
+        private final int tintRed;
+        private final int tintGreen;
+        private final int tintBlue;
+        private final int alpha;
+
+        private HolographicVertexConsumer(VertexConsumer delegate, int tint, int alpha) {
+            this.delegate = delegate;
+            this.tintRed = Math.max(80, FastColor.ARGB32.red(tint));
+            this.tintGreen = Math.max(180, FastColor.ARGB32.green(tint));
+            this.tintBlue = Math.max(220, FastColor.ARGB32.blue(tint));
+            this.alpha = alpha;
+        }
+
+        @Override
+        public VertexConsumer addVertex(float x, float y, float z) {
+            delegate.addVertex(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            delegate.setColor(blend(red, tintRed), blend(green, tintGreen), blend(blue, tintBlue), Math.min(alpha, this.alpha));
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            delegate.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            delegate.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            delegate.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
+            delegate.setNormal(normalX, normalY, normalZ);
+            return this;
+        }
+
+        private int blend(int base, int tint) {
+            return Math.min(255, (base + tint * 2) / 3);
+        }
     }
 }

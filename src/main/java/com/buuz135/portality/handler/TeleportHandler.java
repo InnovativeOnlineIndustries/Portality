@@ -33,11 +33,10 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.util.TeleportationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -47,7 +46,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TeleportHandler {
 
@@ -85,7 +87,7 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            Vec3 destinationPos = Vec3.atCenterOf(controller.getBlockPos()).add(0, controller.getHeight() / 2D - 0.75, 0).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(controller.getLength() - 1));
+            Vec3 destinationPos = Vec3.atCenterOf(controller.getBlockPos()).add(0, controller.getHeight() / 2D - 1.5, 0).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(3 - 1));
             double distance = destinationPos.distanceTo(entry.getKey().position());
             Vec3 destination = destinationPos.subtract(entry.getKey().position()).scale((entry.getValue().time += 0.05) / distance);
             if (destinationPos.distanceTo(entry.getKey().position()) < 1.5) {
@@ -99,7 +101,7 @@ public class TeleportHandler {
                             tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
                         }
                         BlockPos pos = entry.getValue().data.getPos().relative(tpFacing, 2);
-                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.toYRot(), 0);
+                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX(), pos.getY() + 2, pos.getZ(), tpFacing.toYRot(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
                         if (entry.getKey() instanceof ServerPlayer serverPlayer)
