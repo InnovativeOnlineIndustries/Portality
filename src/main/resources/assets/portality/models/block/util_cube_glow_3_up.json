@@ -1,6 +1,6 @@
 {
   "parent": "portality:block/util_cube_glow_3_up_base",
-  "ambientocclusion": false,
+  "ambientocclusion": true,
   "textures": {
     "particle": "#all",
     "down": "#all",

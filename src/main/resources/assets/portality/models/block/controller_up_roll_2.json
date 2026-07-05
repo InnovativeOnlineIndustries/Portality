@@ -1,6 +1,6 @@
 {
   "parent": "block/block",
-  "ambientocclusion": false,
+  "ambientocclusion": true,
   "render_type": "minecraft:cutout",
   "textures": {
     "particle": "portality:block/base/base_all",

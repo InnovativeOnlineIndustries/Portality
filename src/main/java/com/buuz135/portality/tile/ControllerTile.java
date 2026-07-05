@@ -270,7 +270,9 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         if (compound.contains(NBT_LINK))
             linkData = PortalLinkData.readFromNBT(compound.getCompound(NBT_LINK));
         onceCall = compound.getBoolean(NBT_ONCE);
-        display = compound.getBoolean(NBT_DISPLAY);
+        if (compound.contains(NBT_DISPLAY)) {
+            display = compound.getBoolean(NBT_DISPLAY);
+        }
         if (compound.contains(NBT_COLOR))
             color = compound.getInt(NBT_COLOR);
         this.teleportationTokens = new LinkedHashMap<>();
@@ -312,7 +314,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     public AABB getRenderBoundingBox() {
-        return getPortalArea();
+        return getPortalArea().minmax(new AABB(this.worldPosition).inflate(1D, 2D, 1D));
     }
 
     private void getPortalInfo() {

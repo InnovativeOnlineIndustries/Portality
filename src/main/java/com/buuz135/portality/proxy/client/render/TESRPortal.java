@@ -68,7 +68,7 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         }
 
         renderLinkedWorld(tile, poseStack, bufferSource, packedOverlay);
-        renderDisplayName(tile, poseStack, bufferSource);
+        renderDisplayName(tile, poseStack, bufferSource, packedLight);
 
         BlockState blockState = tile.getLevel().getBlockState(tile.getBlockPos());
         if (!blockState.hasProperty(ControllerBlock.FACING_ALL) && !blockState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
@@ -235,21 +235,31 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         return blockEntity.getRenderBoundingBox();
     }
 
-    private void renderDisplayName(ControllerTile tile, PoseStack poseStack, MultiBufferSource bufferSource) {
-        if (!tile.isDisplayNameEnabled() || !tile.isActive() || tile.getLinkData() == null) {
+    private void renderDisplayName(ControllerTile tile, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        if (!tile.isDisplayNameEnabled()) {
             return;
         }
 
+        String displayName = tile.getLinkData() != null ? tile.getLinkData().getName() : tile.getPortalDisplayName();
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = "Portal";
+        }
+        Component name = Component.literal(displayName);
+
         poseStack.pushPose();
         poseStack.translate(0.5D, 1.5D, 0.5D);
+        if (tile.getFacing() == Direction.DOWN) {
+            poseStack.translate(0D, -1.75D, 0D);
+        }
         poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-        poseStack.scale(-0.025F, -0.025F, 0.025F);
+        poseStack.scale(0.025F, -0.025F, 0.025F);
 
-        String name = tile.getLinkData().getName();
         Font font = Minecraft.getInstance().font;
+        float xOffset = -font.width(name) / 2F;
         float backgroundOpacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
         int backgroundColor = (int) (backgroundOpacity * 255.0F) << 24;
-        font.drawInBatch(Component.literal(name), -font.width(name) / 2F, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, backgroundColor, 15728880);
+        font.drawInBatch(name, xOffset, 0, 553648127, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, backgroundColor, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(name, xOffset, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
     }
 

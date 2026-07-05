@@ -1,5 +1,5 @@
 {
-  "ambientocclusion": false,
+  "ambientocclusion": true,
   "display": {
     "gui": {
       "rotation": [
