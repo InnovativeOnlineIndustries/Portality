@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
@@ -51,7 +50,7 @@ public class TeleportationTokenItem extends BasicItem {
         compoundNBT.putInt("X", context.getClickedPos().getX());
         compoundNBT.putInt("Y", context.getClickedPos().getY());
         compoundNBT.putInt("Z", context.getClickedPos().getZ());
-        compoundNBT.putString("Direction", context.getHorizontalDirection().name());
+        compoundNBT.putString("Direction", context.getClickedFace().name());
         context.getItemInHand().set(DataComponents.CUSTOM_DATA, CustomData.of(compoundNBT));
         return InteractionResult.SUCCESS;
     }

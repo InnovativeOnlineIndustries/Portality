@@ -34,6 +34,7 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/block/portal_render.png");
     private static final RenderType TYPE = createRenderType();
     private static final int HOLOGRAM_ALPHA = 120;
+    private static final float PORTAL_SURFACE_OFFSET = 0.01F;
 
     public TESRPortal(BlockEntityRendererProvider.Context context) {
     }
@@ -70,17 +71,65 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         renderDisplayName(tile, poseStack, bufferSource);
 
         BlockState blockState = tile.getLevel().getBlockState(tile.getBlockPos());
-        if (!blockState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+        if (!blockState.hasProperty(ControllerBlock.FACING_ALL) && !blockState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
             return;
         }
 
+        var roll = tile.getRoll();
+
         poseStack.pushPose();
         float frame = (tile.getLevel().getGameTime() % 60 + partialTick) / 60F;
+        Direction facing = tile.getFacing();
+
+        VertexConsumer buffer = bufferSource.getBuffer(TYPE);
+        int color = tile.getColor();
+
+        if (facing.getAxis().isHorizontal()) {
+            renderHorizontalPortal(tile, poseStack, buffer, frame, color, facing);
+        } else {
+            Direction right = tile.getPortalRight();
+            Direction up = tile.getPortalUp();
+            Direction depth = facing.getOpposite();
+            if (facing == Direction.UP) {
+                if (roll == 0) {
+                    poseStack.translate(1, 0, 1);
+                }
+                if (roll == 1) {
+                    poseStack.translate(0, 0, 1);
+                }
+                if (roll == 3) {
+                    poseStack.translate(1, 0, 0);
+                }
+            }
+            if (facing == Direction.DOWN) {
+                if (roll == 0) {
+                    poseStack.translate(1, 1, 0);
+                }
+                if (roll == 1) {
+                    poseStack.translate(0, 1, 0);
+                }
+                if (roll == 2) {
+                    poseStack.translate(0, 1, 1);
+                }
+                if (roll == 3) {
+                    poseStack.translate(1, 1, 1);
+                }
+            }
+
+            renderHorizontalStrip(poseStack, buffer, tile, frame, right, up, depth, -tile.getWidth() + 1F, tile.getHeight() - 1F, -1, tile.getWidth() * 2, color);
+            renderVerticalStrip(poseStack, buffer, tile, frame, right, up, depth, tile.getWidth() - 1F - PORTAL_SURFACE_OFFSET, 2F, -1, tile.getHeight() - 1, color);
+            renderVerticalStrip(poseStack, buffer, tile, frame, right, up, depth, -tile.getWidth() + PORTAL_SURFACE_OFFSET, 2F, -1F, tile.getHeight() - 1, color);
+            renderHorizontalStrip(poseStack, buffer, tile, frame, right, up, depth, -tile.getWidth() + 1F, 1F + PORTAL_SURFACE_OFFSET, -1F, tile.getWidth() * 2, color);
+        }
+
+        poseStack.popPose();
+    }
+
+    private void renderHorizontalPortal(ControllerTile tile, PoseStack poseStack, VertexConsumer buffer, float frame, int color, Direction facing) {
         int x = 0;
         int y = 0;
         int z = 0;
 
-        Direction facing = blockState.getValue(ControllerBlock.FACING_HORIZONTAL);
         if (facing == Direction.SOUTH) {
             z = -1;
             x = -1;
@@ -93,9 +142,6 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
             poseStack.mulPose(Axis.YP.rotationDegrees(90F));
         }
 
-        VertexConsumer buffer = bufferSource.getBuffer(TYPE);
-        int color = tile.getColor();
-
         renderStrip(poseStack, buffer, tile, frame, -tile.getWidth() + 2F + x, tile.getHeight() + y - 1F, z, tile.getWidth() * 2, color);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees(90F));
@@ -107,8 +153,6 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
 
         poseStack.mulPose(Axis.ZN.rotationDegrees(90F));
         renderStrip(poseStack, buffer, tile, frame, -tile.getWidth() - x + 1, -1 - y, z, tile.getWidth() * 2, color);
-
-        poseStack.popPose();
     }
 
     private void renderLinkedWorld(ControllerTile tile, PoseStack poseStack, MultiBufferSource bufferSource, int packedOverlay) {
@@ -122,7 +166,7 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         }
 
         BlockState currentState = level.getBlockState(tile.getBlockPos());
-        if (!currentState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+        if (!currentState.hasProperty(ControllerBlock.FACING_ALL) && !currentState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
             return;
         }
 
@@ -132,14 +176,18 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         }
 
         BlockState linkedState = level.getBlockState(linkedTile.getBlockPos());
-        if (!linkedState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+        if (!linkedState.hasProperty(ControllerBlock.FACING_ALL) && !linkedState.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
             return;
         }
 
-        Direction currentFacing = currentState.getValue(ControllerBlock.FACING_HORIZONTAL);
-        Direction linkedFacing = linkedState.getValue(ControllerBlock.FACING_HORIZONTAL);
-        Direction currentRight = currentFacing.getClockWise();
-        Direction linkedRight = linkedFacing.getClockWise();
+        Direction currentFacing = tile.getFacing();
+        Direction linkedFacing = linkedTile.getFacing();
+        Direction currentRenderDepth = currentFacing.getAxis().isVertical() ? currentFacing.getOpposite() : currentFacing;
+        int localForwardOffset = currentFacing.getAxis().isVertical() ? 0 : -1;
+        Direction currentRight = tile.getPortalRight();
+        Direction currentUp = tile.getPortalUp();
+        Direction linkedRight = linkedTile.getPortalRight();
+        Direction linkedUp = linkedTile.getPortalUp();
         int halfWidth = Math.min(tile.getWidth(), linkedTile.getWidth());
         int height = Math.min(tile.getHeight(), linkedTile.getHeight());
         int depth = tile.getLength();
@@ -151,7 +199,7 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
                 for (int forward = 1; forward <= depth; forward++) {
                     BlockPos remotePos = linkedTile.getBlockPos()
                             .relative(linkedRight, lateral)
-                            .above(vertical)
+                            .relative(linkedUp, vertical)
                             .relative(linkedFacing, forward);
                     if (!level.hasChunkAt(remotePos)) {
                         continue;
@@ -164,8 +212,8 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
 
                     BlockPos localPos = tile.getBlockPos()
                             .relative(currentRight, -lateral)
-                            .above(vertical)
-                            .relative(currentFacing.getOpposite(), forward - 1);
+                            .relative(currentUp, vertical)
+                            .relative(currentRenderDepth, forward + localForwardOffset);
                     poseStack.pushPose();
                     poseStack.translate(
                             localPos.getX() - tile.getBlockPos().getX(),
@@ -203,6 +251,14 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
         int backgroundColor = (int) (backgroundOpacity * 255.0F) << 24;
         font.drawInBatch(Component.literal(name), -font.width(name) / 2F, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, backgroundColor, 15728880);
         poseStack.popPose();
+    }
+
+    private void renderHorizontalStrip(PoseStack poseStack, VertexConsumer buffer, ControllerTile tile, float frame, Direction right, Direction up, Direction depth, float xTrans, float yTrans, float zTrans, int width, int color) {
+        renderStrip(poseStack, buffer, tile, frame, right, up, depth, xTrans, yTrans, zTrans, width, color, false);
+    }
+
+    private void renderVerticalStrip(PoseStack poseStack, VertexConsumer buffer, ControllerTile tile, float frame, Direction right, Direction up, Direction depth, float xTrans, float yTrans, float zTrans, int width, int color) {
+        renderStrip(poseStack, buffer, tile, frame, right, up, depth, xTrans, yTrans, zTrans, width, color, true);
     }
 
     private void renderStrip(PoseStack poseStack, VertexConsumer buffer, ControllerTile tile, float frame, float xTrans, float yTrans, float zTrans, int width, int color) {
@@ -245,6 +301,63 @@ public class TESRPortal implements BlockEntityRenderer<ControllerTile> {
                 addVertex(buffer, matrix, pX2 + xOffset, yOffset, 1 + zOffset, r, g, b, u2, 1);
             }
         }
+    }
+
+    private void renderStrip(PoseStack poseStack, VertexConsumer buffer, ControllerTile tile, float frame, Direction right, Direction up, Direction depth, float xTrans, float yTrans, float zTrans, int width, int color, boolean vertical) {
+        float red = FastColor.ARGB32.red(color) / 255F;
+        float green = FastColor.ARGB32.green(color) / 255F;
+        float blue = FastColor.ARGB32.blue(color) / 255F;
+        int r = (int) (red * 255);
+        int g = (int) (green * 255);
+        int b = (int) (blue * 255);
+        float y = 3.999F;
+        float off = 4 - y;
+        Matrix4f matrix = poseStack.last().pose();
+
+        for (int posX = 0; posX < width; ++posX) {
+            for (int posZ = 0; posZ < tile.getLength(); ++posZ) {
+                float pX1 = 1;
+                float u1 = 1;
+                float pX2 = 0;
+                float u2 = 0;
+                if (posX == 0) {
+                    pX2 = 1 - frame;
+                    u2 = 1 - frame;
+                }
+                if (posX == 1 && frame < 0) {
+                    pX2 = -frame;
+                    u2 = -frame;
+                }
+                if (posX == width - 1) {
+                    pX1 = Math.max(1 - frame, 0);
+                    u1 = 1 - frame;
+                }
+
+                float xOffset = posX - 2F + frame + off + xTrans;
+                float yOffset = yTrans - off;
+                float verticalOffset = posX - 2F + frame + off + yTrans;
+                float zOffset = posZ + zTrans;
+
+                if (vertical) {
+                    addPortalVertex(buffer, matrix, right, up, depth, xTrans, pX2 + verticalOffset, zOffset, r, g, b, u2, 0);
+                    addPortalVertex(buffer, matrix, right, up, depth, xTrans, pX1 + verticalOffset, zOffset, r, g, b, u1, 0);
+                    addPortalVertex(buffer, matrix, right, up, depth, xTrans, pX1 + verticalOffset, 1 + zOffset, r, g, b, u1, 1);
+                    addPortalVertex(buffer, matrix, right, up, depth, xTrans, pX2 + verticalOffset, 1 + zOffset, r, g, b, u2, 1);
+                } else {
+                    addPortalVertex(buffer, matrix, right, up, depth, pX2 + xOffset, yOffset, zOffset, r, g, b, u2, 0);
+                    addPortalVertex(buffer, matrix, right, up, depth, pX1 + xOffset, yOffset, zOffset, r, g, b, u1, 0);
+                    addPortalVertex(buffer, matrix, right, up, depth, pX1 + xOffset, yOffset, 1 + zOffset, r, g, b, u1, 1);
+                    addPortalVertex(buffer, matrix, right, up, depth, pX2 + xOffset, yOffset, 1 + zOffset, r, g, b, u2, 1);
+                }
+            }
+        }
+    }
+
+    private void addPortalVertex(VertexConsumer buffer, Matrix4f matrix, Direction right, Direction up, Direction depth, float x, float y, float z, int red, int green, int blue, float u, float v) {
+        float worldX = x * right.getStepX() + y * up.getStepX() + z * depth.getStepX() + PORTAL_SURFACE_OFFSET * depth.getStepX();
+        float worldY = x * right.getStepY() + y * up.getStepY() + z * depth.getStepY() + PORTAL_SURFACE_OFFSET * depth.getStepY();
+        float worldZ = x * right.getStepZ() + y * up.getStepZ() + z * depth.getStepZ() + PORTAL_SURFACE_OFFSET * depth.getStepZ();
+        buffer.addVertex(matrix, worldX, worldY, worldZ).setColor(red, green, blue, 255).setUv(u, v);
     }
 
     private void addVertex(VertexConsumer buffer, Matrix4f matrix, float x, float y, float z, int red, int green, int blue, float u, float v) {

@@ -1,0 +1,14 @@
+{
+  "parent": "portality:block/util_cube_glow_3_down",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "all": "portality:block/base/base_all",
+    "glow_up": "portality:block/frame/frame_overlay",
+    "glow_down": "portality:block/controller/screen",
+    "glow_down_below": "portality:block/frame/frame_overlay",
+    "glow_east": "portality:block/frame/frame_overlay",
+    "glow_south": "portality:block/frame/frame_overlay",
+    "glow_west": "portality:block/frame/frame_overlay",
+    "glow_north": "portality:block/frame/frame_overlay"
+  }
+}

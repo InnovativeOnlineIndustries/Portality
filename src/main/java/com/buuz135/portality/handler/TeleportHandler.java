@@ -43,6 +43,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -72,11 +73,18 @@ public class TeleportHandler {
             controller.closeLink();
             return;
         }
-        Direction facing = controller.getLevel().getBlockState(controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL).getOpposite();
+        Direction facing = controller.getTeleportDirection();
+        Direction right = controller.getPortalRight();
+        Direction up = controller.getPortalUp();
         RandomSource random = controller.getLevel().random;
         BlockPos offset = controller.getBlockPos().relative(facing);
         double mult = controller.getLength() / 20D;
-        controller.getLevel().addParticle(ParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * (controller.getWidth() + 2) - (controller.getWidth() + 2) / 2D, offset.getY() + controller.getHeight() / 2D + random.nextDouble() * (controller.getHeight() - 2) - (controller.getHeight() - 2) / 2D, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getNormal().getX() * mult, facing.getNormal().getY() * mult, facing.getNormal().getZ() * mult);
+        double widthSpread = Math.max(1D, controller.getWidth() * 2D - 1D);
+        double heightSpread = Math.max(1D, controller.getHeight() - 1D);
+        Vec3 particle = Vec3.atCenterOf(offset)
+                .add(Vec3.atLowerCornerOf(right.getNormal()).scale(random.nextDouble() * widthSpread - widthSpread / 2D))
+                .add(Vec3.atLowerCornerOf(up.getNormal()).scale(0.5D + random.nextDouble() * heightSpread));
+        controller.getLevel().addParticle(ParticleTypes.END_ROD, particle.x, particle.y, particle.z, facing.getNormal().getX() * mult, facing.getNormal().getY() * mult, facing.getNormal().getZ() * mult);
         List<Entity> entityRemove = new ArrayList<>();
         for (Map.Entry<Entity, TeleportData> entry : entityTimeToTeleport.entrySet()) {
             if (!entry.getKey().isAlive() || !controller.getLevel().getEntitiesOfClass(Entity.class, controller.getPortalArea()).contains(entry.getKey())) {
@@ -87,7 +95,11 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            Vec3 destinationPos = Vec3.atCenterOf(controller.getBlockPos()).add(0, controller.getHeight() / 2D - 1.5, 0).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(3 - 1));
+            double planeHeightOffset = controller.getFacing().getAxis().isVertical() ? controller.getHeight() / 2D : controller.getHeight() / 2D - 1.5;
+            Vec3 destinationPos = Vec3.atCenterOf(controller.getBlockPos()).add(Vec3.atLowerCornerOf(up.getNormal()).scale(planeHeightOffset)).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(3 - 1));
+            if (controller.getFacing() == Direction.UP) {
+                destinationPos = new Vec3(entry.getKey().getX(), controller.getBlockPos().getY() - controller.getLength() + 1, entry.getKey().getZ());
+            }
             double distance = destinationPos.distanceTo(entry.getKey().position());
             Vec3 destination = destinationPos.subtract(entry.getKey().position()).scale((entry.getValue().time += 0.05) / distance);
             if (destinationPos.distanceTo(entry.getKey().position()) < 1.5) {
@@ -95,13 +107,20 @@ public class TeleportHandler {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
                         Level tpWorld = entry.getKey().level().getServer().getLevel(entry.getValue().data.getDimension());
                         Direction tpFacing = Direction.NORTH;
+                        ControllerTile targetController = null;
                         if (controller.getLinkData().isToken()){
                             tpFacing = Direction.byName(controller.getTeleportationTokens().get(controller.getLinkData().getName()).getString("Direction"));
                         } else {
-                            tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
+                            BlockEntity blockEntity = tpWorld.getBlockEntity(entry.getValue().data.getPos());
+                            if (blockEntity instanceof ControllerTile controllerTile) {
+                                targetController = controllerTile;
+                                tpFacing = controllerTile.getFacing();
+                            }
                         }
-                        BlockPos pos = entry.getValue().data.getPos().relative(tpFacing, 2);
-                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX(), pos.getY() + 2, pos.getZ(), tpFacing.toYRot(), 0);
+                        Vec3 pos = getExitPosition(entry.getValue().data.getPos(), tpFacing, targetController);
+                        if (controller.getFacing() == Direction.UP || controller.getFacing() == Direction.DOWN)
+                            pos = pos.add(0, 0, -0.5);
+                        Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.x, pos.y, pos.z, tpFacing.toYRot(), getPortalPitch(tpFacing));
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
                         if (entry.getKey() instanceof ServerPlayer serverPlayer)
@@ -118,7 +137,8 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            entry.getKey().setDeltaMovement(destination.x, destination.y, destination.z);
+            if (controller.getFacing() != Direction.UP)
+                entry.getKey().setDeltaMovement(destination.x, destination.y, destination.z);
         }
         for (Entity entity : entityRemove) {
             entityTimeToTeleport.remove(entity);
@@ -135,7 +155,10 @@ public class TeleportHandler {
                 if (controller.getLinkData().isToken()){
                     tpFacing = Direction.byName(controller.getTeleportationTokens().get(controller.getLinkData().getName()).getString("Direction"));
                 } else if (tpWorld.getBlockState(entry.getValue().data.getPos()).getBlock() instanceof ControllerBlock){
-                    tpFacing = tpWorld.getBlockState(entry.getValue().data.getPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
+                    BlockEntity blockEntity = tpWorld.getBlockEntity(entry.getValue().data.getPos());
+                    if (blockEntity instanceof ControllerTile controllerTile) {
+                        tpFacing = controllerTile.getFacing();
+                    }
                 }
                 Vec3 vec3d = new Vec3(tpFacing.getNormal().getX(), tpFacing.getNormal().getY(), tpFacing.getNormal().getZ()).scale(2 * controller.getLength() / (double) PortalityConfig.MAX_PORTAL_LENGTH);
                 entry.getKey().setDeltaMovement(vec3d.x, vec3d.y, vec3d.z);
@@ -171,5 +194,37 @@ public class TeleportHandler {
             this.ticks = 0;
             this.moved = false;
         }
+    }
+
+    private Direction getPortalUp(Direction facing) {
+        if (facing.getAxis().isVertical()) {
+            return facing == Direction.UP ? Direction.NORTH : Direction.SOUTH;
+        }
+        return Direction.UP;
+    }
+
+    private float getPortalPitch(Direction facing) {
+        if (facing == Direction.UP) {
+            return -90;
+        }
+        if (facing == Direction.DOWN) {
+            return 90;
+        }
+        return 0;
+    }
+
+    private Vec3 getExitPosition(BlockPos pos, Direction facing, ControllerTile targetController) {
+        Vec3 exit = Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(2));
+        if (targetController != null) {
+            if (facing.getAxis().isVertical()) {
+                return exit
+                        .add(Vec3.atLowerCornerOf(targetController.getPortalUp().getNormal()).scale(targetController.getHeight() / 2D));
+            }
+            return exit.add(Vec3.atLowerCornerOf(targetController.getPortalUp().getNormal()).scale(1.5));
+        }
+        if (facing.getAxis().isHorizontal()) {
+            return exit.add(Vec3.atLowerCornerOf(getPortalUp(facing).getNormal()).scale(1.5));
+        }
+        return exit;
     }
 }

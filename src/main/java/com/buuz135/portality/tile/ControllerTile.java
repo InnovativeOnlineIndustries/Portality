@@ -64,7 +64,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -302,13 +301,15 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         PortalDataManager.setPortalInterdimensional(this.level, this.worldPosition, interdimensional);
     }
 
-    public AABB getPortalArea() {
-        if (!(level.getBlockState(this.worldPosition).getBlock() instanceof ControllerBlock))
-            return new AABB(0, 0, 0, 0, 0, 0);
-        Direction facing = level.getBlockState(this.worldPosition).getValue(ControllerBlock.FACING_HORIZONTAL);
-        BlockPos corner1 = this.worldPosition.relative(facing.getClockWise(), structureHandler.getWidth()).relative(Direction.UP);
-        BlockPos corner2 = this.worldPosition.relative(facing.getCounterClockWise(), structureHandler.getWidth()).relative(Direction.UP, structureHandler.getHeight() - 1).relative(facing.getOpposite(), structureHandler.getLength() - 1);
-        return new AABB(Vec3.atLowerCornerOf(corner1), Vec3.atLowerCornerOf(corner2));
+    public static Direction getPortalRight(Direction facing, int roll) {
+        Direction right = getBasePortalRight(facing);
+        Direction up = getBasePortalUp(facing);
+        for (int i = 0; i < roll; i++) {
+            Direction oldUp = up;
+            up = right;
+            right = oldUp.getOpposite();
+        }
+        return right;
     }
 
     public AABB getRenderBoundingBox() {
@@ -468,8 +469,92 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         return information;
     }
 
+    public static Direction getPortalUp(Direction facing, int roll) {
+        Direction right = getBasePortalRight(facing);
+        Direction up = getBasePortalUp(facing);
+        for (int i = 0; i < roll; i++) {
+            Direction oldUp = up;
+            up = right;
+            right = oldUp.getOpposite();
+        }
+        return up;
+    }
+
+    private static Direction getBasePortalRight(Direction facing) {
+        if (facing.getAxis().isVertical()) {
+            return Direction.EAST;
+        }
+        return facing.getClockWise();
+    }
+
+    private static Direction getBasePortalUp(Direction facing) {
+        if (facing.getAxis().isVertical()) {
+            return facing == Direction.UP ? Direction.NORTH : Direction.SOUTH;
+        }
+        return Direction.UP;
+    }
+
+    public AABB getPortalArea() {
+        if (!(level.getBlockState(this.worldPosition).getBlock() instanceof ControllerBlock))
+            return new AABB(0, 0, 0, 0, 0, 0);
+        Direction right = getPortalRight();
+        Direction up = getPortalUp();
+        Direction depth = getTeleportDirection();
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        double maxZ = -Double.MAX_VALUE;
+        for (int lateral = -structureHandler.getWidth() + 1; lateral < structureHandler.getWidth(); lateral++) {
+            for (int vertical = 1; vertical < structureHandler.getHeight(); vertical++) {
+                for (int forward = 0; forward < structureHandler.getLength(); forward++) {
+                    BlockPos pos = this.worldPosition.relative(right, lateral).relative(up, vertical).relative(depth, forward);
+                    minX = Math.min(minX, pos.getX());
+                    minY = Math.min(minY, pos.getY());
+                    minZ = Math.min(minZ, pos.getZ());
+                    maxX = Math.max(maxX, pos.getX() + 1);
+                    maxY = Math.max(maxY, pos.getY() + 1);
+                    maxZ = Math.max(maxZ, pos.getZ() + 1);
+                }
+            }
+        }
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
     public int getColor() {
         return color;
+    }
+
+    public Direction getFacing() {
+        BlockState state = this.level.getBlockState(this.worldPosition);
+        if (state.hasProperty(ControllerBlock.FACING_ALL)) {
+            return state.getValue(ControllerBlock.FACING_ALL);
+        }
+        if (state.hasProperty(ControllerBlock.FACING_HORIZONTAL)) {
+            return state.getValue(ControllerBlock.FACING_HORIZONTAL);
+        }
+        return Direction.NORTH;
+    }
+
+    public Direction getPortalRight() {
+        return getPortalRight(getFacing(), getRoll());
+    }
+
+    public Direction getPortalUp() {
+        return getPortalUp(getFacing(), getRoll());
+    }
+
+    public Direction getTeleportDirection() {
+        return getFacing().getOpposite();
+    }
+
+    public int getRoll() {
+        BlockState state = this.level.getBlockState(this.worldPosition);
+        if (state.hasProperty(ControllerBlock.ROLL)) {
+            return state.getValue(ControllerBlock.ROLL);
+        }
+        return 0;
     }
 
     public void setColor(int color) {

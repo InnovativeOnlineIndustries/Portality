@@ -33,6 +33,7 @@ import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -45,9 +46,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nonnull;
@@ -55,6 +60,8 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
+
+    public static final IntegerProperty ROLL = IntegerProperty.create("roll", 0, 3);
 
     public ControllerBlock() {
         super("controller", Block.Properties.ofFullCopy(Blocks.IRON_BLOCK), ControllerTile.class);
@@ -80,16 +87,59 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
         PortalDataManager.removeInformation(worldIn, pos);
     }
 
+    private static int getRollForUp(Direction facing, Direction up) {
+        for (int roll = 0; roll < 4; roll++) {
+            if (ControllerTile.getPortalUp(facing, roll) == up) {
+                return roll;
+            }
+        }
+        return 0;
+    }
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING_HORIZONTAL, context.getHorizontalDirection().getOpposite());
+        Direction facing = context.getClickedFace();
+        int roll = facing.getAxis().isVertical() ? getRollForPlacement(facing, context.getNearestLookingDirections()) : 0;
+        return this.defaultBlockState().setValue(FACING_ALL, facing).setValue(ROLL, roll);
     }
 
     @Nonnull
     @Override
     public RotationType getRotationType() {
-        return RotationType.FOUR_WAY;
+        return RotationType.SIX_WAY;
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(ROLL);
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        Direction oldFacing = state.getValue(FACING_ALL);
+        Direction oldUp = ControllerTile.getPortalUp(oldFacing, state.getValue(ROLL));
+        BlockState rotated = state.setValue(FACING_ALL, rotation.rotate(oldFacing));
+        return rotated.setValue(ROLL, getRollForUp(rotated.getValue(FACING_ALL), rotation.rotate(oldUp)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        Direction oldFacing = state.getValue(FACING_ALL);
+        Direction oldUp = ControllerTile.getPortalUp(oldFacing, state.getValue(ROLL));
+        Rotation rotation = mirror.getRotation(oldFacing);
+        BlockState mirrored = state.setValue(FACING_ALL, rotation.rotate(oldFacing));
+        return mirrored.setValue(ROLL, getRollForUp(mirrored.getValue(FACING_ALL), rotation.rotate(oldUp)));
+    }
+
+    private int getRollForPlacement(Direction facing, Direction[] nearestLookingDirections) {
+        for (Direction direction : nearestLookingDirections) {
+            if (direction.getAxis() != facing.getAxis()) {
+                return getRollForUp(facing, direction);
+            }
+        }
+        return 0;
     }
 
     @Override

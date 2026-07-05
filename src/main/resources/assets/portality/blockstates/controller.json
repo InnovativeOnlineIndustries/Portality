@@ -1,27 +1,88 @@
 {
   "variants": {
-    "subfacing=north": {
+    "facing=north,roll=0": {
       "model": "portality:block/controller"
     },
-    "subfacing=south": {
+    "facing=north,roll=1": {
+      "model": "portality:block/controller"
+    },
+    "facing=north,roll=2": {
+      "model": "portality:block/controller"
+    },
+    "facing=north,roll=3": {
+      "model": "portality:block/controller"
+    },
+    "facing=south,roll=0": {
       "model": "portality:block/controller",
       "y": 180
     },
-    "subfacing=west": {
+    "facing=south,roll=1": {
+      "model": "portality:block/controller",
+      "y": 180
+    },
+    "facing=south,roll=2": {
+      "model": "portality:block/controller",
+      "y": 180
+    },
+    "facing=south,roll=3": {
+      "model": "portality:block/controller",
+      "y": 180
+    },
+    "facing=west,roll=0": {
       "model": "portality:block/controller",
       "y": 270
     },
-    "subfacing=east": {
+    "facing=west,roll=1": {
+      "model": "portality:block/controller",
+      "y": 270
+    },
+    "facing=west,roll=2": {
+      "model": "portality:block/controller",
+      "y": 270
+    },
+    "facing=west,roll=3": {
+      "model": "portality:block/controller",
+      "y": 270
+    },
+    "facing=east,roll=0": {
       "model": "portality:block/controller",
       "y": 90
     },
-    "subfacing=up": {
+    "facing=east,roll=1": {
       "model": "portality:block/controller",
-      "x": -90
+      "y": 90
     },
-    "subfacing=down": {
+    "facing=east,roll=2": {
       "model": "portality:block/controller",
-      "x": 90
+      "y": 90
+    },
+    "facing=east,roll=3": {
+      "model": "portality:block/controller",
+      "y": 90
+    },
+    "facing=up,roll=0": {
+      "model": "portality:block/controller_up"
+    },
+    "facing=up,roll=1": {
+      "model": "portality:block/controller_up_roll_1"
+    },
+    "facing=up,roll=2": {
+      "model": "portality:block/controller_up_roll_2"
+    },
+    "facing=up,roll=3": {
+      "model": "portality:block/controller_up_roll_3"
+    },
+    "facing=down,roll=0": {
+      "model": "portality:block/controller_down"
+    },
+    "facing=down,roll=1": {
+      "model": "portality:block/controller_down_roll_1"
+    },
+    "facing=down,roll=2": {
+      "model": "portality:block/controller_down_roll_2"
+    },
+    "facing=down,roll=3": {
+      "model": "portality:block/controller_down_roll_3"
     }
   }
 }

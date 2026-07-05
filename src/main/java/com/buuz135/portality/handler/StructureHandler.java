@@ -23,7 +23,6 @@
  */
 package com.buuz135.portality.handler;
 
-import com.buuz135.portality.block.ControllerBlock;
 import com.buuz135.portality.block.module.IPortalModule;
 import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.tile.ControllerTile;
@@ -56,24 +55,27 @@ public class StructureHandler {
     public boolean checkArea() {
         checkPortalSize();
         if (length < 3) return false;
-        Direction facing = this.controller.getLevel().getBlockState(this.controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
+        Direction facing = this.controller.getFacing();
+        Direction widthFacing = this.controller.getPortalRight();
+        Direction heightFacing = this.controller.getPortalUp();
+        Direction lengthFacing = facing.getOpposite();
         modules.clear();
-        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1), false)) { //BOTTOM
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(lengthFacing, length - 1), false)) { //BOTTOM
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1).relative(Direction.UP, height - 1), false)) { //TOP
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, height - 1), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(lengthFacing, length - 1).relative(heightFacing, height - 1), false)) { //TOP
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, 1), this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, height - 2).relative(lengthFacing, length - 1), false)) { //LEFT
             return false;
         }
-        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), false)) { //LEFT
+        if (!checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(heightFacing, 1), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(heightFacing, height - 2).relative(lengthFacing, length - 1), false)) { //LEFT
             return false;
         }
-        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(facing.getOpposite(), length - 1).relative(Direction.UP, height - 1), true);
-        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), true);
-        checkFramesInTheBox(this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, 1), this.controller.getBlockPos().relative(facing.getCounterClockWise(), width).relative(Direction.UP, height - 2).relative(facing.getOpposite(), length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(lengthFacing, length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, height - 1), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(lengthFacing, length - 1).relative(heightFacing, height - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, 1), this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, height - 2).relative(lengthFacing, length - 1), true);
+        checkFramesInTheBox(this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(heightFacing, 1), this.controller.getBlockPos().relative(widthFacing.getOpposite(), width).relative(heightFacing, height - 2).relative(lengthFacing, length - 1), true);
         return true;
     }
 
@@ -98,17 +100,17 @@ public class StructureHandler {
     }
 
     private void checkPortalSize() {
-        Direction controllerFacing = this.controller.getLevel().getBlockState(this.controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL);
-        if (controllerFacing.getAxis().isVertical()) return;
+        Direction controllerFacing = this.controller.getFacing();
         //Checking width
-        Direction widthFacing = controllerFacing.getClockWise();
+        Direction widthFacing = this.controller.getPortalRight();
+        Direction heightFacing = this.controller.getPortalUp();
         int width = 1;
-        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width)) && !isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(Direction.UP)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
+        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width)) && !isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing)) && width <= PortalityConfig.MAX_PORTAL_WIDTH) {
             ++width;
         }
         //Checking height
         int height = 1;
-        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(Direction.UP, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
+        while (isValidFrame(this.controller.getBlockPos().relative(widthFacing, width).relative(heightFacing, height)) && height <= PortalityConfig.MAX_PORTAL_HEIGHT) {
             ++height;
         }
         Direction lengthChecking = controllerFacing.getOpposite();
