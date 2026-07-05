@@ -27,7 +27,7 @@ import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class PortalDisplayToggleMessage extends Message {
 
@@ -42,13 +42,13 @@ public class PortalDisplayToggleMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
+    protected void handleMessage(IPayloadContext context) {
         context.enqueueWork(() -> {
-            Level world = context.getSender().level;
+            Level world = context.player().level();
             BlockPos pos = BlockPos.of(tileLocation);
             if (world.getBlockEntity(pos) instanceof ControllerTile) {
                 ControllerTile controller = (ControllerTile) world.getBlockEntity(pos);
-                if (controller.getOwner().equals(context.getSender().getUUID()))
+                if (controller.getOwner().equals(context.player().getUUID()))
                     controller.setDisplayNameEnabled(!controller.isDisplayNameEnabled());
             }
         });

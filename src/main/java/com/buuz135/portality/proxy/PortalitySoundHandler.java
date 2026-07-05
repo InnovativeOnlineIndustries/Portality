@@ -23,15 +23,13 @@
  */
 package com.buuz135.portality.proxy;
 
-import com.buuz135.portality.Portality;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class PortalitySoundHandler {
 
-    public static RegistryObject<SoundEvent> PORTAL;
-    public static RegistryObject<SoundEvent> PORTAL_TP;
+    public static DeferredHolder<SoundEvent, SoundEvent> PORTAL;
+    public static DeferredHolder<SoundEvent, SoundEvent> PORTAL_TP;
 
 
 }

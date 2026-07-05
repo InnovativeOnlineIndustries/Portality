@@ -36,11 +36,12 @@ import com.hrznstudio.titanium.component.button.ButtonComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,8 +52,8 @@ public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
     private boolean input;
     private ButtonComponent button;
 
-    public ModuleTile(BasicTileBlock<T> base, BlockPos pos, BlockState state) {
-        super(base, pos, state);
+    public ModuleTile(BasicTileBlock<T> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+        super(base, blockEntityType, pos, state);
         this.input = true;
         this.addButton(button = new ButtonComponent(153, 84, 14, 14) {
 
@@ -72,11 +73,11 @@ public abstract class ModuleTile<T extends ModuleTile<T>> extends FrameTile<T> {
     }
 
     @Override
-    public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) == InteractionResult.SUCCESS)
-            return InteractionResult.SUCCESS;
+    public ItemInteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) == ItemInteractionResult.SUCCESS)
+            return ItemInteractionResult.SUCCESS;
         openGui(playerIn);
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     public void changeMode() {

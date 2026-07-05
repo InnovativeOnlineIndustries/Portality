@@ -29,9 +29,10 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class TickeableSound extends AbstractSoundInstance implements TickableSoundInstance {
@@ -40,7 +41,7 @@ public class TickeableSound extends AbstractSoundInstance implements TickableSou
     private Level world;
 
     public TickeableSound(Level world, BlockPos pos, SoundEvent soundIn) {
-        super(soundIn, SoundSource.BLOCKS);
+        super(soundIn, SoundSource.BLOCKS, RandomSource.create());
         this.world = world;
         this.x = pos.getX();
         this.y = pos.getY();
@@ -75,10 +76,11 @@ public class TickeableSound extends AbstractSoundInstance implements TickableSou
 
     @Override
     public void tick() {
-        if (world.getBlockEntity(new BlockPos(x, y, z)) == null) {
+        BlockPos soundPos = BlockPos.containing(x, y, z);
+        if (world.getBlockEntity(soundPos) == null) {
             setDone();
         }
-        double distance = Minecraft.getInstance().player.blockPosition().distManhattan(new BlockPos(this.x, this.y, this.z));
+        double distance = Minecraft.getInstance().player.blockPosition().distManhattan(soundPos);
         if (distance > 16) {
             this.volume = 0;
         } else {

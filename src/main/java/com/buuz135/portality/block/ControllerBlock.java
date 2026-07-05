@@ -33,14 +33,13 @@ import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -58,13 +57,13 @@ import java.util.UUID;
 public class ControllerBlock extends RotatableBlock<ControllerTile> {
 
     public ControllerBlock() {
-        super("controller", Block.Properties.copy(Blocks.IRON_BLOCK), ControllerTile.class);
+        super("controller", Block.Properties.ofFullCopy(Blocks.IRON_BLOCK), ControllerTile.class);
         setItemGroup(Portality.TAB);
     }
 
     @Override
     public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME.get()), false);
+        PortalInformation information = new PortalInformation(UUID.randomUUID(), placer.getUUID(), false, false, worldIn.dimension(), pos, "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ(), new ItemStack(CommonProxy.BLOCK_FRAME.block().get()), false);
         PortalDataManager.addInformation(worldIn, information);
         super.setPlacedBy(worldIn, pos, state, placer, stack);
     }
@@ -94,41 +93,41 @@ public class ControllerBlock extends RotatableBlock<ControllerTile> {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult ray) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult ray) {
         BlockEntity tile = worldIn.getBlockEntity(pos);
         if (tile instanceof ControllerTile) {
             ControllerTile controller = (ControllerTile) tile;
             if (!worldIn.isClientSide()) {
                 if (!controller.isFormed()) {
-                    playerIn.displayClientMessage(new TranslatableComponent("portality.controller.error.size").withStyle(ChatFormatting.RED), true);
-                    return InteractionResult.SUCCESS;
+                    playerIn.displayClientMessage(Component.translatable("portality.controller.error.size").withStyle(ChatFormatting.RED), true);
+                    return ItemInteractionResult.SUCCESS;
                 }
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUUID())) {
-                    playerIn.displayClientMessage(new TranslatableComponent("portality.controller.error.privacy").withStyle(ChatFormatting.RED), true);
-                    return InteractionResult.SUCCESS;
+                    playerIn.displayClientMessage(Component.translatable("portality.controller.error.privacy").withStyle(ChatFormatting.RED), true);
+                    return ItemInteractionResult.SUCCESS;
                 }
-                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUUID()) && !playerIn.getItemInHand(hand).isEmpty() && !playerIn.getItemInHand(hand).sameItem(controller.getDisplay())) {
-                    if (playerIn.getItemInHand(hand).getItem() instanceof TeleportationTokenItem){
-                        if (playerIn.getItemInHand(hand).hasTag()){
-                            controller.addTeleportationToken(playerIn.getItemInHand(hand));
-                            playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.added_token").withStyle(ChatFormatting.GREEN), true);
+                if (playerIn.isCrouching() && controller.getOwner().equals(playerIn.getUUID()) && !stack.isEmpty() && !ItemStack.isSameItemSameComponents(stack, controller.getDisplay())) {
+                    if (stack.getItem() instanceof TeleportationTokenItem) {
+                        if (TeleportationTokenItem.hasTokenData(stack)) {
+                            controller.addTeleportationToken(stack);
+                            playerIn.displayClientMessage(Component.translatable("portility.controller.info.added_token").withStyle(ChatFormatting.GREEN), true);
                         }
-                        return InteractionResult.SUCCESS;
+                        return ItemInteractionResult.SUCCESS;
                     }
-                    playerIn.displayClientMessage(new TranslatableComponent("portility.controller.info.icon_changed").withStyle(ChatFormatting.GREEN), true);
-                    controller.setDisplayNameEnabled(playerIn.getItemInHand(hand));
-                    return InteractionResult.SUCCESS;
+                    playerIn.displayClientMessage(Component.translatable("portility.controller.info.icon_changed").withStyle(ChatFormatting.GREEN), true);
+                    controller.setDisplayNameEnabled(stack);
+                    return ItemInteractionResult.SUCCESS;
                 }
             } else if (controller.isFormed()) {
                 if (controller.isPrivate() && !controller.getOwner().equals(playerIn.getUUID()))
-                    return InteractionResult.SUCCESS;
+                    return ItemInteractionResult.SUCCESS;
                 Minecraft.getInstance().submitAsync(() -> {
                     ControllerTile.OpenGui.open(0, (ControllerTile) tile);
                 });
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
         }
-        return super.use(state, worldIn, pos, playerIn, hand, ray);
+        return super.useItemOn(stack, state, worldIn, pos, playerIn, hand, ray);
     }
 
     @Override

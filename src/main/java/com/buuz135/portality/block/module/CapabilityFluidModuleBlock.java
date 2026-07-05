@@ -25,15 +25,14 @@ package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.FluidModuleTile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHandler, FluidModuleTile> {
@@ -43,26 +42,28 @@ public class CapabilityFluidModuleBlock extends CapabilityModuleBlock<IFluidHand
     }
 
     @Override
-    public Capability<IFluidHandler> getCapability() {
-        return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
+    public BlockCapability<IFluidHandler, Direction> getCapability() {
+        return Capabilities.FluidHandler.BLOCK;
     }
 
     @Override
     void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getBlockEntity(myself).getCapability(getCapability(), null).ifPresent(handler -> {
+        IFluidHandler handler = current.getCapability(getCapability(), myself, null);
+        if (handler != null) {
             if (!handler.drain(500, IFluidHandler.FluidAction.SIMULATE).isEmpty()) {
                 for (BlockPos pos : compatibleBlockPos) {
                     BlockEntity otherTile = otherWorld.getBlockEntity(pos);
                     if (otherTile != null) {
-                        otherTile.getCapability(getCapability(), null).ifPresent(otherHandler -> {
+                        IFluidHandler otherHandler = otherWorld.getCapability(getCapability(), pos, null);
+                        if (otherHandler != null) {
                             int filled = otherHandler.fill(handler.drain(500, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE);
                             handler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
                             if (filled > 0) return;
-                        });
+                        }
                     }
                 }
             }
-        });
+        }
     }
 
     @Override

@@ -24,7 +24,8 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +62,14 @@ public class PortalInformation {
 
     public static PortalInformation readFromNBT(CompoundTag info) {
         return new PortalInformation(info.getUUID("ID"), info.getUUID("Owner"), info.getBoolean("Active"), info.getBoolean("Private"),
-                ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(info.getString("Dimension"))), BlockPos.of(info.getLong("Position")), info.getString("Name"), ItemStack.of(info.getCompound("Display")), info.getBoolean("Interdimensional")).setToken(info.getBoolean("Token"));
+                ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(info.getString("Dimension"))), BlockPos.of(info.getLong("Position")), info.getString("Name"), readDisplay(info), info.getBoolean("Interdimensional")).setToken(info.getBoolean("Token"));
+    }
+
+    private static ItemStack readDisplay(CompoundTag info) {
+        if (info.contains("DisplayItem")) {
+            return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(info.getString("DisplayItem"))));
+        }
+        return ItemStack.EMPTY;
     }
 
     public UUID getId() {
@@ -138,7 +146,7 @@ public class PortalInformation {
         infoTag.putString("Dimension", getDimension().location().toString());
         infoTag.putLong("Position", getLocation().asLong());
         infoTag.putString("Name", getName());
-        infoTag.put("Display", display.serializeNBT());
+        infoTag.putString("DisplayItem", BuiltInRegistries.ITEM.getKey(display.getItem()).toString());
         infoTag.putBoolean("Interdimensional", interdimensional);
         infoTag.putBoolean("Token", isToken());
         return infoTag;

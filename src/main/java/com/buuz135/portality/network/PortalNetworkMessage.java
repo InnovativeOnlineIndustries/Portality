@@ -33,16 +33,15 @@ import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,24 +53,24 @@ public class PortalNetworkMessage {
         List<PortalInformation> infos = new ArrayList<>();
         tokens.forEach((s, compoundNBT) -> {
             infos.add(new TokenPortalInformation(playerEntity.getUUID(),
-                    ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compoundNBT.getString("Dimension"))),
+                    ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compoundNBT.getString("Dimension"))),
                     new BlockPos(compoundNBT.getInt("X"), compoundNBT.getInt("Y"), compoundNBT.getInt("Z")),
                     s));
         });
-        infos.addAll(PortalDataManager.getData(playerEntity.level).getInformationList());
-        infos.removeIf(information -> information.getDimension().equals(playerEntity.getLevel().dimension()) && information.getLocation().equals(pos));
+        infos.addAll(PortalDataManager.getData(playerEntity.level()).getInformationList());
+        infos.removeIf(information -> information.getDimension().equals(playerEntity.level().dimension()) && information.getLocation().equals(pos));
         infos.removeIf(information -> {
             Level world = playerEntity.getServer().getLevel(information.getDimension());
             return world.getBlockEntity(information.getLocation()) instanceof ControllerTile && !((ControllerTile) world.getBlockEntity(information.getLocation())).isFormed();
         });
-        infos.removeIf(information -> !interdimensional && !playerEntity.getLevel().dimension().equals(information.getDimension()));
-        infos.removeIf(information -> interdimensional && !playerEntity.getLevel().dimension().equals(information.getDimension()) && !information.isInterdimensional());
+        infos.removeIf(information -> !interdimensional && !playerEntity.level().dimension().equals(information.getDimension()));
+        infos.removeIf(information -> interdimensional && !playerEntity.level().dimension().equals(information.getDimension()) && !information.isInterdimensional());
         infos.removeIf(information -> {
             Level world = playerEntity.getCommandSenderWorld().getServer().getLevel(information.getDimension());
             BlockEntity entity = world.getBlockEntity(information.getLocation());
-            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.getLevel().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), distance) || !information.getLocation().closerThan(new Vec3(pos.getX(), pos.getY(), pos.getZ()), BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
+            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.level().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(pos, distance) || !information.getLocation().closerThan(pos, BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
         });
-        Portality.NETWORK.get().sendTo(new Response(infos), playerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        Portality.NETWORK.sendTo(new Response(infos), playerEntity);
     }
 
     public static class Response extends Message {
@@ -88,7 +87,7 @@ public class PortalNetworkMessage {
         }
 
         @Override
-        protected void handleMessage(NetworkEvent.Context context) {
+        protected void handleMessage(IPayloadContext context) {
             Minecraft.getInstance().tell(() -> {
                 if (Minecraft.getInstance().screen instanceof PortalsScreen) {
                     List<PortalInformation> information = new ArrayList<>();

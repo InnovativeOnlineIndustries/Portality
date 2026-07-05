@@ -24,6 +24,7 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -39,6 +40,7 @@ import java.util.UUID;
 public class PortalDataManager extends SavedData {
 
     public static final String NAME = "Portality";
+    private static final SavedData.Factory<PortalDataManager> FACTORY = new SavedData.Factory<>(PortalDataManager::new, PortalDataManager::load);
     private List<PortalInformation> informationList;
 
     public PortalDataManager() {
@@ -134,7 +136,7 @@ public class PortalDataManager extends SavedData {
     public static PortalDataManager getData(LevelAccessor world) {
         if (world instanceof ServerLevel) {
             ServerLevel serverWorld = ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD);
-            PortalDataManager data = serverWorld.getDataStorage().computeIfAbsent(PortalDataManager::load, PortalDataManager::new, NAME);
+            PortalDataManager data = serverWorld.getDataStorage().computeIfAbsent(FACTORY, NAME);
             return data;
         }
         return null;
@@ -151,7 +153,7 @@ public class PortalDataManager extends SavedData {
     }
 
 
-    public static PortalDataManager load(CompoundTag nbt) {
+    public static PortalDataManager load(CompoundTag nbt, HolderLookup.Provider provider) {
         PortalDataManager portalDataManager = new PortalDataManager();
         CompoundTag root = nbt.getCompound(NAME);
         for (String key : root.getAllKeys()) {
@@ -162,7 +164,7 @@ public class PortalDataManager extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    public CompoundTag save(CompoundTag compound, HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         for (PortalInformation information : informationList) {
             tag.put(information.getId().toString(), information.writetoNBT());

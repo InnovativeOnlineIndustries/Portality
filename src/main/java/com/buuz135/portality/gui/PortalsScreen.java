@@ -32,10 +32,10 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
@@ -76,8 +76,8 @@ public class PortalsScreen extends ScreenAddonScreen {
         this.x = this.width / 2 - guiWidth / 2;
         this.y = this.height / 2 - guiWidth / 2;
         if (informationList != null && !informationList.isEmpty()) addPortalButtons();
-        textField = new EditBox(Minecraft.getInstance().font, this.x + guiWidth - 131, this.y + 3, 100, 10, new TextComponent(""));
-        textField.setFocus(true);
+        textField = new EditBox(Minecraft.getInstance().font, this.x + guiWidth - 131, this.y + 3, 100, 10, Component.literal(""));
+        textField.setFocused(true);
         textField.setVisible(true);
         textField.setBordered(true);
         //this.setFocused(textField);
@@ -101,7 +101,7 @@ public class PortalsScreen extends ScreenAddonScreen {
         for (int i = pointer; i < pointer + 7; i++) {
             if (tempInformations.size() > i && i >= 0) {
                 int finalI = i;
-                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, tempInformations.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png")) {
+                GuiButtonImagePortal buttonImage = new GuiButtonImagePortal(this, tempInformations.get(finalI), this.x + 9, this.y + 19 + 23 * (finalI - pointer), 157, 22, 0, 234, 0, ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png")) {
                     @Override
                     public void onPress() {
                         selectedPortal = currentlyShowing.get(finalI + (int) (((currentlyShowing.size() - 7) * scrolling)));
@@ -130,14 +130,13 @@ public class PortalsScreen extends ScreenAddonScreen {
     }
 
     @Override
-    public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         checkForScrolling(mouseX, mouseY);
-        this.renderBackground(stack);
-        RenderSystem.setShaderTexture(0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, guiWidth, guiHeight);
-        Minecraft.getInstance().screen.blit(stack, this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23);
-        super.renderBackground(stack, mouseX, mouseY, partialTicks);
-        textField.renderButton(stack, mouseX, mouseY, partialTicks);
+        RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png"));
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png"), x, y, 0, 0, guiWidth, guiHeight, 256, 256);
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png"), this.x + guiWidth - 22, (int) (this.y + 10 + 140 * scrolling), 200, 9, 18, 23, 256, 256);
+        super.renderBackground(graphics, mouseX, mouseY, partialTicks);
+        textField.render(graphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -171,8 +170,8 @@ public class PortalsScreen extends ScreenAddonScreen {
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double z) {
-        scrolling = Mth.clamp(scrolling -= z / (currentlyShowing.size() - 7D), 0, 1);
+    public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+        scrolling = Mth.clamp(scrolling -= scrollY / (currentlyShowing.size() - 7D), 0, 1);
         addPortalButtons();
         return true;
     }

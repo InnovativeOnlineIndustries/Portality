@@ -40,7 +40,7 @@ import java.awt.*;
 public final class TileAssetProvider implements IAssetProvider {
 
     public static TileAssetProvider PROVIDER = new TileAssetProvider();
-    private static final ResourceLocation LOCATION = new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+    private static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/background.png");
     private final Point HOTBAR_POS = new Point(8, 160);
     private final Point INV_POS = new Point(8, 102);
     private final IAsset PROGRESS_BAR_BORDER = new IAsset() {

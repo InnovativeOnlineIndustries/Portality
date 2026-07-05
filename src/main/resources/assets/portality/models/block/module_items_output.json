@@ -1,6 +1,6 @@
 {
   "parent": "portality:block/module",
   "textures": {
-    "glow": "portality:blocks/modules/items_output"
+    "glow": "portality:block/modules/items_output"
   }
 }

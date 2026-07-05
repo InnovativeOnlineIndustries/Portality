@@ -35,7 +35,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket;
+import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -46,7 +46,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkDirection;
 
 import java.util.*;
 
@@ -72,7 +71,7 @@ public class TeleportHandler {
             return;
         }
         Direction facing = controller.getLevel().getBlockState(controller.getBlockPos()).getValue(ControllerBlock.FACING_HORIZONTAL).getOpposite();
-        Random random = controller.getLevel().random;
+        RandomSource random = controller.getLevel().random;
         BlockPos offset = controller.getBlockPos().relative(facing);
         double mult = controller.getLength() / 20D;
         controller.getLevel().addParticle(ParticleTypes.END_ROD, offset.getX() + 0.5 + random.nextDouble() * (controller.getWidth() + 2) - (controller.getWidth() + 2) / 2D, offset.getY() + controller.getHeight() / 2D + random.nextDouble() * (controller.getHeight() - 2) - (controller.getHeight() - 2) / 2D, offset.getZ() + 0.5 + random.nextDouble() * 2 - 1, facing.getNormal().getX() * mult, facing.getNormal().getY() * mult, facing.getNormal().getZ() * mult);
@@ -86,14 +85,13 @@ public class TeleportHandler {
                 entityRemove.add(entry.getKey());
                 continue;
             }
-            BlockPos destinationPos = controller.getBlockPos().offset(0.5, controller.getHeight() / 2D - 0.75, 0.5).relative(facing, controller.getLength() - 1);
-            Vec3 destination = new Vec3(destinationPos.getX(), destinationPos.getY(), destinationPos.getZ()).add(0.5, 0, 0.5);
-            double distance = destinationPos.distManhattan(new Vec3i(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()));
-            destination = destination.subtract(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()).scale((entry.getValue().time += 0.05) / distance);
-            if (destinationPos.closerThan(new Vec3i(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()), 1.5)) {
-                if (!entry.getKey().level.isClientSide) {
+            Vec3 destinationPos = Vec3.atCenterOf(controller.getBlockPos()).add(0, controller.getHeight() / 2D - 0.75, 0).add(Vec3.atLowerCornerOf(facing.getNormal()).scale(controller.getLength() - 1));
+            double distance = destinationPos.distanceTo(entry.getKey().position());
+            Vec3 destination = destinationPos.subtract(entry.getKey().position()).scale((entry.getValue().time += 0.05) / distance);
+            if (destinationPos.distanceTo(entry.getKey().position()) < 1.5) {
+                if (!entry.getKey().level().isClientSide) {
                     if (controller.getEnergyStorage().getEnergyStored() >= PortalityConfig.TELEPORT_ENERGY_AMOUNT) {
-                        Level tpWorld = entry.getKey().level.getServer().getLevel(entry.getValue().data.getDimension());
+                        Level tpWorld = entry.getKey().level().getServer().getLevel(entry.getValue().data.getDimension());
                         Direction tpFacing = Direction.NORTH;
                         if (controller.getLinkData().isToken()){
                             tpFacing = Direction.byName(controller.getTeleportationTokens().get(controller.getLinkData().getName()).getString("Direction"));
@@ -104,8 +102,8 @@ public class TeleportHandler {
                         Entity entity = TeleportationUtils.teleportEntity(entry.getKey(), entry.getValue().data.getDimension(), pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, tpFacing.toYRot(), 0);
                         entitesTeleported.put(entity, new TeleportedEntityData(entry.getValue().data));
                         controller.getEnergyStorage().extractEnergy(PortalityConfig.TELEPORT_ENERGY_AMOUNT, false);
-                        if (entry.getKey() instanceof ServerPlayer)
-                            Portality.NETWORK.get().sendTo(new PortalTeleportMessage(tpFacing.get3DDataValue(), controller.getLength()), ((ServerPlayer) entry.getKey()).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                        if (entry.getKey() instanceof ServerPlayer serverPlayer)
+                            Portality.NETWORK.sendTo(new PortalTeleportMessage(tpFacing.get3DDataValue(), controller.getLength()), serverPlayer);
                         if (controller.teleportedEntity()) {
                             return;
                         }
@@ -127,10 +125,10 @@ public class TeleportHandler {
         for (Map.Entry<Entity, TeleportedEntityData> entry : entitesTeleported.entrySet()) {
             entry.getValue().ticks++;
             if (entry.getValue().ticks > 2 && !entry.getValue().moved) {
-                if (entry.getKey().level.isClientSide)
-                    entry.getKey().level.getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ(), entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()).inflate(16)).forEach(entityPlayer -> entityPlayer.connection.send(new ClientboundCustomSoundPacket(PortalitySoundHandler.PORTAL_TP.get().getRegistryName(), SoundSource.BLOCKS, new Vec3(entry.getKey().blockPosition().getX(), entry.getKey().blockPosition().getY(), entry.getKey().blockPosition().getZ()), 0.5f, 1f)));
+                if (!entry.getKey().level().isClientSide)
+                    entry.getKey().level().getEntitiesOfClass(ServerPlayer.class, new AABB(entry.getKey().blockPosition()).inflate(16)).forEach(entityPlayer -> entityPlayer.playNotifySound(PortalitySoundHandler.PORTAL_TP.get(), SoundSource.BLOCKS, 0.5f, 1f));
                 entry.getValue().moved = true;
-                Level tpWorld = entry.getKey().level;
+                Level tpWorld = entry.getKey().level();
                 Direction tpFacing = Direction.NORTH;
                 if (controller.getLinkData().isToken()){
                     tpFacing = Direction.byName(controller.getTeleportationTokens().get(controller.getLinkData().getName()).getString("Direction"));

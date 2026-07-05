@@ -27,10 +27,8 @@ import com.buuz135.portality.Portality;
 import com.buuz135.portality.tile.BasicFrameTile;
 import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.tile.FrameTile;
-import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -40,12 +38,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class FrameBlock<T extends FrameTile<T>> extends RotatableBlock<T> {
 
     public FrameBlock(String name, Class<T> tileClass) {
-        super(name, Block.Properties.copy(Blocks.IRON_BLOCK), tileClass);
+        super(name, Block.Properties.ofFullCopy(Blocks.IRON_BLOCK), tileClass);
         setItemGroup(Portality.TAB);
     }
 

@@ -30,9 +30,9 @@ public class AuraRender extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
     @Override
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, AbstractClientPlayer entityIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (!ClientRewardStorage.REWARD_STORAGE.getRewards().containsKey(entityIn.getUUID())) return;
-        if (!ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUUID()).getEnabled().containsKey(new ResourceLocation(Portality.MOD_ID, "aura")))
+        if (!ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUUID()).getEnabled().containsKey(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "aura")))
             return;
-        Portality.AuraType type = Portality.AuraType.valueOf(ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUUID()).getEnabled().get(new ResourceLocation(Portality.MOD_ID, "aura")));
+        Portality.AuraType type = Portality.AuraType.valueOf(ClientRewardStorage.REWARD_STORAGE.getRewards().get(entityIn.getUUID()).getEnabled().get(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "aura")));
         float f = (float) entityIn.tickCount + partialTicks;
         EntityModel<AbstractClientPlayer> entitymodel = this.getParentModel();
         entitymodel.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTicks);
@@ -51,7 +51,7 @@ public class AuraRender extends RenderLayer<AbstractClientPlayer, PlayerModel<Ab
                 //.setTransparencyState(new RenderStateShard.TransparencyStateShard(0.003921569F))
                 .createCompositeState(true);
         entitymodel.setupAnim(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        entitymodel.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.create("portality_aura", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, rendertype$state)), 100, 100, 0.5F, 0.5F, 0.5F, 0.5F);
+        entitymodel.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.create("portality_aura", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, rendertype$state)), 100, 100, 0x80FFFFFF);
     }
 
 }

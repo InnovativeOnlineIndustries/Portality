@@ -27,7 +27,9 @@ import com.buuz135.portality.proxy.client.IPortalColor;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.ActiveTile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> implements IPortalColor {
@@ -35,14 +37,14 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     private BlockPos controllerPos;
     private int color;
 
-    public FrameTile(BasicTileBlock<T> base, BlockPos pos, BlockState state) {
-        super(base, pos, state);
+    public FrameTile(BasicTileBlock<T> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+        super(base, blockEntityType, pos, state);
         this.color = Integer.parseInt("0094ff", 16); //Default Blue
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        super.saveAdditional(compoundTag, provider);
         if (controllerPos != null) {
             compoundTag.putInt("X", controllerPos.getX());
             compoundTag.putInt("Y", controllerPos.getY());
@@ -52,8 +54,8 @@ public abstract class FrameTile<T extends FrameTile<T>> extends ActiveTile<T> im
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         if (compound.contains("X")) {
             controllerPos = new BlockPos(compound.getInt("X"), compound.getInt("Y"), compound.getInt("Z"));
         }

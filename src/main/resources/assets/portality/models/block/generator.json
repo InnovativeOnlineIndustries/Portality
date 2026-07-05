@@ -1,12 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "particle": "portality:blocks/generator_top",
-    "north": "portality:blocks/generator_side",
-    "west": "portality:blocks/generator_side",
-    "east": "portality:blocks/generator_side",
-    "south": "portality:blocks/generator_front_on",
-    "up": "portality:blocks/generator_top",
-    "down": "portality:blocks/generator_top"
+    "particle": "portality:block/generator_top",
+    "north": "portality:block/generator_side",
+    "west": "portality:block/generator_side",
+    "east": "portality:block/generator_side",
+    "south": "portality:block/generator_front_on",
+    "up": "portality:block/generator_top",
+    "down": "portality:block/generator_top"
   }
 }

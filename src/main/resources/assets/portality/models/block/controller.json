@@ -1,13 +1,13 @@
 {
   "parent": "portality:block/util_cube_glow_3_north",
   "textures": {
-    "all": "portality:blocks/base/base_all",
-    "glow_up": "portality:blocks/frame/frame_overlay",
-    "glow_down": "portality:blocks/frame/frame_overlay",
-    "glow_east": "portality:blocks/frame/frame_overlay",
-    "glow_south": "portality:blocks/frame/frame_overlay",
-    "glow_west": "portality:blocks/frame/frame_overlay",
-    "glow_north": "portality:blocks/controller/screen",
-    "glow_north_below": "portality:blocks/frame/frame_overlay"
+    "all": "portality:block/base/base_all",
+    "glow_up": "portality:block/frame/frame_overlay",
+    "glow_down": "portality:block/frame/frame_overlay",
+    "glow_east": "portality:block/frame/frame_overlay",
+    "glow_south": "portality:block/frame/frame_overlay",
+    "glow_west": "portality:block/frame/frame_overlay",
+    "glow_north": "portality:block/controller/screen",
+    "glow_north_below": "portality:block/frame/frame_overlay"
   }
 }

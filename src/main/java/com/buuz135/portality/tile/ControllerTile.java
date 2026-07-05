@@ -51,10 +51,11 @@ import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -63,8 +64,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -100,7 +102,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     private StructureHandler structureHandler;
 
     public ControllerTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<ControllerTile>) CommonProxy.BLOCK_CONTROLLER.get(), pos, state);
+        super((BasicTileBlock<ControllerTile>) CommonProxy.BLOCK_CONTROLLER.block().get(), CommonProxy.BLOCK_CONTROLLER.type().get(), pos, state);
         this.teleportationTokens = new LinkedHashMap<>();
         this.isFormed = false;
         this.onceCall = false;
@@ -241,8 +243,8 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
         compound.putBoolean(NBT_FORMED, isFormed);
         compound.putInt(NBT_LENGTH, structureHandler.getLength());
         compound.putInt(NBT_WIDTH, structureHandler.getWidth());
@@ -260,7 +262,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     @Override
-    public void load(CompoundTag compound) {
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
         isFormed = compound.getBoolean(NBT_FORMED);
         structureHandler.setLength(compound.getInt(NBT_LENGTH));
         structureHandler.setWidth(compound.getInt(NBT_WIDTH));
@@ -280,7 +282,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                 this.teleportationTokens.put(s, tokens.getCompound(s));
             }
         }
-        super.load(compound);
+        super.loadAdditional(compound, provider);
     }
 
     public void breakController() {
@@ -306,10 +308,9 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
         Direction facing = level.getBlockState(this.worldPosition).getValue(ControllerBlock.FACING_HORIZONTAL);
         BlockPos corner1 = this.worldPosition.relative(facing.getClockWise(), structureHandler.getWidth()).relative(Direction.UP);
         BlockPos corner2 = this.worldPosition.relative(facing.getCounterClockWise(), structureHandler.getWidth()).relative(Direction.UP, structureHandler.getHeight() - 1).relative(facing.getOpposite(), structureHandler.getLength() - 1);
-        return new AABB(corner1, corner2);
+        return new AABB(Vec3.atLowerCornerOf(corner1), Vec3.atLowerCornerOf(corner2));
     }
 
-    @Override
     public AABB getRenderBoundingBox() {
         return getPortalArea();
     }
@@ -480,12 +481,12 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
+    public ItemInteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ItemInteractionResult.SUCCESS) {
             Minecraft.getInstance().submitAsync(() -> OpenGui.open(0, this));
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
@@ -514,7 +515,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
     }
 
     public boolean addTeleportationToken(ItemStack stack){
-        this.teleportationTokens.put(stack.getHoverName().getString(), stack.getTag());
+        this.teleportationTokens.put(stack.getHoverName().getString(), com.buuz135.portality.item.TeleportationTokenItem.getTokenData(stack));
         markForUpdate();
         return true;
     }

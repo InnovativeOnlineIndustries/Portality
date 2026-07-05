@@ -25,15 +25,14 @@ package com.buuz135.portality.block.module;
 
 import com.buuz135.portality.tile.EnergyModuleTile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class CapabilityEnergyModuleBlock extends CapabilityModuleBlock<IEnergyStorage, EnergyModuleTile> {
@@ -43,24 +42,26 @@ public class CapabilityEnergyModuleBlock extends CapabilityModuleBlock<IEnergySt
     }
 
     @Override
-    public Capability<IEnergyStorage> getCapability() {
-        return CapabilityEnergy.ENERGY;
+    public BlockCapability<IEnergyStorage, Direction> getCapability() {
+        return Capabilities.EnergyStorage.BLOCK;
     }
 
     @Override
     void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getBlockEntity(myself).getCapability(getCapability()).ifPresent(storage -> {
+        IEnergyStorage storage = current.getCapability(getCapability(), myself, null);
+        if (storage != null) {
                 for (BlockPos pos : compatibleBlockPos) {
                     BlockEntity entity = otherWorld.getBlockEntity(pos);
                     if (entity != null) {
-                        entity.getCapability(getCapability()).ifPresent(otherStorage -> {
+                        IEnergyStorage otherStorage = otherWorld.getCapability(getCapability(), pos, null);
+                        if (otherStorage != null) {
                             int energy = otherStorage.receiveEnergy(Math.min(storage.getEnergyStored(), 5000), false);
                             storage.extractEnergy(energy, false);
                             if (energy > 0) return;
-                        });
+                        }
                     }
                 }
-            });
+        }
     }
 
     @Override

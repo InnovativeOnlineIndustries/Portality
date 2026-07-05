@@ -7,13 +7,11 @@ import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.color.ColorPickerAddon;
-import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ public class ChangeColorScreen extends ScreenAddonScreen {
     @Override
     public void init() {
         super.init();
-        textField = new EditBox(Minecraft.getInstance().font, this.x + 14, this.y + 120, 80, 16, new TextComponent(""));
+        textField = new EditBox(Minecraft.getInstance().font, this.x + 14, this.y + 120, 80, 16, Component.literal(""));
         //textField.setFocused2(true);
         textField.setVisible(true);
         textField.setBordered(true);
@@ -64,25 +62,23 @@ public class ChangeColorScreen extends ScreenAddonScreen {
     }
 
     @Override
-    public void renderBackground(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-        renderBackground(stack);
-        RenderSystem.setShaderTexture(0, new ResourceLocation(Portality.MOD_ID, "textures/gui/color_change.png"));
-        Minecraft.getInstance().screen.blit(stack, x, y, 0, 0, 175, 146);
-        GuiComponent.fill(stack, x + 13, y + 9, x + 15 + 100, y + 91, -16739073);
-        GuiComponent.fill(stack, x + 123, y + 9, x + 121 + 40, y + 91, -16739073);
-        GuiComponent.fill(stack, x + 13, y + 99, x + 13 + 148, y + 109, -16739073);
-        super.renderBackground(stack, mouseX, mouseY, partialTicks);
-        textField.renderButton(stack, mouseX, mouseY, partialTicks);
-        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y - 1, -16739073);
-        AssetUtil.drawHorizontalLine(stack, textField.x - 1, textField.x + textField.getWidth(), textField.y + textField.getHeight(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x - 1, textField.y - 1, textField.y + textField.getHeight(), -16739073);
-        AssetUtil.drawVerticalLine(stack, textField.x + textField.getWidth(), textField.y - 1, textField.y + textField.getHeight(), -16739073);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/color_change.png"));
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/color_change.png"), x, y, 0, 0, 175, 146, 256, 256);
+        graphics.fill(x + 13, y + 9, x + 15 + 100, y + 91, -16739073);
+        graphics.fill(x + 123, y + 9, x + 121 + 40, y + 91, -16739073);
+        graphics.fill(x + 13, y + 99, x + 13 + 148, y + 109, -16739073);
+        super.renderBackground(graphics, mouseX, mouseY, partialTicks);
+        textField.render(graphics, mouseX, mouseY, partialTicks);
+        graphics.hLine(textField.getX() - 1, textField.getX() + textField.getWidth(), textField.getY() - 1, -16739073);
+        graphics.hLine(textField.getX() - 1, textField.getX() + textField.getWidth(), textField.getY() + textField.getHeight(), -16739073);
+        graphics.vLine(textField.getX() - 1, textField.getY() - 1, textField.getY() + textField.getHeight(), -16739073);
+        graphics.vLine(textField.getX() + textField.getWidth(), textField.getY() - 1, textField.getY() + textField.getHeight(), -16739073);
     }
 
     @Override
     public void tick() {
         super.tick();
-        textField.tick();
     }
 
     @Override

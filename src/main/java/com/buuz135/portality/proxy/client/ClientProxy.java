@@ -26,36 +26,27 @@ package com.buuz135.portality.proxy.client;
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.proxy.client.render.AuraRender;
 import com.buuz135.portality.proxy.client.render.TESRPortal;
-import com.hrznstudio.titanium.TitaniumClient;
-import com.hrznstudio.titanium.block.BasicTileBlock;
+import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.event.handler.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 public class ClientProxy extends CommonProxy {
 
     public ClientProxy() {
         EventManager.mod(EntityRenderersEvent.RegisterRenderers.class).process(registerRenderers -> {
-            System.out.println(((BasicTileBlock)CommonProxy.BLOCK_CONTROLLER.get()).getTileEntityType());
-            registerRenderers.registerBlockEntityRenderer(((BasicTileBlock)CommonProxy.BLOCK_CONTROLLER.get()).getTileEntityType(), TESRPortal::new);
+            BlockEntityType<ControllerTile> controllerType = (BlockEntityType<ControllerTile>) (BlockEntityType) CommonProxy.BLOCK_CONTROLLER.type().get();
+            registerRenderers.registerBlockEntityRenderer(controllerType, TESRPortal::new);
         }).subscribe();
         EventManager.mod(EntityRenderersEvent.AddLayers.class).process(registerRenderers -> {
-            for (String skin : registerRenderers.getSkins()) {
+            for (var skin : registerRenderers.getSkins()) {
                 PlayerRenderer renderer = registerRenderers.getSkin(skin);
                 renderer.addLayer(new AuraRender(renderer));
-            }
-        }).subscribe();
-        EventManager.mod(TextureStitchEvent.Pre.class).process(pre -> {
-            if (pre.getAtlas().equals(InventoryMenu.BLOCK_ATLAS)){
-                pre.addSprite(TESRPortal.TEXTURE);
             }
         }).subscribe();
     }
@@ -63,12 +54,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void onClient(Minecraft instance) {
         super.onClient(instance);
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CONTROLLER.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_FRAME.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CONTROLLER.block().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_FRAME.block().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.block().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.block().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.block().get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.block().get(), RenderType.cutout());
         Minecraft.getInstance().getBlockColors().register((state, world, pos, index) -> {
             if (index == 0 && world != null) {
                 BlockEntity tileEntity = world.getBlockEntity(pos);
@@ -77,6 +68,6 @@ public class ClientProxy extends CommonProxy {
                 }
             }
             return -16739073;
-        }, CommonProxy.BLOCK_FRAME.get(), CommonProxy.BLOCK_CONTROLLER.get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.get());
+        }, CommonProxy.BLOCK_FRAME.block().get(), CommonProxy.BLOCK_CONTROLLER.block().get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.block().get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.block().get());
     }
 }

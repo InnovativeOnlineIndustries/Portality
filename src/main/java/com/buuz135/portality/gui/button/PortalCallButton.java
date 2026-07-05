@@ -28,19 +28,19 @@ import com.buuz135.portality.data.PortalLinkData;
 import com.buuz135.portality.gui.PortalsScreen;
 import com.buuz135.portality.network.PortalLinkMessage;
 import com.buuz135.portality.tile.ControllerTile;
-import com.hrznstudio.titanium.client.screen.ITileContainer;
 import com.hrznstudio.titanium.client.screen.ScreenAddonScreen;
 import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
 public class PortalCallButton extends BasicScreenAddon {
 
@@ -60,9 +60,9 @@ public class PortalCallButton extends BasicScreenAddon {
     }
 
     @Override
-    public void drawBackgroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
-        RenderSystem.setShaderTexture(0, new ResourceLocation(Portality.MOD_ID, "textures/gui/portals.png"));
-        screen.blit(stack, this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize());
+    public void drawBackgroundLayer(GuiGraphics graphics, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
+        RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png"));
+        graphics.blit(ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/portals.png"), this.getPosX(), this.getPosY(), 0, 187, this.getXSize(), this.getYSize(), 256, 256);
         this.guiX = guiX;
         this.guiY = guiY;
     }
@@ -83,8 +83,8 @@ public class PortalCallButton extends BasicScreenAddon {
     }
 
     @Override
-    public void drawForegroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partial) {
-        screen.drawCenteredString(stack, Minecraft.getInstance().font, new TranslatableComponent(action.getName()).getString(), this.getPosX() + 25, this.getPosY() + 7, isMouseOver(mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
+    public void drawForegroundLayer(GuiGraphics graphics, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partial) {
+        graphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable(action.getName()).getString(), this.getPosX() + 25, this.getPosY() + 7, isMouseOver(mouseX - guiX, mouseY - guiY) ? 16777120 : 0xFFFFFFFF);
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
@@ -95,8 +95,8 @@ public class PortalCallButton extends BasicScreenAddon {
             if (screen instanceof ScreenAddonScreen) {
                 if (!isMouseOver(mouseX - ((ScreenAddonScreen) screen).x, mouseY - ((ScreenAddonScreen) screen).y))
                     return false;
-                Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.PLAYERS, 0.2f, 1f, Minecraft.getInstance().player.blockPosition()));
-                Portality.NETWORK.get().sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getLevel().dimension(), controller.getBlockPos(), true, guiPortals.getSelectedPortal().getName(),guiPortals.getSelectedPortal().isToken()), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false,guiPortals.getSelectedPortal().getName(), guiPortals.getSelectedPortal().isToken())));
+                Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.PLAYERS, 0.2f, 1f, RandomSource.create(), Minecraft.getInstance().player.blockPosition()));
+                Portality.NETWORK.sendToServer(new PortalLinkMessage(action.getId(), new PortalLinkData(controller.getLevel().dimension(), controller.getBlockPos(), true, guiPortals.getSelectedPortal().getName(), guiPortals.getSelectedPortal().isToken()), new PortalLinkData(guiPortals.getSelectedPortal().getDimension(), guiPortals.getSelectedPortal().getLocation(), false, guiPortals.getSelectedPortal().getName(), guiPortals.getSelectedPortal().isToken())));
                 Minecraft.getInstance().setScreen(null);
                 return true;
             }

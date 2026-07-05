@@ -27,16 +27,14 @@ import com.buuz135.portality.tile.ItemModuleTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandler, ItemModuleTile> {
@@ -46,17 +44,19 @@ public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandle
     }
 
     @Override
-    public Capability<IItemHandler> getCapability() {
-        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+    public BlockCapability<IItemHandler, Direction> getCapability() {
+        return Capabilities.ItemHandler.BLOCK;
     }
 
     @Override
     void internalWork(Level current, BlockPos myself, Level otherWorld, List<BlockPos> compatibleBlockPos) {
-        current.getBlockEntity(myself).getCapability(this.getCapability(), Direction.UP).ifPresent(handlerSelf -> {
+        IItemHandler handlerSelf = current.getCapability(this.getCapability(), myself, Direction.UP);
+        if (handlerSelf != null) {
             for (BlockPos otherPos : compatibleBlockPos) {
                 BlockEntity otherTile = otherWorld.getBlockEntity(otherPos);
                 if (otherTile != null) {
-                    otherTile.getCapability(this.getCapability(), Direction.UP).ifPresent(handlerOther -> {
+                    IItemHandler handlerOther = otherWorld.getCapability(this.getCapability(), otherPos, Direction.UP);
+                    if (handlerOther != null) {
                         for (int i = 0; i < handlerSelf.getSlots(); i++) {
                             ItemStack stack = handlerSelf.getStackInSlot(i);
                             if (stack.isEmpty()) continue;
@@ -66,10 +66,10 @@ public class CapabilityItemModuleBlock extends CapabilityModuleBlock<IItemHandle
                                 return;
                             }
                         }
-                    });
+                    }
                 }
             }
-        });
+        }
     }
 
     @Override

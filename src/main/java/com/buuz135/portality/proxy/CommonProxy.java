@@ -23,39 +23,31 @@
  */
 package com.buuz135.portality.proxy;
 
-import com.buuz135.portality.block.ControllerBlock;
-import com.buuz135.portality.block.FrameBlock;
-import com.buuz135.portality.block.GeneratorBlock;
-import com.buuz135.portality.block.InterdimensionalModuleBlock;
-import com.buuz135.portality.block.module.CapabilityEnergyModuleBlock;
-import com.buuz135.portality.block.module.CapabilityFluidModuleBlock;
-import com.buuz135.portality.block.module.CapabilityItemModuleBlock;
-import com.buuz135.portality.item.TeleportationTokenItem;
-import com.buuz135.portality.tile.BasicFrameTile;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.event.handler.EventManager;
+import com.hrznstudio.titanium.module.BlockWithTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 
 public class CommonProxy {
 
-    public static RegistryObject<Block> BLOCK_CONTROLLER;
-    public static RegistryObject<Block> BLOCK_FRAME;
-    public static RegistryObject<Block> BLOCK_GENERATOR;
+    public static BlockWithTile BLOCK_CONTROLLER;
+    public static BlockWithTile BLOCK_FRAME;
+    public static BlockWithTile BLOCK_GENERATOR;
 
-    public static RegistryObject<Block> BLOCK_INTERDIMENSIONAL_MODULE;
-    public static RegistryObject<Block> BLOCK_CAPABILITY_ITEM_MODULE;
-    public static RegistryObject<Block> BLOCK_CAPABILITY_FLUID_MODULE;
-    public static RegistryObject<Block> BLOCK_CAPABILITY_ENERGY_MODULE;
+    public static BlockWithTile BLOCK_INTERDIMENSIONAL_MODULE;
+    public static BlockWithTile BLOCK_CAPABILITY_ITEM_MODULE;
+    public static BlockWithTile BLOCK_CAPABILITY_FLUID_MODULE;
+    public static BlockWithTile BLOCK_CAPABILITY_ENERGY_MODULE;
 
-    public static RegistryObject<Item> TELEPORTATION_TOKEN_ITEM;
+    public static DeferredHolder<Item, Item> TELEPORTATION_TOKEN_ITEM;
 
     public void onCommon() {
         EventManager.forge(PlayerInteractEvent.RightClickBlock.class).process(this::onInteract).subscribe();
@@ -67,10 +59,10 @@ public class CommonProxy {
     }
 
     public void onInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getPlayer().isCrouching() && event.getPlayer().level.getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER)) {
-            ControllerTile controller = (ControllerTile) event.getWorld().getBlockEntity(event.getPos());
-            if (!controller.getDisplay().sameItem(event.getItemStack())) {
-                event.setUseBlock(Event.Result.ALLOW);
+        if (event.getEntity().isCrouching() && event.getLevel().getBlockState(event.getPos()).getBlock().equals(BLOCK_CONTROLLER.block().get())) {
+            ControllerTile controller = (ControllerTile) event.getLevel().getBlockEntity(event.getPos());
+            if (!ItemStack.isSameItemSameComponents(controller.getDisplay(), event.getItemStack())) {
+                event.setUseBlock(TriState.TRUE);
             }
         }
     }

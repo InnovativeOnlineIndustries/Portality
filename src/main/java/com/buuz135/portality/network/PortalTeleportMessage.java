@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class PortalTeleportMessage extends Message {
 
@@ -47,9 +47,9 @@ public class PortalTeleportMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
+    protected void handleMessage(IPayloadContext context) {
         Minecraft.getInstance().submitAsync(() -> {
-            //Minecraft.getMinecraft().player.playSound(new SoundEvent(new ResourceLocation("entity.shulker.teleport")), 1, 1);
+            //Minecraft.getMinecraft().player.playSound(new SoundEvent(ResourceLocation.fromNamespaceAndPath("entity.shulker.teleport")), 1, 1);
             Minecraft.getInstance().player.playSound(PortalitySoundHandler.PORTAL_TP.get(), 0.1f, 1f);
             if (PortalityConfig.LAUNCH_PLAYERS) {
                 Direction facing = Direction.values()[this.facing];

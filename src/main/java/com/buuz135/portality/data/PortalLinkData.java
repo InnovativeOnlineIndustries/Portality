@@ -24,7 +24,7 @@
 package com.buuz135.portality.data;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -47,7 +47,7 @@ public class PortalLinkData {
     }
 
     public static PortalLinkData readFromNBT(CompoundTag compound) {
-        return new PortalLinkData(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("Dimension"))), BlockPos.of(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"), compound.getBoolean("Token"));
+        return new PortalLinkData(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getString("Dimension"))), BlockPos.of(compound.getLong("Position")), compound.getBoolean("Caller"), compound.getString("Name"), compound.getBoolean("Token"));
     }
 
     public ResourceKey<Level> getDimension() {

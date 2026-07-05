@@ -34,7 +34,7 @@ import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
@@ -48,7 +48,7 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
     private SidedInventoryComponent<LowEfficiencyGeneratorTile> fuel;
 
     public LowEfficiencyGeneratorTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<LowEfficiencyGeneratorTile>) CommonProxy.BLOCK_GENERATOR.get(), pos, state);
+        super((BasicTileBlock<LowEfficiencyGeneratorTile>) CommonProxy.BLOCK_GENERATOR.block().get(), CommonProxy.BLOCK_GENERATOR.type().get(), pos, state);
         this.addInventory(fuel = (SidedInventoryComponent<LowEfficiencyGeneratorTile>) new SidedInventoryComponent<LowEfficiencyGeneratorTile>("fuel", 46, 22, 1, 0)
                 .setColor(DyeColor.ORANGE)
                 .setColorGuiEnabled(false)
@@ -58,12 +58,12 @@ public class LowEfficiencyGeneratorTile extends GeneratorTile<LowEfficiencyGener
     }
 
     @Override
-    public InteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != InteractionResult.SUCCESS) {
+    public ItemInteractionResult onActivated(Player playerIn, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
+        if (super.onActivated(playerIn, hand, facing, hitX, hitY, hitZ) != ItemInteractionResult.SUCCESS) {
             openGui(playerIn);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

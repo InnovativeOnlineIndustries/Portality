@@ -39,7 +39,7 @@ import java.awt.*;
 public class PortalityAssetProvider implements IAssetProvider {
 
     public static PortalityAssetProvider PROVIDER = new PortalityAssetProvider();
-    private static ResourceLocation LOCATION = new ResourceLocation(Portality.MOD_ID, "textures/gui/controller.png");
+    private static ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/controller.png");
 
     private final IBackgroundAsset BACKGROUND = new IBackgroundAsset() {
         @Override
@@ -171,7 +171,7 @@ public class PortalityAssetProvider implements IAssetProvider {
 
         @Override
         public ResourceLocation getResourceLocation() {
-            return new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+            return ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/background.png");
         }
     };
     private final IAsset SHADER_PICKER = new IAsset() {
@@ -182,7 +182,7 @@ public class PortalityAssetProvider implements IAssetProvider {
 
         @Override
         public ResourceLocation getResourceLocation() {
-            return new ResourceLocation(Portality.MOD_ID, "textures/gui/background.png");
+            return ResourceLocation.fromNamespaceAndPath(Portality.MOD_ID, "textures/gui/background.png");
         }
     };
 

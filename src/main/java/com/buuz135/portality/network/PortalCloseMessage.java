@@ -26,12 +26,12 @@ package com.buuz135.portality.network;
 import com.buuz135.portality.tile.ControllerTile;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class PortalCloseMessage extends Message {
 
@@ -47,8 +47,8 @@ public class PortalCloseMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        Level world = context.getSender().level.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, dimension));
+    protected void handleMessage(IPayloadContext context) {
+        Level world = context.player().level().getServer().getLevel(ResourceKey.create(Registries.DIMENSION, dimension));
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof ControllerTile) {
             ((ControllerTile) tileEntity).closeLink();

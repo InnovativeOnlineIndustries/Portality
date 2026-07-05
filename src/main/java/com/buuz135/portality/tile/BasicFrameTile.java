@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class BasicFrameTile extends FrameTile<BasicFrameTile> {
 
     public BasicFrameTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<BasicFrameTile>) CommonProxy.BLOCK_FRAME.get(), pos, state);
+        super((BasicTileBlock<BasicFrameTile>) CommonProxy.BLOCK_FRAME.block().get(), CommonProxy.BLOCK_FRAME.type().get(), pos, state);
     }
 
     @Nonnull

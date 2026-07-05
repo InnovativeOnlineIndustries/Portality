@@ -28,7 +28,7 @@ import com.buuz135.portality.block.FrameBlock;
 import com.buuz135.portality.tile.ControllerTile;
 import com.buuz135.portality.tile.FrameTile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -37,8 +37,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -72,7 +71,7 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
         return RotationType.FOUR_WAY;
     }
 
-    public abstract Capability<T> getCapability();
+    public abstract BlockCapability<T, Direction> getCapability();
 
     public boolean isInput(BlockState state) {
         return state.getValue(INPUT);
@@ -91,7 +90,6 @@ public abstract class CapabilityModuleBlock<T, S extends FrameTile<S>> extends F
         builder.add(INPUT);
     }
 
-    @Override
     public ItemStack getCloneItemStack(BlockGetter p_49823_, BlockPos p_49824_, BlockState p_49825_) {
         return new ItemStack(this, 1);
     }
