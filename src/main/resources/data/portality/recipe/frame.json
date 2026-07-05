@@ -1,21 +1,22 @@
 
 {
-  "result": {
-    "item": "portality:frame"
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "f": {
+      "item": "minecraft:stone"
+    },
+    "d": {
+      "item": "minecraft:quartz"
+    }
   },
   "pattern": [
     "fdf",
     "d d",
     "fdf"
   ],
-  "type": "minecraft:crafting_shaped",
-  "key": {
-    "f": {
-      "item": "minecraft:stone",
-      "data": 0
-    },
-    "d": {
-      "item": "minecraft:quartz"
-    }
+  "result": {
+    "count": 1,
+    "id": "portality:frame"
   }
 }

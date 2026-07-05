@@ -1,13 +1,6 @@
 {
-  "result": {
-    "item": "portality:module_interdimensional"
-  },
-  "pattern": [
-    "fdf",
-    "dqd",
-    "fdf"
-  ],
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "f": {
       "item": "portality:frame"
@@ -16,8 +9,16 @@
       "item": "minecraft:ender_eye"
     },
     "q": {
-      "item": "minecraft:quartz_block",
-      "data": 0
+      "item": "minecraft:quartz_block"
     }
+  },
+  "pattern": [
+    "fdf",
+    "dqd",
+    "fdf"
+  ],
+  "result": {
+    "count": 1,
+    "id": "portality:module_interdimensional"
   }
 }

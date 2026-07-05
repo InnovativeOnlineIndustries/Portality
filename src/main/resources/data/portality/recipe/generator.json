@@ -1,13 +1,6 @@
 {
-  "result": {
-    "item": "portality:generator"
-  },
-  "pattern": [
-    "fff",
-    "fqf",
-    "fdf"
-  ],
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "f": {
       "item": "portality:frame"
@@ -18,5 +11,14 @@
     "q": {
       "item": "minecraft:blast_furnace"
     }
+  },
+  "pattern": [
+    "fff",
+    "fqf",
+    "fdf"
+  ],
+  "result": {
+    "count": 1,
+    "id": "portality:generator"
   }
 }

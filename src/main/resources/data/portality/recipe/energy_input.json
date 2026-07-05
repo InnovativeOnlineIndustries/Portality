@@ -1,14 +1,7 @@
 
 {
-  "result": {
-    "item": "portality:module_energy"
-  },
-  "pattern": [
-    "f f",
-    " q ",
-    "f f"
-  ],
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "f": {
       "item": "portality:frame"
@@ -16,5 +9,14 @@
     "q": {
       "item": "minecraft:redstone_block"
     }
+  },
+  "pattern": [
+    "f f",
+    " q ",
+    "f f"
+  ],
+  "result": {
+    "count": 1,
+    "id": "portality:module_energy"
   }
 }
