@@ -66,9 +66,4 @@ public class PortalityConfig {
     @ConfigVal.InRangeInt(min = 1)
     public static int POWER_PORTAL_TICK = 1;
 
-    @ConfigVal(comment = "Max distance multiplier that a portal can be linked, based on length. PortalLength*ThisValue")
-    @ConfigVal.InRangeInt(min = 1)
-    public static int DISTANCE_MULTIPLIER = 200;
-
-
 }

@@ -25,7 +25,6 @@
   "portality.display.change_color": "改变传送门颜色",
   "portality.gui.controller": "名称：",
   "portality.gui.controller.private": "私有：",
-  "portality.gui.controller.max_distance": "最大距离：",
   "portality.gui.controller.interdimensional": "多维度交互：",
   "portality.gui.controller.power": "能量：",
   "portality.gui.controller.link": "链接：",

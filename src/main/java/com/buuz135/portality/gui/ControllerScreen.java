@@ -25,7 +25,6 @@ package com.buuz135.portality.gui;
 
 import com.buuz135.portality.proxy.CommonProxy;
 import com.buuz135.portality.tile.ControllerTile;
-import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.AssetTypes;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
@@ -69,10 +68,9 @@ public class ControllerScreen extends ScreenAddonScreen implements ITileContaine
         graphics.drawString(fontRenderer, ChatFormatting.DARK_AQUA + name, this.x + background.getArea().width / 2 - fontRenderer.width(name) / 2, this.y + 3, 0x000000, true);
         graphics.drawString(fontRenderer, I18n.get("portality.gui.controller") + " " + controller.getPortalDisplayName().substring(0, Math.min(controller.getPortalDisplayName().length(), 26)), this.x + 10, this.y + 21, 0xFFFFFF, true);
         graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.private") + " " + controller.isPrivate(), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1), 0xFFFFFF, true);
-        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.max_distance") + " " + BlockPosUtils.getMaxDistance(controller.getLength()), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 2, 0xFFFFFF, true);
-        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 3, 0xFFFFFF, true);
-        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.power") + " " + new DecimalFormat().format(controller.getEnergyStorage().getEnergyStored()) + " FE", this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 4, 0xFFFFFF, true);
-        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.link") + " " + (controller.isActive() ? I18n.get("portality.gui.controller.link_active") : I18n.get("portality.gui.controller.link_missing")), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 5, 0xFFFFFF, true);
+        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.interdimensional") + " " + controller.isInterdimensional(), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 2, 0xFFFFFF, true);
+        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.power") + " " + new DecimalFormat().format(controller.getEnergyStorage().getEnergyStored()) + " FE", this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 3, 0xFFFFFF, true);
+        graphics.drawString(fontRenderer, I18n.get("portality.gui.controller.link") + " " + (controller.isActive() ? I18n.get("portality.gui.controller.link_active") : I18n.get("portality.gui.controller.link_missing")), this.x + 10, this.y + 21 + (fontRenderer.lineHeight + 1) * 4, 0xFFFFFF, true);
         super.renderForeground(graphics, mouseX, mouseY, partialTicks);
     }
 

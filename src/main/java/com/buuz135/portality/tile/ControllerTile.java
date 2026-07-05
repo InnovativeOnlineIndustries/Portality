@@ -43,7 +43,6 @@ import com.buuz135.portality.proxy.PortalityConfig;
 import com.buuz135.portality.proxy.PortalitySoundHandler;
 import com.buuz135.portality.proxy.client.IPortalColor;
 import com.buuz135.portality.proxy.client.TickeableSound;
-import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.StateButtonInfo;
@@ -131,7 +130,7 @@ public class ControllerTile extends PoweredTile<ControllerTile> implements IPort
                     OpenGui.open(2, ControllerTile.this);
                 })
                 .setId(4)
-                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayer) playerEntity, isInterdimensional(), getBlockPos(), BlockPosUtils.getMaxDistance(this.getLength()), this.teleportationTokens))
+                .setPredicate((playerEntity, compoundNBT) -> PortalNetworkMessage.sendInformationToPlayer((ServerPlayer) playerEntity, isInterdimensional(), getBlockPos(), this.teleportationTokens))
         );
 
         this.addButton(new PortalSettingButton(-22, 12 + 22, () -> () -> {

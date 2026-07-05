@@ -25,7 +25,6 @@ portality.display.hide_name=Hide Name Display
 portality.display.show_name=Show Name Display
 portality.gui.controller.name=Name:
 portality.gui.controller.private=Private:
-portality.gui.controller.max_distance=Max Distance:
 portality.gui.controller.interdimensional=Interdimensional:
 portality.gui.controller.power=Power:
 portality.gui.controller.link=Link:

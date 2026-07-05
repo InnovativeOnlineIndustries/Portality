@@ -29,7 +29,6 @@ import com.buuz135.portality.data.PortalInformation;
 import com.buuz135.portality.data.TokenPortalInformation;
 import com.buuz135.portality.gui.PortalsScreen;
 import com.buuz135.portality.tile.ControllerTile;
-import com.buuz135.portality.util.BlockPosUtils;
 import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -39,8 +38,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -49,7 +46,7 @@ import java.util.List;
 
 public class PortalNetworkMessage {
 
-    public static void sendInformationToPlayer(ServerPlayer playerEntity, boolean interdimensional, BlockPos pos, int distance, HashMap<String, CompoundTag> tokens) {
+    public static void sendInformationToPlayer(ServerPlayer playerEntity, boolean interdimensional, BlockPos pos, HashMap<String, CompoundTag> tokens) {
         List<PortalInformation> infos = new ArrayList<>();
         tokens.forEach((s, compoundNBT) -> {
             infos.add(new TokenPortalInformation(playerEntity.getUUID(),
@@ -65,11 +62,6 @@ public class PortalNetworkMessage {
         });
         infos.removeIf(information -> !interdimensional && !playerEntity.level().dimension().equals(information.getDimension()));
         infos.removeIf(information -> interdimensional && !playerEntity.level().dimension().equals(information.getDimension()) && !information.isInterdimensional());
-        infos.removeIf(information -> {
-            Level world = playerEntity.getCommandSenderWorld().getServer().getLevel(information.getDimension());
-            BlockEntity entity = world.getBlockEntity(information.getLocation());
-            return entity instanceof ControllerTile && !interdimensional && (!playerEntity.level().dimension().equals(information.getDimension()) || (!information.getLocation().closerThan(pos, distance) || !information.getLocation().closerThan(pos, BlockPosUtils.getMaxDistance(((ControllerTile) entity).getLength()))));
-        });
         Portality.NETWORK.sendTo(new Response(infos), playerEntity);
     }
 
