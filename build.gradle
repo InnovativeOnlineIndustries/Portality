@@ -61,7 +61,7 @@ repositories {
 
 dependencies {
     implementation "com.hrznstudio:titanium:${project.titanium_version}"
-    implementation "curse.maven:athena-841890:8061947"
+    implementation "curse.maven:ctm-267602:5587515"
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -77,7 +77,8 @@ tasks.withType(ProcessResources).configureEach {
             mod_version            : mod_version,
             mod_authors            : mod_authors,
             mod_description        : mod_description,
-            titanium_version_range : titanium_version_range
+            titanium_version_range: titanium_version_range,
+            ctm_version_range     : ctm_version_range
     ]
     inputs.properties replaceProperties
 

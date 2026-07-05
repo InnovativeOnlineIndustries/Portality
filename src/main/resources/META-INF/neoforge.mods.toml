@@ -29,3 +29,10 @@ type = "required"
 versionRange = "${titanium_version_range}"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "ctm"
+type = "required"
+versionRange = "${ctm_version_range}"
+ordering = "AFTER"
+side = "BOTH"

@@ -4,7 +4,7 @@
      "type": "ctm",
      "layer": "SOLID",
      "textures": [
-         "portality:blocks/base/base_all_ctm"
+       "portality:block/base/base_all_ctm"
      ],
      "extra": {
        "light": 0,
