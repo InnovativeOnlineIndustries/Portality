@@ -69,5 +69,11 @@ public class ClientProxy extends CommonProxy {
             }
             return -16739073;
         }, CommonProxy.BLOCK_FRAME.block().get(), CommonProxy.BLOCK_CONTROLLER.block().get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.block().get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.block().get());
+        Minecraft.getInstance().getItemColors().register((stack, index) -> {
+            if (index == 0) {
+                return -16739073;
+            }
+            return -16739073;
+        }, CommonProxy.BLOCK_FRAME.block().get(), CommonProxy.BLOCK_CONTROLLER.block().get(), CommonProxy.BLOCK_CAPABILITY_ENERGY_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_FLUID_MODULE.block().get(), CommonProxy.BLOCK_CAPABILITY_ITEM_MODULE.block().get(), CommonProxy.BLOCK_INTERDIMENSIONAL_MODULE.block().get());
     }
 }
