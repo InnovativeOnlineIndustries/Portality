@@ -1,40 +1,54 @@
-name: Publish action
+name: Publish
 
 on:
-  create:
-    tag:
+  push:
+    tags:
       - '*'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v2
-      - name: validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: setup jdk 17
-        uses: actions/setup-java@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
         with:
-          java-version: "17"
-      - name: make gradle wrapper executable
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: Publish Minecraft Mods Forge
-        uses: Kir-Antipov/mc-publish@v2.1
+
+      - name: Build
+        run: ./gradlew build --console=plain --no-daemon
+
+      - name: Publish to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: 291493
+          modrint-id: EXgHWI1S
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files-primary: build/libs/!(*-@(dev|sources|deobf)).jar
-          files-secondary: build/libs/*-@(dev|sources|deobf).jar
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: |
+            build/libs/!(*-@(dev|sources|deobf|javadoc)).jar
+            build/libs/*-sources.jar
           version-type: beta
-          loaders: forge
-          game-versions: 1.18.1
-          java: 17
+          loaders: neoforge
+          game-versions: 1.21.1
+          java: 21
           name: ""
-          changelog: "https://github.com/InnovativeOnlineIndustries/Portality/commits/1.18"
-          dependencies: |
-            titanium | depends
+          changelog: https://github.com/InnovativeOnlineIndustries/Portality/commits/1.21
+          curseforge-dependencies: |
+            titanium(required)
+            ctm(required)
